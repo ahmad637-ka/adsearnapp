@@ -444,16 +444,19 @@
     <div class="hero-btns">
       <a href="#download" class="btn-primary">📥 APK Download Karo</a>
       <a href="#features" class="btn-secondary">✨ Features Dekho</a>
+      <a href="https://ahmad637-ka.github.io/adsearnapp/app" class="btn-secondary" target="_blank">🌐 Web Version Open Karo</a>
     </div>
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-num">10K+</div>
+        <div class="hero-stat-num">--</div>
         <div class="hero-stat-label">Active Users</div>
       </div>
+      <!-- DAILY EARN — uncomment when ready
       <div class="hero-stat">
         <div class="hero-stat-num">Rs.500+</div>
         <div class="hero-stat-label">Daily Earn</div>
       </div>
+      -->
       <div class="hero-stat">
         <div class="hero-stat-num">100%</div>
         <div class="hero-stat-label">Free App</div>
@@ -658,7 +661,7 @@
           Roz kitna kama sakte hain?
           <span class="faq-arrow">▼</span>
         </div>
-        <div class="faq-a">Ye depend karta hai activity pe. Daily bonus, spin wheel, watch ads, aur tasks se agar sab karo to Rs.50-500+ roz kama sakte ho!</div>
+        <div class="faq-a">Ye depend karta hai activity pe. Daily bonus, spin wheel, watch ads, aur tasks se agar sab karo to achha kama sakte ho!</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">
@@ -681,7 +684,7 @@
         <a href="ads-earn-app.apk" class="apk-btn" id="apkBtn">
           📥 Android APK Download
         </a>
-       <a href="https://ahmad637-ka.github.io/adsearnapp-web/" class="web-btn" target="_blank">
+        <a href="https://ahmad637-ka.github.io/adsearnapp/app" class="web-btn" target="_blank">
           🌐 Web Version Open Karo
         </a>
       </div>
@@ -715,14 +718,10 @@ function toggleFaq(el) {
   item.classList.toggle('open');
 }
 
-// APK download button
 document.getElementById('apkBtn').addEventListener('click', function(e) {
   // APK URL yahan dalo jab ready ho
-  // e.preventDefault();
-  // alert('APK jald available hogi!');
 });
 
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', function(e) {
     const target = document.querySelector(this.getAttribute('href'));
