@@ -318,9 +318,23 @@
       document.getElementById('errorState').style.display   = 'block';
     }
 
-    // ── Redirect function ──
+        // -- Redirect chain --
+    const redirectChain = [
+      'https://www.effectivegateway.com/',
+      'https://www.highperformanceformat.com/',
+    ];
+    let redirectIndex = 0;
+
     window.goToLink = function() {
-      if (destURL) window.location.href = destURL;
+      if (!destURL) return;
+      if (redirectIndex < redirectChain.length) {
+        const nextRedirect = redirectChain[redirectIndex];
+        redirectIndex++;
+        window.open(nextRedirect, '_blank');
+        setTimeout(window.goToLink, 1500);
+      } else {
+        window.location.href = destURL;
+      }
     };
   </script>
 
