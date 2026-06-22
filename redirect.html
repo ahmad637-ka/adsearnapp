@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,6 +165,7 @@
       cursor: pointer;
       box-shadow: 0 4px 24px rgba(255,215,0,0.5);
       animation: pulse-gold 1.5s infinite;
+      margin-top: 8px;
     }
     @keyframes pulse-gold {
       0%,100% { box-shadow: 0 4px 24px rgba(255,215,0,0.5); }
@@ -181,6 +183,15 @@
       border: 1px solid rgba(108,71,255,0.25);
       border-radius: 20px; font-size: 11px; color: #a78bfa; text-align: center;
     }
+    /* Waiting for user to come back */
+    .waiting-box {
+      margin: 0 20px; padding: 14px;
+      background: rgba(255,200,0,0.08);
+      border: 1px solid rgba(255,200,0,0.25);
+      border-radius: 14px; font-size: 12px; color: #fde68a;
+      text-align: center; display: none; line-height: 1.6;
+    }
+    .waiting-box .w-icon { font-size: 28px; margin-bottom: 6px; display: block; animation: spin 2s linear infinite; }
     .final-congrats { padding: 24px 20px; text-align: center; display: none; }
     .congrats-icon { font-size: 52px; margin-bottom: 12px; animation: bounce 0.8s ease; }
     @keyframes bounce {
@@ -222,7 +233,7 @@
       <div class="subtitle" id="headerSubtitle">⚡ Earn coins by sharing links</div>
     </div>
 
-    <!-- Step Indicator — promote flow only -->
+    <!-- Step Indicator -->
     <div id="stepIndicatorWrap" style="display:none;">
       <div class="step-indicator">
         <div class="step-dot" id="dot1">1</div>
@@ -266,7 +277,7 @@
         <div class="link-url" id="destUrlDisplay">Loading...</div>
       </div>
 
-      <div class="coins-badge" id="coinsBadge"  style="display:none;">🪙 +2 coins link owner ko milenge!</div>
+      <div class="coins-badge"    id="coinsBadge" style="display:none;">🪙 +2 coins link owner ko milenge!</div>
       <div class="ad-reward-banner" id="adBanner" style="display:none;">📺 Ads dekho — creator ko support karo!</div>
 
       <div class="countdown-area">
@@ -282,13 +293,20 @@
           ✅ <span id="activeLabel">Continue →</span>
         </button>
       </div>
+
+      <!-- Waiting box — dikhega jab ad new tab mein khule -->
+      <div class="waiting-box" id="waitingBox">
+        <span class="w-icon">⏳</span>
+        <strong>Ad tab mein khul gayi!</strong><br>
+        Wapas is tab pe aao — next step automatically start hoga!
+      </div>
     </div>
 
-    <!-- Final Congrats — step 4 -->
+    <!-- Final Congrats -->
     <div class="final-congrats" id="finalCongrats">
       <div class="congrats-icon">🎉</div>
       <div class="congrats-title">Video Unlock Ho Gayi!</div>
-      <div class="congrats-sub">Creator ko support karne ka shukriya ❤️<br>Ab video khul rahi hai...</div>
+      <div class="congrats-sub">Creator ko support karne ka shukriya ❤️</div>
       <button class="btn-video" onclick="openFinalVideo()">
         🎬 Video Play Karo!
       </button>
@@ -332,7 +350,7 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Adsterra Smartlink — yeh automatically redirect karega + ads dikhayega ──
+    // ── Adsterra Smartlink ──
     const SMARTLINK = 'https://www.effectivecpmnetwork.com/ymkp7z996j?key=0ba6f39d7160c59c2c2df7be9b1af583';
 
     const params    = new URLSearchParams(window.location.search);
@@ -343,14 +361,13 @@
     let destURL     = '';
     let flowType    = '';
     let currentStep = isNaN(stepParam) ? 1 : stepParam;
+    let visibilityHandler = null;
 
     const COUNTDOWN_SECS = 10;
-    const TOTAL_STEPS    = 3; // 3 countdown steps, phir step 4 = final video
 
     // ── Step UI ──
     function updateStepUI(step) {
-      const stepTexts = [
-        '',
+      const stepTexts = ['',
         'Step 1 of 4 — Ads dekho, creator ko support karo',
         'Step 2 of 4 — Thoda aur wait karo...',
         'Step 3 of 4 — Almost there!',
@@ -435,7 +452,6 @@
         });
 
       } else {
-        // Promote flow
         document.getElementById('coinsBadge').style.display        = 'none';
         document.getElementById('adBanner').style.display          = 'block';
         document.getElementById('stepIndicatorWrap').style.display = 'block';
@@ -451,8 +467,10 @@
       currentStep = step;
       updateStepUI(step);
 
+      // Hide waiting box
+      document.getElementById('waitingBox').style.display = 'none';
+
       if (step === 4) {
-        // Final step — video show karo
         document.getElementById('mainContent').style.display   = 'none';
         document.getElementById('finalCongrats').style.display = 'block';
         return;
@@ -464,9 +482,9 @@
         '🔓 Video unlock ho rahi hai...'
       ];
       const btnTexts = ['',
-        'Next Step →',
-        'Next Step →',
-        '🔓 Video Unlock Karo →'
+        'Ad Dekho & Next Step →',
+        'Ad Dekho & Next Step →',
+        'Ad Dekho & Video Unlock →'
       ];
 
       document.getElementById('waitText').textContent    = waitTexts[step];
@@ -478,32 +496,54 @@
       });
     }
 
-    // ── Continue button click ──
+    // ── Open Smartlink in NEW TAB, then wait for user to come back ──
+    function openAdNewTab(afterAdCallback) {
+      // Remove old visibility listener if any
+      if (visibilityHandler) {
+        document.removeEventListener('visibilitychange', visibilityHandler);
+        visibilityHandler = null;
+      }
+
+      // Open Smartlink in new tab
+      window.open(SMARTLINK, '_blank');
+
+      // Show waiting box
+      document.getElementById('btnActive').style.display  = 'none';
+      document.getElementById('waitingBox').style.display = 'block';
+
+      // When user comes back to this tab → run callback
+      visibilityHandler = function () {
+        if (document.visibilityState === 'visible') {
+          document.removeEventListener('visibilitychange', visibilityHandler);
+          visibilityHandler = null;
+          document.getElementById('waitingBox').style.display = 'none';
+          afterAdCallback();
+        }
+      };
+      document.addEventListener('visibilitychange', visibilityHandler);
+    }
+
+    // ── Continue button ──
     window.onContinue = function () {
       if (flowType === 'link-earn') {
-        // Link & Earn: Smartlink se jaao, jo apne aap final URL pe le jaayega
-        window.location.replace(SMARTLINK + '&target=' + encodeURIComponent(destURL));
+        // Link & Earn: new tab mein smartlink, is tab mein original link
+        window.open(SMARTLINK, '_blank');
+        setTimeout(() => {
+          window.location.replace(destURL);
+        }, 500);
         return;
       }
 
       // Promote flow
-      const nextStep   = currentStep + 1;
-      const encodedUrl = encodeURIComponent(destURL);
-      const base       = window.location.origin + window.location.pathname;
+      const nextStep = currentStep + 1;
 
-      if (nextStep <= TOTAL_STEPS) {
-        // Steps 1,2,3: Smartlink se redirect ho — ads chale — phir wapas next step pe aao
-        // Smartlink ke baad wapas aane ke liye return URL set karo
-        const returnUrl  = `${base}?url=${encodedUrl}&step=${nextStep}`;
-        const smartUrl   = SMARTLINK + '&target=' + encodeURIComponent(returnUrl);
-        window.location.replace(smartUrl);
-      } else {
-        // Step 4: Final video
-        runStep(4);
-      }
+      openAdNewTab(() => {
+        // User wapas aaya — next step chalao
+        runStep(nextStep);
+      });
     };
 
-    // ── Final video open ──
+    // ── Final video ──
     window.openFinalVideo = function () {
       if (destURL) window.location.replace(destURL);
     };
@@ -540,3 +580,4 @@
   </script>
 </body>
 </html>
+HTMLEOF
