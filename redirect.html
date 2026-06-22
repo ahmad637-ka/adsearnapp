@@ -43,6 +43,62 @@
     .logo { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
     .logo span { color: #ffd700; }
     .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px 0;
+      gap: 0;
+    }
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #1e1e3a;
+      border: 2px solid #2a2a4a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #555;
+      transition: all 0.4s;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .step-dot.active {
+      background: linear-gradient(135deg, #6c47ff, #a855f7);
+      border-color: #6c47ff;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(108,71,255,0.6);
+    }
+    .step-dot.done {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+    }
+    .step-dot.final-done {
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      border-color: #ffd700;
+      color: #000;
+      box-shadow: 0 0 14px rgba(255,215,0,0.7);
+    }
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: #2a2a4a;
+      transition: background 0.4s;
+      max-width: 40px;
+    }
+    .step-line.done { background: #16a34a; }
+
+    .step-label {
+      text-align: center;
+      font-size: 10px;
+      color: #555;
+      padding: 4px 20px 0;
+      letter-spacing: 0.5px;
+    }
+    .step-label.active-label { color: #a78bfa; }
+
     .ad-middle {
       background: #12122a;
       min-height: 60px;
@@ -51,7 +107,10 @@
       justify-content: center;
       border-top: 1px solid #2a2a4a;
       border-bottom: 1px solid #2a2a4a;
+      margin-top: 14px;
     }
+
+    /* Loading */
     .loading-state { padding: 30px 24px; text-align: center; }
     .spinner {
       width: 36px; height: 36px;
@@ -62,9 +121,13 @@
       margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
     .error-state { padding: 30px 24px; text-align: center; display: none; }
     .error-icon { font-size: 40px; margin-bottom: 10px; }
     .error-text { color: #ff6b6b; font-size: 14px; }
+
+    /* Link Info */
     .link-info { padding: 16px 20px 0; }
     .link-label {
       font-size: 10px; color: #888;
@@ -76,6 +139,8 @@
       font-size: 12px; color: #a0a0c0;
       word-break: break-all; max-height: 55px; overflow: hidden;
     }
+
+    /* Countdown */
     .countdown-area { padding: 20px; text-align: center; }
     .wait-text { font-size: 12px; color: #888; margin-bottom: 10px; }
     .progress-wrap {
@@ -86,7 +151,10 @@
       height: 100%; width: 100%;
       background: linear-gradient(90deg, #6c47ff, #a855f7);
       border-radius: 999px;
+      transition: none;
     }
+
+    /* Ghost button */
     .btn-ghost {
       width: 100%; padding: 14px; border-radius: 12px;
       border: 2px solid #2a2a4a; background: #12122a;
@@ -96,6 +164,8 @@
       font-size: 30px; font-weight: 800; color: #6c47ff;
       display: block; line-height: 1; margin-bottom: 2px;
     }
+
+    /* Active continue button */
     .btn-active {
       width: 100%; padding: 14px; border-radius: 12px; border: none;
       background: linear-gradient(135deg, #6c47ff, #a855f7);
@@ -108,22 +178,63 @@
       0%,100% { box-shadow: 0 4px 20px rgba(108,71,255,0.5); }
       50%      { box-shadow: 0 4px 30px rgba(168,85,247,0.8); }
     }
+
+    /* Final video button */
+    .btn-video {
+      width: 100%; padding: 16px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #ffd700, #ff8c00);
+      color: #000; font-size: 17px; font-weight: 800;
+      cursor: pointer; display: none;
+      box-shadow: 0 4px 24px rgba(255,215,0,0.5);
+      animation: pulse-gold 1.5s infinite;
+    }
+    @keyframes pulse-gold {
+      0%,100% { box-shadow: 0 4px 24px rgba(255,215,0,0.5); }
+      50%      { box-shadow: 0 6px 32px rgba(255,140,0,0.8); }
+    }
+
+    /* Coins badge */
     .coins-badge {
       margin: 10px 20px 0; padding: 8px 14px;
       background: rgba(0,200,100,0.1);
       border: 1px solid rgba(0,200,100,0.25);
       border-radius: 20px; font-size: 12px; color: #4ade80; text-align: center;
     }
+
+    /* Ad reward banner */
+    .ad-reward-banner {
+      margin: 10px 20px 0; padding: 8px 14px;
+      background: rgba(108,71,255,0.1);
+      border: 1px solid rgba(108,71,255,0.25);
+      border-radius: 20px; font-size: 11px; color: #a78bfa; text-align: center;
+    }
+
+    /* Final step congratulations */
+    .final-congrats {
+      padding: 20px; text-align: center; display: none;
+    }
+    .congrats-icon { font-size: 48px; margin-bottom: 10px; animation: bounce 0.8s ease; }
+    @keyframes bounce {
+      0%   { transform: scale(0.5); opacity: 0; }
+      60%  { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .congrats-title { font-size: 18px; font-weight: 800; color: #ffd700; margin-bottom: 6px; }
+    .congrats-sub   { font-size: 12px; color: #888; margin-bottom: 16px; }
+
     .footer-note {
       padding: 12px 20px 20px; text-align: center;
       font-size: 10px; color: #555; line-height: 1.7;
     }
+
+    /* Sticky bottom ad */
     .ad-socialbar {
       position: fixed; bottom: 0; left: 0; right: 0;
       min-height: 55px; background: #0a0a18;
       border-top: 1px solid #2a2a4a;
       display: flex; align-items: center; justify-content: center; z-index: 999;
     }
+
     @media (max-width: 500px) { .card { margin: 10px 10px 80px 10px; } }
   </style>
 </head>
@@ -143,7 +254,21 @@
   <div class="card">
     <div class="card-header">
       <div class="logo">Ads<span>Earn</span></div>
-      <div class="subtitle">⚡ Earn coins by sharing links</div>
+      <div class="subtitle" id="headerSubtitle">⚡ Earn coins by sharing links</div>
+    </div>
+
+    <!-- Step Indicator (only for Promote flow) -->
+    <div id="stepIndicatorWrap" style="display:none;">
+      <div class="step-indicator">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-line" id="line2"></div>
+        <div class="step-dot" id="dot3">3</div>
+        <div class="step-line" id="line3"></div>
+        <div class="step-dot" id="dot4">🎬</div>
+      </div>
+      <div class="step-label" id="stepLabel">Step 1 of 4 — Watch ads to support creator</div>
     </div>
 
     <!-- MIDDLE AD -->
@@ -169,30 +294,44 @@
       <div class="error-text">Link nahi mila ya expire ho gaya</div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content (Countdown + Ads) -->
     <div id="mainContent" style="display:none;">
       <div class="link-info">
         <div class="link-label">🔗 Your destination link</div>
         <div class="link-url" id="destUrl">Loading...</div>
       </div>
 
-      <div class="coins-badge" id="coinsBadge">🪙 +2 coins link owner ko milenge is click se!</div>
+      <div class="coins-badge" id="coinsBadge" style="display:none;">🪙 +2 coins link owner ko milenge is click se!</div>
+      <div class="ad-reward-banner" id="adRewardBanner" style="display:none;">📺 Creator ko support karo — ads dekho, video unlock karo!</div>
 
       <div class="countdown-area">
-        <div class="wait-text">Please wait while ads load...</div>
+        <div class="wait-text" id="waitText">Please wait while ads load...</div>
         <div class="progress-wrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
         <div class="btn-wrap">
           <button class="btn-ghost" id="btnGhost" disabled>
             <span class="countdown-inside" id="countdownNum">10</span>
-            Continue to your link →
+            <span id="btnGhostLabel">Continue →</span>
           </button>
-          <button class="btn-active" id="btnActive" onclick="goToLink()">
-            ✅ Continue to your link →
+          <button class="btn-active" id="btnActive" onclick="onContinue()">
+            ✅ <span id="btnActiveLabel">Continue →</span>
+          </button>
+          <button class="btn-video" id="btnVideo" onclick="openFinalVideo()">
+            🎬 Video Play Karo!
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Final Congrats (Step 4) -->
+    <div class="final-congrats" id="finalCongrats">
+      <div class="congrats-icon">🎉</div>
+      <div class="congrats-title">Video Unlock Ho Gayi!</div>
+      <div class="congrats-sub">Creator ko support karne ka shukriya ❤️</div>
+      <button class="btn-video" id="btnVideoFinal" style="display:block;" onclick="openFinalVideo()">
+        🎬 Video Play Karo!
+      </button>
     </div>
 
     <!-- POPUNDER AD -->
@@ -202,7 +341,7 @@
 
     <div class="footer-note">
       🛡️ Safe redirect by AdsEarn App<br>
-      Link owner earns coins when you visit!
+      <span id="footerNote">Link owner earns coins when you visit!</span>
     </div>
   </div>
 
@@ -237,47 +376,223 @@
     const code     = params.get('code');
     const urlParam = params.get('url');
 
-    let destURL = '';
+    let destURL  = '';
+    let flowType = ''; // 'link-earn' or 'promote'
 
-    // ── Countdown ──
-    function startCountdown() {
-      const TOTAL = 10;
-      let remaining = TOTAL;
+    // ── Promote flow: step tracking ──
+    // Steps 1,2,3 = countdown + redirect intermediate
+    // Step 4 = final video open
+    const PROMOTE_STEPS   = 4;
+    const STEP_COUNTDOWN  = 10; // seconds per step
+    // Intermediate redirect URLs for steps 1,2,3 (these reload same page with step param)
+    // We use same page URL + step param to simulate "redirect"
+    let currentStep = 1;
+
+    // ─────────────────────────────────────────────
+    // Step Indicator Update
+    // ─────────────────────────────────────────────
+    function updateStepUI(step) {
+      const labels = [
+        '', // 0 unused
+        'Step 1 of 4 — Watch ads to support creator',
+        'Step 2 of 4 — Almost there...',
+        'Step 3 of 4 — One more step!',
+        'Step 4 of 4 — Video ready! 🎬'
+      ];
+      document.getElementById('stepLabel').textContent = labels[step] || '';
+
+      // Dots: 1,2,3,4
+      for (let i = 1; i <= 3; i++) {
+        const dot  = document.getElementById('dot' + i);
+        const line = document.getElementById('line' + i);
+        if (i < step) {
+          dot.classList.remove('active');
+          dot.classList.add('done');
+          dot.textContent = '✓';
+          if (line) line.classList.add('done');
+        } else if (i === step) {
+          dot.classList.add('active');
+          dot.classList.remove('done');
+          dot.textContent = i;
+        } else {
+          dot.classList.remove('active', 'done');
+          dot.textContent = i;
+          if (line) line.classList.remove('done');
+        }
+      }
+      // Dot 4 (video)
+      const dot4 = document.getElementById('dot4');
+      if (step === 4) {
+        dot4.classList.add('final-done');
+        dot4.textContent = '🎬';
+      } else if (step > 4) {
+        dot4.classList.add('done');
+      } else {
+        dot4.classList.remove('final-done', 'done');
+        dot4.textContent = '🎬';
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // Countdown Logic
+    // ─────────────────────────────────────────────
+    function startCountdown(seconds, onDone) {
+      let remaining = seconds;
       const numEl  = document.getElementById('countdownNum');
       const barEl  = document.getElementById('progressBar');
       const ghost  = document.getElementById('btnGhost');
       const active = document.getElementById('btnActive');
+      const video  = document.getElementById('btnVideo');
 
-      barEl.style.width = '100%';
+      // Reset buttons
+      ghost.style.display  = 'block';
+      active.style.display = 'none';
+      video.style.display  = 'none';
+      numEl.textContent    = remaining;
+
+      // Progress bar reset then animate
+      barEl.style.transition = 'none';
+      barEl.style.width      = '100%';
       setTimeout(() => {
-        barEl.style.transition = `width ${TOTAL}s linear`;
-        barEl.style.width = '0%';
-      }, 50);
+        barEl.style.transition = `width ${seconds}s linear`;
+        barEl.style.width      = '0%';
+      }, 80);
 
       const timer = setInterval(() => {
         remaining--;
         numEl.textContent = remaining;
         if (remaining <= 0) {
           clearInterval(timer);
-          ghost.style.display  = 'none';
-          active.style.display = 'block';
+          ghost.style.display = 'none';
+          onDone();
         }
       }, 1000);
     }
 
-    // ── Show content ──
-    function showContent(url, showBadge) {
-      destURL = url;
+    // ─────────────────────────────────────────────
+    // Show Main Content Area
+    // ─────────────────────────────────────────────
+    function showContent(url, type) {
+      destURL  = url;
+      flowType = type;
+
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display  = 'block';
       document.getElementById('destUrl').textContent        = url;
-      if (!showBadge) {
-        document.getElementById('coinsBadge').style.display = 'none';
+
+      if (type === 'link-earn') {
+        // Original link-earn flow: one countdown, then go to link
+        document.getElementById('coinsBadge').style.display      = 'flex';
+        document.getElementById('adRewardBanner').style.display  = 'none';
+        document.getElementById('stepIndicatorWrap').style.display = 'none';
+        document.getElementById('headerSubtitle').textContent    = '⚡ Earn coins by sharing links';
+
+        startCountdown(STEP_COUNTDOWN, () => {
+          const active = document.getElementById('btnActive');
+          document.getElementById('btnActiveLabel').textContent = 'Continue to your link →';
+          active.style.display = 'block';
+        });
+
+      } else if (type === 'promote') {
+        // Promote flow: 4 steps
+        document.getElementById('coinsBadge').style.display      = 'none';
+        document.getElementById('adRewardBanner').style.display  = 'block';
+        document.getElementById('stepIndicatorWrap').style.display = 'block';
+        document.getElementById('headerSubtitle').textContent    = '🎬 Video unlock ho rahi hai...';
+        document.getElementById('footerNote').textContent        = 'Creator ko support karo — video free hai!';
+
+        // Check if step param exists (means we were redirected here)
+        const stepParam = parseInt(params.get('step') || '1');
+        currentStep = isNaN(stepParam) ? 1 : stepParam;
+
+        runPromoteStep(currentStep);
       }
-      startCountdown();
     }
 
-    // ── CASE 1: code — Link & Earn ──
+    // ─────────────────────────────────────────────
+    // Promote Step Runner
+    // ─────────────────────────────────────────────
+    function runPromoteStep(step) {
+      currentStep = step;
+      updateStepUI(step);
+
+      const waitTexts = [
+        '',
+        '📺 Ads dekho — creator ko support karo...',
+        '⏳ Thoda aur wait karo...',
+        '🔓 Video unlock ho rahi hai...',
+        '🎬 Video ready hai!'
+      ];
+      document.getElementById('waitText').textContent = waitTexts[step] || 'Please wait...';
+
+      const btnGhostLabels = [
+        '', 'Step 2 pe jao →', 'Step 3 pe jao →', 'Video Unlock Karo →', ''
+      ];
+
+      if (step <= 3) {
+        // Countdown + show continue
+        document.getElementById('btnGhostLabel').textContent = btnGhostLabels[step];
+        startCountdown(STEP_COUNTDOWN, () => {
+          if (step < 3) {
+            // Steps 1 & 2: show "Continue" button to next step
+            const active = document.getElementById('btnActive');
+            document.getElementById('btnActiveLabel').textContent = btnGhostLabels[step];
+            active.style.display = 'block';
+          } else {
+            // Step 3: show "Unlock Video" button
+            const active = document.getElementById('btnActive');
+            document.getElementById('btnActiveLabel').textContent = '🔓 Video Unlock Karo →';
+            active.style.display = 'block';
+          }
+        });
+
+      } else if (step === 4) {
+        // Step 4: show final congrats + video button
+        document.getElementById('mainContent').style.display  = 'none';
+        document.getElementById('finalCongrats').style.display = 'block';
+        updateStepUI(4);
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // Continue Button Click
+    // ─────────────────────────────────────────────
+    window.onContinue = function() {
+      if (flowType === 'link-earn') {
+        // Direct go to link
+        if (destURL) window.location.href = destURL;
+        return;
+      }
+
+      if (flowType === 'promote') {
+        const nextStep = currentStep + 1;
+
+        if (nextStep <= 3) {
+          // Redirect to same page with next step (simulates real redirect + new ad load)
+          const baseUrl    = window.location.pathname;
+          const encodedUrl = encodeURIComponent(destURL);
+          window.location.href = `${baseUrl}?url=${encodedUrl}&step=${nextStep}`;
+        } else if (nextStep === 4) {
+          // Final step — show video button
+          runPromoteStep(4);
+        }
+      }
+    };
+
+    // ─────────────────────────────────────────────
+    // Final Video Open
+    // ─────────────────────────────────────────────
+    window.openFinalVideo = function() {
+      if (destURL) {
+        window.open(destURL, '_blank');
+        // Optionally also replace current page
+        // window.location.href = destURL;
+      }
+    };
+
+    // ─────────────────────────────────────────────
+    // CASE 1: code — Link & Earn
+    // ─────────────────────────────────────────────
     if (code) {
       const linkRef = ref(db, 'shortLinks/' + code);
       get(linkRef).then((snap) => {
@@ -292,34 +607,32 @@
         update(linkRef, { clicks: (data.clicks || 0) + 1 });
 
         // Coins to owner
-        const COINS = 2;
+        const COINS    = 2;
         const ownerRef = ref(db, 'users/' + data.userId + '/coins');
         get(ownerRef).then((s) => {
           set(ownerRef, (s.val() || 0) + COINS);
         });
 
-        showContent(data.originalUrl, true);
+        showContent(data.originalUrl, 'link-earn');
       }).catch(() => {
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('errorState').style.display   = 'block';
       });
 
-    // ── CASE 2: url — Promote/Earn ──
+    // ─────────────────────────────────────────────
+    // CASE 2: url — Promote/Earn
+    // ─────────────────────────────────────────────
     } else if (urlParam) {
-      showContent(decodeURIComponent(urlParam), false);
+      showContent(decodeURIComponent(urlParam), 'promote');
 
-    // ── CASE 3: error ──
+    // ─────────────────────────────────────────────
+    // CASE 3: No params — Error
+    // ─────────────────────────────────────────────
     } else {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display   = 'block';
     }
 
-    // ── Continue button ──
-    window.goToLink = function() {
-      if (destURL) {
-        window.location.href = destURL;
-      }
-    };
   </script>
 
 </body>
