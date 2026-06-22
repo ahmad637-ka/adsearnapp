@@ -315,11 +315,17 @@
     }
 
     // ── Continue button ──
-    window.goToLink = function() {
-      if (destURL) {
-        window.location.href = destURL;
-      }
-    };
+window.goToLink = function() {
+  if (destURL) {
+    // Popunder fire karo (extra earning)
+    try {
+      const popup = window.open('', '_blank', 'width=1,height=1');
+      if (popup) popup.close();
+    } catch(e) {}
+    // Original URL pe jao
+    window.location.href = destURL;
+  }
+};
   </script>
 
 </body>
