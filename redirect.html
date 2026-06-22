@@ -43,6 +43,7 @@
     .logo { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
     .logo span { color: #ffd700; }
     .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
     .ad-middle {
       background: #12122a;
       min-height: 60px;
@@ -52,7 +53,12 @@
       border-top: 1px solid #2a2a4a;
       border-bottom: 1px solid #2a2a4a;
     }
-    .loading-state { padding: 30px 24px; text-align: center; }
+
+    /* Loading state */
+    .loading-state {
+      padding: 30px 24px;
+      text-align: center;
+    }
     .spinner {
       width: 36px; height: 36px;
       border: 3px solid #2a2a4a;
@@ -62,45 +68,82 @@
       margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error-state { padding: 30px 24px; text-align: center; display: none; }
+
+    /* Error state */
+    .error-state {
+      padding: 30px 24px;
+      text-align: center;
+      display: none;
+    }
     .error-icon { font-size: 40px; margin-bottom: 10px; }
     .error-text { color: #ff6b6b; font-size: 14px; }
+
     .link-info { padding: 16px 20px 0; }
     .link-label {
-      font-size: 10px; color: #888;
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
     }
     .link-url {
-      background: #0f0f1a; border: 1px solid #2a2a4a;
-      border-radius: 10px; padding: 10px 14px;
-      font-size: 12px; color: #a0a0c0;
-      word-break: break-all; max-height: 55px; overflow: hidden;
+      background: #0f0f1a;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #a0a0c0;
+      word-break: break-all;
+      max-height: 55px;
+      overflow: hidden;
     }
+
     .countdown-area { padding: 20px; text-align: center; }
     .wait-text { font-size: 12px; color: #888; margin-bottom: 10px; }
     .progress-wrap {
-      background: #0f0f1a; border-radius: 999px;
-      height: 8px; width: 100%; margin-bottom: 16px; overflow: hidden;
+      background: #0f0f1a;
+      border-radius: 999px;
+      height: 8px;
+      width: 100%;
+      margin-bottom: 16px;
+      overflow: hidden;
     }
     .progress-bar {
-      height: 100%; width: 100%;
+      height: 100%;
+      width: 100%;
       background: linear-gradient(90deg, #6c47ff, #a855f7);
       border-radius: 999px;
     }
     .btn-ghost {
-      width: 100%; padding: 14px; border-radius: 12px;
-      border: 2px solid #2a2a4a; background: #12122a;
-      color: #444; font-size: 15px; font-weight: 600; cursor: not-allowed;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px solid #2a2a4a;
+      background: #12122a;
+      color: #444;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: not-allowed;
     }
     .btn-ghost .countdown-inside {
-      font-size: 30px; font-weight: 800; color: #6c47ff;
-      display: block; line-height: 1; margin-bottom: 2px;
+      font-size: 30px;
+      font-weight: 800;
+      color: #6c47ff;
+      display: block;
+      line-height: 1;
+      margin-bottom: 2px;
     }
     .btn-active {
-      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
       background: linear-gradient(135deg, #6c47ff, #a855f7);
-      color: #fff; font-size: 16px; font-weight: 700;
-      cursor: pointer; display: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
       box-shadow: 0 4px 20px rgba(108,71,255,0.5);
       animation: pulse 1.5s infinite;
     }
@@ -109,22 +152,36 @@
       50%      { box-shadow: 0 4px 30px rgba(168,85,247,0.8); }
     }
     .coins-badge {
-      margin: 10px 20px 0; padding: 8px 14px;
+      margin: 10px 20px 0;
+      padding: 8px 14px;
       background: rgba(0,200,100,0.1);
       border: 1px solid rgba(0,200,100,0.25);
-      border-radius: 20px; font-size: 12px; color: #4ade80; text-align: center;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #4ade80;
+      text-align: center;
     }
     .footer-note {
-      padding: 12px 20px 20px; text-align: center;
-      font-size: 10px; color: #555; line-height: 1.7;
+      padding: 12px 20px 20px;
+      text-align: center;
+      font-size: 10px;
+      color: #555;
+      line-height: 1.7;
     }
     .ad-socialbar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      min-height: 55px; background: #0a0a18;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      min-height: 55px;
+      background: #0a0a18;
       border-top: 1px solid #2a2a4a;
-      display: flex; align-items: center; justify-content: center; z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
-    @media (max-width: 500px) { .card { margin: 10px 10px 80px 10px; } }
+    @media (max-width: 500px) {
+      .card { margin: 10px 10px 80px 10px; }
+    }
   </style>
 </head>
 <body>
@@ -134,7 +191,10 @@
     <script>
       atOptions = {
         'key' : '054b7c1a4cbb13266b09c565eb61513e',
-        'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
       };
     </script>
     <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -151,7 +211,10 @@
       <script>
         atOptions = {
           'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
+          'format' : 'iframe',
+          'height' : 50,
+          'width' : 320,
+          'params' : {}
         };
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -169,14 +232,14 @@
       <div class="error-text">Link nahi mila ya expire ho gaya</div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content (hidden until loaded) -->
     <div id="mainContent" style="display:none;">
       <div class="link-info">
         <div class="link-label">🔗 Your destination link</div>
         <div class="link-url" id="destUrl">Loading...</div>
       </div>
 
-      <div class="coins-badge" id="coinsBadge">🪙 +2 coins link owner ko milenge is click se!</div>
+      <div class="coins-badge">🪙 +2 coins link owner ko milenge is click se!</div>
 
       <div class="countdown-area">
         <div class="wait-text">Please wait while ads load...</div>
@@ -195,7 +258,7 @@
       </div>
     </div>
 
-    <!-- POPUNDER AD -->
+    <!-- POPUNDER AD (auto fires) -->
     <div style="display:none;">
       <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
     </div>
@@ -211,7 +274,10 @@
     <script>
       atOptions = {
         'key' : '054b7c1a4cbb13266b09c565eb61513e',
-        'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
       };
     </script>
     <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -220,9 +286,10 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, get, set, update }
+    import { getDatabase, ref, get, update, increment }
       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
+    // ── Firebase Config ──
     const firebaseConfig = {
       apiKey: "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
       authDomain: "this-is-my-first-app-99e55.firebaseapp.com",
@@ -233,52 +300,18 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    const params   = new URLSearchParams(window.location.search);
-    const code     = params.get('code');
-    const urlParam = params.get('url');
+    // ── Read code from URL ──
+    const params  = new URLSearchParams(window.location.search);
+    const code    = params.get('code');
 
     let destURL = '';
 
-    // ── Countdown function ──
-    function startCountdown() {
-      const TOTAL = 10;
-      let remaining = TOTAL;
-      const numEl  = document.getElementById('countdownNum');
-      const barEl  = document.getElementById('progressBar');
-      const ghost  = document.getElementById('btnGhost');
-      const active = document.getElementById('btnActive');
-
-      barEl.style.width = '100%';
-      setTimeout(() => {
-        barEl.style.transition = `width ${TOTAL}s linear`;
-        barEl.style.width = '0%';
-      }, 50);
-
-      const timer = setInterval(() => {
-        remaining--;
-        numEl.textContent = remaining;
-        if (remaining <= 0) {
-          clearInterval(timer);
-          ghost.style.display  = 'none';
-          active.style.display = 'block';
-        }
-      }, 1000);
-    }
-
-    // ── Show main content ──
-    function showContent(url, showBadge) {
-      destURL = url;
+    if (!code) {
+      // No code — show error
       document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('mainContent').style.display  = 'block';
-      document.getElementById('destUrl').textContent        = url;
-      if (!showBadge) {
-        document.getElementById('coinsBadge').style.display = 'none';
-      }
-      startCountdown();
-    }
-
-    // ── CASE 1: code parameter — Link & Earn ──
-    if (code && code !== 'promote') {
+      document.getElementById('errorState').style.display   = 'block';
+    } else {
+      // Fetch link from Firebase
       const linkRef = ref(db, `shortLinks/${code}`);
       get(linkRef).then((snap) => {
         if (!snap.exists()) {
@@ -286,39 +319,61 @@
           document.getElementById('errorState').style.display   = 'block';
           return;
         }
+
         const data = snap.val();
+        destURL = data.originalUrl;
+
+        // Show main content
+        document.getElementById('loadingState').style.display  = 'none';
+        document.getElementById('mainContent').style.display   = 'block';
+        document.getElementById('destUrl').textContent          = destURL;
+
+        // Update clicks in Firebase
         update(linkRef, { clicks: (data.clicks || 0) + 1 });
+
+        // Add coins to link owner
         const COINS_PER_CLICK = 2;
         const ownerCoinsRef = ref(db, `users/${data.userId}/coins`);
         get(ownerCoinsRef).then((cSnap) => {
           const current = cSnap.val() || 0;
-          set(ownerCoinsRef, current + COINS_PER_CLICK);
+          import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js')
+            .then(({ set }) => set(ownerCoinsRef, current + COINS_PER_CLICK));
         });
-        showContent(data.originalUrl, true);
+
+        // ── Start Countdown ──
+        const TOTAL = 10;
+        let remaining = TOTAL;
+
+        const numEl  = document.getElementById('countdownNum');
+        const barEl  = document.getElementById('progressBar');
+        const ghost  = document.getElementById('btnGhost');
+        const active = document.getElementById('btnActive');
+
+        barEl.style.width = '100%';
+        setTimeout(() => {
+          barEl.style.transition = `width ${TOTAL}s linear`;
+          barEl.style.width = '0%';
+        }, 50);
+
+        const timer = setInterval(() => {
+          remaining--;
+          numEl.textContent = remaining;
+          if (remaining <= 0) {
+            clearInterval(timer);
+            ghost.style.display  = 'none';
+            active.style.display = 'block';
+          }
+        }, 1000);
+
       }).catch(() => {
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('errorState').style.display   = 'block';
       });
-
-    // ── CASE 2: url parameter — Promote/Earn ──
-    } else if (urlParam) {
-      showContent(decodeURIComponent(urlParam), false);
-
-    // ── CASE 3: kuch nahi — error ──
-    } else {
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('errorState').style.display   = 'block';
     }
 
-    // ── Redirect function — Continue button ──
+    // ── Redirect function ──
     window.goToLink = function() {
-      if (!destURL) return;
-      // Pehle Adsterra banner page new tab mein kholo (extra earning)
-      window.open('https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js', '_blank');
-      // 1 second baad original URL pe redirect
-      setTimeout(() => {
-        window.location.href = destURL;
-      }, 1000);
+      if (destURL) window.location.href = destURL;
     };
   </script>
 
