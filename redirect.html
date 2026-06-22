@@ -233,9 +233,9 @@
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    const params = new URLSearchParams(window.location.search);
-    const code   = params.get('code');
-    const urlParam = params.get('url'); // Promote/Earn se aata hai
+    const params   = new URLSearchParams(window.location.search);
+    const code     = params.get('code');
+    const urlParam = params.get('url');
 
     let destURL = '';
 
@@ -266,18 +266,18 @@
     }
 
     // ── Show main content ──
-    function showContent(url, showCoinsBadge) {
+    function showContent(url, showBadge) {
       destURL = url;
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display  = 'block';
       document.getElementById('destUrl').textContent        = url;
-      if (!showCoinsBadge) {
+      if (!showBadge) {
         document.getElementById('coinsBadge').style.display = 'none';
       }
       startCountdown();
     }
 
-    // ── CASE 1: code parameter — Link & Earn system ──
+    // ── CASE 1: code parameter — Link & Earn ──
     if (code && code !== 'promote') {
       const linkRef = ref(db, `shortLinks/${code}`);
       get(linkRef).then((snap) => {
@@ -286,55 +286,39 @@
           document.getElementById('errorState').style.display   = 'block';
           return;
         }
-
         const data = snap.val();
-
-        // Clicks update
         update(linkRef, { clicks: (data.clicks || 0) + 1 });
-
-        // Coins add to link owner
         const COINS_PER_CLICK = 2;
         const ownerCoinsRef = ref(db, `users/${data.userId}/coins`);
         get(ownerCoinsRef).then((cSnap) => {
           const current = cSnap.val() || 0;
           set(ownerCoinsRef, current + COINS_PER_CLICK);
         });
-
         showContent(data.originalUrl, true);
-
       }).catch(() => {
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('errorState').style.display   = 'block';
       });
 
-    // ── CASE 2: url parameter — Promote/Earn system ──
+    // ── CASE 2: url parameter — Promote/Earn ──
     } else if (urlParam) {
-      // Direct URL — no Firebase lookup needed
       showContent(decodeURIComponent(urlParam), false);
 
-    // ── CASE 3: kuch bhi nahi — error ──
+    // ── CASE 3: kuch nahi — error ──
     } else {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display   = 'block';
     }
 
-        // -- Redirect chain --
-    const redirectChain = [
-      'https://www.effectivegateway.com/',
-      'https://www.highperformanceformat.com/',
-    ];
-    let redirectIndex = 0;
-
+    // ── Redirect function — Continue button ──
     window.goToLink = function() {
       if (!destURL) return;
-      if (redirectIndex < redirectChain.length) {
-        const nextRedirect = redirectChain[redirectIndex];
-        redirectIndex++;
-        window.open(nextRedirect, '_blank');
-        setTimeout(window.goToLink, 1500);
-      } else {
+      // Pehle Adsterra banner page new tab mein kholo (extra earning)
+      window.open('https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js', '_blank');
+      // 1 second baad original URL pe redirect
+      setTimeout(() => {
         window.location.href = destURL;
-      }
+      }, 1000);
     };
   </script>
 
