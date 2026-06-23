@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +15,35 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       flex-direction: column;
       align-items: center;
     }
+
+    /* ── SIDE BANNERS ── */
+    .side-left, .side-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+    .side-left  { left: 8px; }
+    .side-right { right: 8px; }
+    .side-banner-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+    /* Hide on small screens */
+    @media (max-width: 900px) {
+      .side-left, .side-right { display: none; }
+    }
+
     .ad-top {
       width: 100%;
       max-width: 728px;
@@ -183,7 +211,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       border: 1px solid rgba(108,71,255,0.25);
       border-radius: 20px; font-size: 11px; color: #a78bfa; text-align: center;
     }
-    /* Waiting for user to come back */
     .waiting-box {
       margin: 0 20px; padding: 14px;
       background: rgba(255,200,0,0.08);
@@ -215,6 +242,50 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
   </style>
 </head>
 <body>
+
+  <!-- ── LEFT SIDE BANNERS ── -->
+  <div class="side-left">
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+  </div>
+
+  <!-- ── RIGHT SIDE BANNERS ── -->
+  <div class="side-right">
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+  </div>
 
   <!-- TOP BANNER AD -->
   <div class="ad-top">
@@ -277,7 +348,7 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
         <div class="link-url" id="destUrlDisplay">Loading...</div>
       </div>
 
-      <div class="coins-badge"    id="coinsBadge" style="display:none;">🪙 +2 coins link owner ko milenge!</div>
+      <div class="coins-badge" id="coinsBadge" style="display:none;">🪙 +2 coins link owner ko milenge!</div>
       <div class="ad-reward-banner" id="adBanner" style="display:none;">📺 Ads dekho — creator ko support karo!</div>
 
       <div class="countdown-area">
@@ -294,7 +365,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
         </button>
       </div>
 
-      <!-- Waiting box — dikhega jab ad new tab mein khule -->
       <div class="waiting-box" id="waitingBox">
         <span class="w-icon">⏳</span>
         <strong>Ad tab mein khul gayi!</strong><br>
@@ -350,7 +420,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Adsterra Smartlink ──
     const SMARTLINK = 'https://www.effectivecpmnetwork.com/ymkp7z996j?key=0ba6f39d7160c59c2c2df7be9b1af583';
 
     const params    = new URLSearchParams(window.location.search);
@@ -365,7 +434,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
 
     const COUNTDOWN_SECS = 10;
 
-    // ── Step UI ──
     function updateStepUI(step) {
       const stepTexts = ['',
         'Step 1 of 4 — Ads dekho, creator ko support karo',
@@ -374,7 +442,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
         'Step 4 of 4 — 🎬 Video Ready!'
       ];
       document.getElementById('stepLabel').textContent = stepTexts[step] || '';
-
       for (let i = 1; i <= 3; i++) {
         const dot  = document.getElementById('dot' + i);
         const line = document.getElementById('line' + i);
@@ -397,7 +464,6 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       dot4.textContent = '🎬';
     }
 
-    // ── Countdown ──
     function startCountdown(onDone) {
       let remaining = COUNTDOWN_SECS;
       const numEl = document.getElementById('countdownNum');
@@ -429,11 +495,9 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       }, 1000);
     }
 
-    // ── Show page ──
     function showContent(url, type) {
       destURL  = url;
       flowType = type;
-
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('mainContent').style.display  = 'block';
       document.getElementById('destUrlDisplay').textContent = url;
@@ -446,28 +510,22 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
         document.getElementById('waitText').textContent            = 'Please wait while ads load...';
         document.getElementById('activeLabel').textContent         = 'Continue to your link →';
         document.getElementById('ghostLabel').textContent          = 'Continue to your link →';
-
         startCountdown(() => {
           document.getElementById('btnActive').style.display = 'block';
         });
-
       } else {
         document.getElementById('coinsBadge').style.display        = 'none';
         document.getElementById('adBanner').style.display          = 'block';
         document.getElementById('stepIndicatorWrap').style.display = 'block';
         document.getElementById('headerSubtitle').textContent      = '🎬 Video unlock ho rahi hai...';
         document.getElementById('footerNote').textContent          = 'Creator ko support karo — video free hai!';
-
         runStep(currentStep);
       }
     }
 
-    // ── Run promote step ──
     function runStep(step) {
       currentStep = step;
       updateStepUI(step);
-
-      // Hide waiting box
       document.getElementById('waitingBox').style.display = 'none';
 
       if (step === 4) {
@@ -496,22 +554,15 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       });
     }
 
-    // ── Open Smartlink in NEW TAB, then wait for user to come back ──
     function openAdNewTab(afterAdCallback) {
-      // Remove old visibility listener if any
       if (visibilityHandler) {
         document.removeEventListener('visibilitychange', visibilityHandler);
         visibilityHandler = null;
       }
-
-      // Open Smartlink in new tab
       window.open(SMARTLINK, '_blank');
-
-      // Show waiting box
       document.getElementById('btnActive').style.display  = 'none';
       document.getElementById('waitingBox').style.display = 'block';
 
-      // When user comes back to this tab → run callback
       visibilityHandler = function () {
         if (document.visibilityState === 'visible') {
           document.removeEventListener('visibilitychange', visibilityHandler);
@@ -523,34 +574,24 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
       document.addEventListener('visibilitychange', visibilityHandler);
     }
 
-    // ── Continue button ──
     window.onContinue = function () {
       if (flowType === 'link-earn') {
-        // Link & Earn: new tab mein smartlink, is tab mein original link
         window.open(SMARTLINK, '_blank');
         setTimeout(() => {
           window.location.replace(destURL);
         }, 500);
         return;
       }
-
-      // Promote flow
       const nextStep = currentStep + 1;
-
       openAdNewTab(() => {
-        // User wapas aaya — next step chalao
         runStep(nextStep);
       });
     };
 
-    // ── Final video ──
     window.openFinalVideo = function () {
       if (destURL) window.location.replace(destURL);
     };
 
-    // ══════════════════════════
-    // ROUTING
-    // ══════════════════════════
     if (code) {
       const linkRef = ref(db, 'shortLinks/' + code);
       get(linkRef).then((snap) => {
@@ -568,16 +609,12 @@ cat > /mnt/user-data/outputs/redirect.html << 'HTMLEOF'
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('errorState').style.display   = 'block';
       });
-
     } else if (urlParam) {
       showContent(decodeURIComponent(urlParam), 'promote');
-
     } else {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display   = 'block';
     }
-
   </script>
 </body>
 </html>
-HTMLEOF
