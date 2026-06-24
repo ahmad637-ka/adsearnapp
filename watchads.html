@@ -1,1 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AdsEarn - Watch Ads & Earn</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A1628;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
+    .container {
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .logo span { color: #FFD700; }
+
+    .subtitle {
+      font-size: 13px;
+      color: #8BA0C0;
+      margin-bottom: 24px;
+    }
+
+    /* TV Screen */
+    .tv-screen {
+      width: 100%;
+      background: #000;
+      border-radius: 16px;
+      border: 3px solid #1a3a6b;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tv-content {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .tv-icon { font-size: 60px; margin-bottom: 12px; }
+
+    .tv-text {
+      font-size: 14px;
+      color: #8BA0C0;
+      line-height: 1.6;
+    }
+
+    /* Coins counter */
+    .coins-box {
+      background: #1a2f52;
+      border: 1px solid #FFD700;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .coins-label {
+      font-size: 13px;
+      color: #8BA0C0;
+    }
+
+    .coins-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFD700;
+    }
+
+    .timer-box {
+      font-size: 13px;
+      color: #8BA0C0;
+      text-align: right;
+    }
+
+    .timer-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #a855f7;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      background: #1a1a2e;
+      border-radius: 999px;
+      height: 8px;
+      width: 100%;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6c47ff, #FFD700);
+      border-radius: 999px;
+      transition: width 1s linear;
+    }
+
+    /* Status */
+    .status-box {
+      background: rgba(108,71,255,0.1);
+      border: 1px solid rgba(108,71,255,0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #a78bfa;
+    }
+
+    .status-box.earning {
+      background: rgba(0,200,100,0.1);
+      border-color: rgba(0,200,100,0.3);
+      color: #4ade80;
+    }
+
+    /* Ad banner slot */
+    .ad-slot {
+      background: #12122a;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: #1a2f52;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-icon { font-size: 20px; }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFD700;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: #8BA0C0;
+    }
+
+    .footer-note {
+      font-size: 10px;
+      color: #555;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    /* Coin earned animation */
+    @keyframes coinPop {
+      0%   { transform: scale(0.5) translateY(0); opacity: 1; }
+      100% { transform: scale(1.2) translateY(-40px); opacity: 0; }
+    }
+    .coin-pop {
+      position: fixed;
+      font-size: 22px;
+      animation: coinPop 1s ease forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="logo">Ads<span>Earn</span></div>
+    <div class="subtitle">📺 Ads dekho — coins kamao!</div>
+
+    <!-- TV Screen -->
+    <div class="tv-screen">
+      <div class="tv-content" id="tvContent">
+        <div class="tv-icon">📺</div>
+        <div class="tv-text">
+          Ads load ho rahe hain...<br>
+          <small style="color:#555;">Video Slider bottom-right mein dikhega!</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adsterra Banner -->
+    <div class="ad-slot">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe',
+          'height' : 50,
+          'width' : 320,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+
+    <!-- Coins + Timer -->
+    <div class="coins-box">
+      <div>
+        <div class="coins-label">🪙 Coins Earned</div>
+        <div class="coins-value" id="coinsDisplay">0</div>
+      </div>
+      <div class="timer-box">
+        <div class="coins-label">⏱ Next coins in</div>
+        <div class="timer-value" id="timerDisplay">30</div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-box earning" id="statusBox">
+      ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">👁</div>
+        <div class="stat-value" id="adsWatched">0</div>
+        <div class="stat-label">Ads Watched</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🪙</div>
+        <div class="stat-value" id="totalCoins">0</div>
+        <div class="stat-label">Total Earned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-value" id="timeWatched">0</div>
+        <div class="stat-label">Minutes</div>
+      </div>
+    </div>
+
+    <!-- Second Ad Slot -->
+    <div class="ad-slot">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe',
+          'height' : 50,
+          'width' : 320,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+
+    <div class="footer-note">
+      🛡️ AdsEarn — Ads dekho, real coins kamao!<br>
+      Page band mat karo — coins milte rahenge!
+    </div>
+
+  </div>
+
+  <!-- ADSTERRA POPUNDER -->
+  <div style="display:none;">
+    <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
+  </div>
+
+  <!-- ADSTERRA SOCIAL BAR -->
+  <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
+
+  <!-- HILLTOPADS VIDEO SLIDER -->
+  <script>
+  (function(iia){
+  var d = document,
+      s = d.createElement('script'),
+      l = d.scripts[d.scripts.length - 1];
+  s.settings = iia || {};
+  s.src = "\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
+  s.async = true;
+  s.referrerPolicy = 'no-referrer-when-downgrade';
+  l.parentNode.insertBefore(s, l);
+  })({})
+  </script>
+
+  <script>
+    const COINS_PER_CYCLE = 2;  // har 30 sec mein coins
+    const CYCLE_SECS = 30;
+
+    let coins = 0;
+    let adsWatched = 0;
+    let totalMinutes = 0;
+    let remaining = CYCLE_SECS;
+
+    const coinsEl    = document.getElementById('coinsDisplay');
+    const timerEl    = document.getElementById('timerDisplay');
+    const progressEl = document.getElementById('progressBar');
+    const adsEl      = document.getElementById('adsWatched');
+    const totalEl    = document.getElementById('totalCoins');
+    const timeEl     = document.getElementById('timeWatched');
+
+    // ── Timer ──
+    setInterval(() => {
+      remaining--;
+      timerEl.textContent = remaining;
+
+      // Progress bar
+      const pct = ((CYCLE_SECS - remaining) / CYCLE_SECS) * 100;
+      progressEl.style.width = pct + '%';
+
+      if (remaining <= 0) {
+        remaining = CYCLE_SECS;
+        progressEl.style.width = '0%';
+
+        // Coins add karo
+        coins += COINS_PER_CYCLE;
+        adsWatched++;
+        coinsEl.textContent = coins;
+        adsEl.textContent   = adsWatched;
+        totalEl.textContent = coins;
+
+        // Coin pop animation
+        showCoinPop();
+
+        // Flutter app ko notify karo
+        if (window.CoinChannel) {
+          window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
+        }
+      }
+    }, 1000);
+
+    // ── Minutes counter ──
+    setInterval(() => {
+      totalMinutes++;
+      timeEl.textContent = totalMinutes;
+    }, 60000);
+
+    // ── Coin pop animation ──
+    function showCoinPop() {
+      const el = document.createElement('div');
+      el.className = 'coin-pop';
+      el.textContent = '+' + COINS_PER_CYCLE + ' 🪙';
+      el.style.left = (Math.random() * 60 + 20) + '%';
+      el.style.top  = '60%';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+  </script>
+
+</body>
+</html>
