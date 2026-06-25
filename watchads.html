@@ -1,3 +1,4 @@
+cat > /home/claude/watch-ads.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,28 +15,57 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+
+    /* TOP BANNER */
+    .ad-top {
+      width: 100%;
+      max-width: 728px;
+      min-height: 60px;
+      background: #1a1a2e;
+      border-bottom: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
       justify-content: center;
+    }
+
+    /* SIDE BANNERS */
+    .side-left, .side-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+    .side-left  { left: 8px; }
+    .side-right { right: 8px; }
+    .side-banner-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+    @media (max-width: 900px) {
+      .side-left, .side-right { display: none; }
     }
 
     .container {
       width: 100%;
       max-width: 480px;
-      padding: 20px;
+      padding: 16px 16px 90px 16px;
       text-align: center;
     }
 
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
+    .logo { font-size: 24px; font-weight: 800; margin-bottom: 4px; margin-top: 12px; }
     .logo span { color: #FFD700; }
-
-    .subtitle {
-      font-size: 13px;
-      color: #8BA0C0;
-      margin-bottom: 24px;
-    }
+    .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 16px; }
 
     /* TV Screen */
     .tv-screen {
@@ -43,99 +73,19 @@
       background: #000;
       border-radius: 16px;
       border: 3px solid #1a3a6b;
-      min-height: 200px;
+      min-height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
       position: relative;
       overflow: hidden;
     }
+    .tv-content { text-align: center; padding: 20px; }
+    .tv-icon { font-size: 50px; margin-bottom: 10px; }
+    .tv-text { font-size: 13px; color: #8BA0C0; line-height: 1.6; }
 
-    .tv-content {
-      text-align: center;
-      padding: 20px;
-    }
-
-    .tv-icon { font-size: 60px; margin-bottom: 12px; }
-
-    .tv-text {
-      font-size: 14px;
-      color: #8BA0C0;
-      line-height: 1.6;
-    }
-
-    /* Coins counter */
-    .coins-box {
-      background: #1a2f52;
-      border: 1px solid #FFD700;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .coins-label {
-      font-size: 13px;
-      color: #8BA0C0;
-    }
-
-    .coins-value {
-      font-size: 22px;
-      font-weight: 800;
-      color: #FFD700;
-    }
-
-    .timer-box {
-      font-size: 13px;
-      color: #8BA0C0;
-      text-align: right;
-    }
-
-    .timer-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: #a855f7;
-    }
-
-    /* Progress bar */
-    .progress-wrap {
-      background: #1a1a2e;
-      border-radius: 999px;
-      height: 8px;
-      width: 100%;
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #6c47ff, #FFD700);
-      border-radius: 999px;
-      transition: width 1s linear;
-    }
-
-    /* Status */
-    .status-box {
-      background: rgba(108,71,255,0.1);
-      border: 1px solid rgba(108,71,255,0.3);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 16px;
-      font-size: 13px;
-      color: #a78bfa;
-    }
-
-    .status-box.earning {
-      background: rgba(0,200,100,0.1);
-      border-color: rgba(0,200,100,0.3);
-      color: #4ade80;
-    }
-
-    /* Ad banner slot */
+    /* Ad slots */
     .ad-slot {
       background: #12122a;
       border: 1px solid #2a2a4a;
@@ -148,48 +98,97 @@
       overflow: hidden;
     }
 
+    /* Coins + Timer */
+    .coins-box {
+      background: #1a2f52;
+      border: 1px solid #FFD700;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .coins-label { font-size: 12px; color: #8BA0C0; }
+    .coins-value { font-size: 22px; font-weight: 800; color: #FFD700; }
+    .timer-box { text-align: right; }
+    .timer-value { font-size: 20px; font-weight: 700; color: #a855f7; }
+
+    /* Progress */
+    .progress-wrap {
+      background: #1a1a2e;
+      border-radius: 999px;
+      height: 8px;
+      width: 100%;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6c47ff, #FFD700);
+      border-radius: 999px;
+      transition: width 1s linear;
+    }
+
+    /* Status */
+    .status-box {
+      background: rgba(0,200,100,0.1);
+      border: 1px solid rgba(0,200,100,0.3);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #4ade80;
+    }
+
     /* Stats */
     .stats-row {
       display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-
     .stat-card {
       flex: 1;
       background: #1a2f52;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
       text-align: center;
     }
-
-    .stat-icon { font-size: 20px; }
-    .stat-value {
-      font-size: 18px;
-      font-weight: 800;
-      color: #FFD700;
-    }
-    .stat-label {
-      font-size: 10px;
-      color: #8BA0C0;
-    }
+    .stat-icon { font-size: 18px; }
+    .stat-value { font-size: 18px; font-weight: 800; color: #FFD700; }
+    .stat-label { font-size: 10px; color: #8BA0C0; }
 
     .footer-note {
       font-size: 10px;
       color: #555;
-      margin-top: 12px;
+      margin-top: 10px;
       line-height: 1.6;
     }
 
-    /* Coin earned animation */
+    /* BOTTOM STICKY AD */
+    .ad-bottom-sticky {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      min-height: 55px;
+      background: #0a0a18;
+      border-top: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
     @keyframes coinPop {
       0%   { transform: scale(0.5) translateY(0); opacity: 1; }
-      100% { transform: scale(1.2) translateY(-40px); opacity: 0; }
+      100% { transform: scale(1.5) translateY(-60px); opacity: 0; }
     }
     .coin-pop {
       position: fixed;
       font-size: 22px;
-      animation: coinPop 1s ease forwards;
+      font-weight: 800;
+      color: #FFD700;
+      animation: coinPop 1.2s ease forwards;
       pointer-events: none;
       z-index: 9999;
     }
@@ -197,10 +196,65 @@
 </head>
 <body>
 
+  <!-- TOP BANNER (Adsterra) -->
+  <div class="ad-top">
+    <script>
+      atOptions = {
+        'key' : '054b7c1a4cbb13266b09c565eb61513e',
+        'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
+      };
+    </script>
+    <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+  </div>
+
+  <!-- LEFT SIDE BANNERS (Adsterra) -->
+  <div class="side-left">
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE BANNERS (Adsterra) -->
+  <div class="side-right">
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {
+          'key' : '054b7c1a4cbb13266b09c565eb61513e',
+          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+  </div>
+
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
-    <div class="subtitle">📺 Ads dekho — coins kamao!</div>
+    <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
 
     <!-- TV Screen -->
     <div class="tv-screen">
@@ -213,15 +267,12 @@
       </div>
     </div>
 
-    <!-- Adsterra Banner -->
+    <!-- AD SLOT 1 (Adsterra Banner) -->
     <div class="ad-slot">
       <script>
         atOptions = {
           'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe',
-          'height' : 50,
-          'width' : 320,
-          'params' : {}
+          'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
         };
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -245,7 +296,7 @@
     </div>
 
     <!-- Status -->
-    <div class="status-box earning" id="statusBox">
+    <div class="status-box" id="statusBox">
       ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
     </div>
 
@@ -268,15 +319,12 @@
       </div>
     </div>
 
-    <!-- Second Ad Slot -->
+    <!-- AD SLOT 2 (Adsterra Banner) -->
     <div class="ad-slot">
       <script>
         atOptions = {
           'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe',
-          'height' : 50,
-          'width' : 320,
-          'params' : {}
+          'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
         };
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -289,20 +337,20 @@
 
   </div>
 
+  <!-- BOTTOM STICKY AD (Adsterra Social Bar) -->
+  <div class="ad-bottom-sticky">
+    <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
+  </div>
+
   <!-- ADSTERRA POPUNDER -->
   <div style="display:none;">
     <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
   </div>
 
-  <!-- ADSTERRA SOCIAL BAR -->
-  <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
-
   <!-- HILLTOPADS VIDEO SLIDER -->
   <script>
   (function(iia){
-  var d = document,
-      s = d.createElement('script'),
-      l = d.scripts[d.scripts.length - 1];
+  var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
   s.settings = iia || {};
   s.src = "\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
   s.async = true;
@@ -311,14 +359,52 @@
   })({})
   </script>
 
-  <script>
-    const COINS_PER_CYCLE = 2;  // har 30 sec mein coins
+  <!-- DAO.AD VIDEO SLIDER -->
+  <script type="text/javascript" src="https://video.agenteimmobiliare.info/d-video.js?b=32"></script>
+  <script>function dviInit(){
+  window.daoVideoSlider = new DaoVideo({"sourceId":62512,"tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"});
+  daoVideoSlider.loadAd(function(){
+    daoVideoSlider.slider({"containerId":"vi-d-ad-container","positionY":"bottom","positionX":"left","volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"tada","pulseInterval":5}});
+  });} if(document.readyState === "complete" || document.readyState !== "loading") dviInit(); else document.addEventListener('DOMContentLoaded', dviInit);
+  </script>
+
+  <!-- DAO.AD INPAGE PUSH -->
+  <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
+  <script>function dippInit(){let dIppObj = new DaoInPagePush({"sourceId":62514,"maxCount":2,"startDelay":5,"showInterval":30,"renewInterval":300,"positionY":"bottom","positionX":"right","adMarkType":"no","largeImage":"hover","color":"#fafafa","bgColor":"rgba(90, 90, 90, 0.85)","borderColor":"#727272","font":{"color":"#fafafa","size":"normal"},"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},"sound":{"enable":false,"volume":60}});}
+  if(document.readyState === "complete" || document.readyState !== "loading") dippInit(); else document.addEventListener('DOMContentLoaded', dippInit);
+  </script>
+
+  <!-- DAO.AD POPUNDER -->
+  <script src="https://onetouch4.com/sl/pnm/62513.js"></script>
+  <script>firstAggOmg.make("https://daleelerah.info/pop-go/62513", {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000})</script>
+
+  <!-- Firebase + Coins Logic -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, get, set, update }
+      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+    import { getAuth, onAuthStateChanged }
+      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
+      authDomain: "this-is-my-first-app-99e55.firebaseapp.com",
+      databaseURL: "https://this-is-my-first-app-99e55-default-rtdb.firebaseio.com",
+      projectId: "this-is-my-first-app-99e55"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = getDatabase(app);
+    const auth = getAuth(app);
+
+    const COINS_PER_CYCLE = 2;
     const CYCLE_SECS = 30;
 
     let coins = 0;
     let adsWatched = 0;
     let totalMinutes = 0;
     let remaining = CYCLE_SECS;
+    let currentUser = null;
 
     const coinsEl    = document.getElementById('coinsDisplay');
     const timerEl    = document.getElementById('timerDisplay');
@@ -327,12 +413,37 @@
     const totalEl    = document.getElementById('totalCoins');
     const timeEl     = document.getElementById('timeWatched');
 
-    // ── Timer ──
+    // User check karo
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('statusBox').textContent =
+          '✅ ' + (user.displayName || user.email) + ' — Ads dekho coins kamao!';
+      } else {
+        document.getElementById('statusBox').textContent =
+          '⚠️ Login karo coins save karne ke liye!';
+      }
+    });
+
+    // Coins Firebase mein save karo
+    async function saveCoinsToFirebase(newCoins) {
+      if (!currentUser) return;
+      const userRef = ref(db, 'users/' + currentUser.uid + '/coins');
+      const snap = await get(userRef);
+      const current = snap.val() || 0;
+      await set(userRef, current + newCoins);
+
+      // Watch history bhi save karo
+      const historyRef = ref(db, 'users/' + currentUser.uid + '/watchHistory');
+      const histSnap = await get(historyRef);
+      const hist = histSnap.val() || 0;
+      await set(historyRef, hist + 1);
+    }
+
+    // Timer
     setInterval(() => {
       remaining--;
       timerEl.textContent = remaining;
-
-      // Progress bar
       const pct = ((CYCLE_SECS - remaining) / CYCLE_SECS) * 100;
       progressEl.style.width = pct + '%';
 
@@ -340,15 +451,16 @@
         remaining = CYCLE_SECS;
         progressEl.style.width = '0%';
 
-        // Coins add karo
         coins += COINS_PER_CYCLE;
         adsWatched++;
         coinsEl.textContent = coins;
         adsEl.textContent   = adsWatched;
         totalEl.textContent = coins;
 
-        // Coin pop animation
         showCoinPop();
+
+        // Firebase mein save karo
+        saveCoinsToFirebase(COINS_PER_CYCLE);
 
         // Flutter app ko notify karo
         if (window.CoinChannel) {
@@ -357,23 +469,25 @@
       }
     }, 1000);
 
-    // ── Minutes counter ──
+    // Minutes counter
     setInterval(() => {
       totalMinutes++;
       timeEl.textContent = totalMinutes;
     }, 60000);
 
-    // ── Coin pop animation ──
+    // Coin pop animation
     function showCoinPop() {
       const el = document.createElement('div');
       el.className = 'coin-pop';
       el.textContent = '+' + COINS_PER_CYCLE + ' 🪙';
       el.style.left = (Math.random() * 60 + 20) + '%';
-      el.style.top  = '60%';
+      el.style.top  = '50%';
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1000);
+      setTimeout(() => el.remove(), 1200);
     }
   </script>
 
 </body>
 </html>
+HTMLEOF
+echo "Done!"
