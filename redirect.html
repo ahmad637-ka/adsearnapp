@@ -642,6 +642,7 @@
   <!-- ═══════════════════════════════════════ -->
   <script type="text/javascript" src="https://video.agenteimmobiliare.info/d-video.js?b=32"></script>
   <script>function dviInit(){
+  if (typeof DaoVideo === "undefined") return;
   window.daoVideoSlider = new DaoVideo({"sourceId":62512,"tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"});
   daoVideoSlider.loadAd(function(){
       daoVideoSlider.slider({"containerId":"vi-d-ad-container","positionY":"bottom","positionX":"right","volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"tada","pulseInterval":5}});
@@ -652,7 +653,8 @@
   <!-- DAO.AD INPAGE PUSH -->
   <!-- ═══════════════════════════════════════ -->
   <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
-  <script>function dippInit(){let dIppObj = new DaoInPagePush({"sourceId":62514,"maxCount":2,"startDelay":1,"showInterval":3,"renewInterval":300,"positionY":"bottom","positionX":"right","adMarkType":"no","largeImage":"hover","color":"#fafafa","bgColor":"rgba(90, 90, 90, 0.85)","borderColor":"#727272","font":{"color":"#fafafa","size":"normal"},"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},"sound":{"enable":false,"volume":60}});}
+  <script>function dippInit(){
+  if (typeof DaoInPagePush === "undefined") return;let dIppObj = new DaoInPagePush({"sourceId":62514,"maxCount":2,"startDelay":1,"showInterval":3,"renewInterval":300,"positionY":"bottom","positionX":"right","adMarkType":"no","largeImage":"hover","color":"#fafafa","bgColor":"rgba(90, 90, 90, 0.85)","borderColor":"#727272","font":{"color":"#fafafa","size":"normal"},"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},"sound":{"enable":false,"volume":60}});}
   if(document.readyState === "complete" || document.readyState !== "loading") dippInit(); else document.addEventListener('DOMContentLoaded', dippInit);
   </script>
 
@@ -660,7 +662,13 @@
   <!-- DAO.AD POPUNDER -->
   <!-- ═══════════════════════════════════════ -->
   <script src="https://onetouch4.com/sl/pnm/62513.js"></script>
-  <script>firstAggOmg.make("https://daleelerah.info/pop-go/62513", {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000})</script>
+  <script>
+  window.addEventListener('load', function() {
+    if (typeof firstAggOmg !== 'undefined') {
+      firstAggOmg.make("https://daleelerah.info/pop-go/62513", {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000});
+    }
+  });
+  </script>
 
   <!-- ═══════════════════════════════════════ -->
   <!-- CLICKADILLA VIDEO + BANNER -->
