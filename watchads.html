@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AdsEarn - Watch Ads & Earn</title>
+
+  <!-- Video.js CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
+  <!-- Contrib-ads CSS (zaruri hai vast plugin ke liye) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.3.2/videojs.ads.css" rel="stylesheet">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -45,7 +51,6 @@
     }
     .side-left  { left: 0; }
     .side-right { right: 0; }
-
     .side-banner-box {
       background: #1a1a2e;
       border: 1px solid #2a2a4a;
@@ -59,7 +64,7 @@
       flex-shrink: 0;
     }
 
-    /* Video Slider containers fixed at bottom corners */
+    /* Video Slider containers — bottom corners */
     .dao-slider-wrap {
       position: fixed;
       bottom: 60px;
@@ -93,7 +98,7 @@
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
-    /* VIDEO PLAYER */
+    /* VIDEO PLAYER WRAPPER */
     .video-player-wrap {
       width: 100%;
       background: #000;
@@ -102,48 +107,79 @@
       overflow: hidden;
       margin-bottom: 14px;
       position: relative;
-      min-height: 200px;
     }
 
-    /* IMA container — must be on top of video */
-    #adContainer {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 10;
+    /* VideoJS player size */
+    #myVideoPlayer {
+      width: 100% !important;
+      height: 220px !important;
     }
-
-    #contentVideo {
-      width: 100%;
-      display: block;
-      max-height: 220px;
+    .video-js {
+      width: 100% !important;
+      height: 220px !important;
       background: #000;
     }
 
-    .video-overlay {
+    /* Play Button Overlay (user gesture ke liye) */
+    .play-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.75);
-      flex-direction: column;
-      gap: 8px;
-      z-index: 5;
+      background: rgba(0,0,0,0.82);
+      z-index: 50;
+      gap: 10px;
       cursor: pointer;
+      border-radius: 11px;
     }
-    .video-overlay-icon { font-size: 50px; }
-    .video-overlay-text { font-size: 13px; color: #8BA0C0; }
-    .play-btn {
-      background: #FFD700;
+    .play-overlay .ov-icon { font-size: 48px; }
+    .play-overlay .ov-text { font-size: 13px; color: #8BA0C0; }
+    .play-overlay .ov-btn {
+      background: linear-gradient(135deg, #FFD700, #ff8c00);
       color: #000;
       border: none;
       border-radius: 30px;
-      padding: 8px 24px;
-      font-size: 14px;
+      padding: 10px 28px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 4px;
+      box-shadow: 0 4px 18px rgba(255,215,0,0.5);
+      animation: glow 1.5s infinite;
+    }
+    @keyframes glow {
+      0%,100% { box-shadow: 0 4px 18px rgba(255,215,0,0.5); }
+      50% { box-shadow: 0 6px 28px rgba(255,140,0,0.9); }
+    }
+
+    /* Status badge jab video chal rahi ho */
+    .video-status-bar {
+      background: rgba(108,71,255,0.15);
+      border: 1px solid rgba(108,71,255,0.35);
+      border-radius: 10px;
+      padding: 8px 14px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #a78bfa;
+      display: none;
+      text-align: center;
+    }
+
+    /* Next Ad Button */
+    .next-ad-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6c47ff, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 6px;
+      margin-bottom: 12px;
+      display: none;
     }
 
     /* AD SLOTS */
@@ -202,6 +238,11 @@
       font-size: 12px;
       color: #4ade80;
     }
+    .status-box.warning {
+      background: rgba(255,150,0,0.1);
+      border-color: rgba(255,150,0,0.3);
+      color: #fbbf24;
+    }
 
     /* STATS */
     .stats-row {
@@ -240,22 +281,6 @@
       z-index: 999;
     }
 
-    /* NEXT AD BUTTON */
-    .next-ad-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #6c47ff, #a855f7);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-bottom: 12px;
-      display: none;
-    }
-    .next-ad-btn:hover { opacity: 0.9; }
-
     @keyframes coinPop {
       0%   { transform: scale(0.5) translateY(0); opacity: 1; }
       100% { transform: scale(1.5) translateY(-60px); opacity: 0; }
@@ -269,16 +294,20 @@
       pointer-events: none;
       z-index: 9999;
     }
-  </style>
 
-  <!-- Google IMA SDK for VAST video ads -->
-  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    /* VideoJS skin tweaks */
+    .video-js .vjs-big-play-button {
+      display: none !important;
+    }
+    .video-js .vjs-control-bar {
+      background: rgba(0,0,0,0.7);
+    }
+  </style>
 </head>
 <body>
 
   <!-- TOP BANNER -->
   <div class="ad-top">
-    <!-- Adsterra banner -->
     <script>
       atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
     </script>
@@ -339,25 +368,32 @@
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
-    <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
+    <div class="subtitle">&#x1F4FA; Ads dekho &#x2014; real coins kamao!</div>
 
-    <!-- VIDEO PLAYER (Google IMA SDK — VAST) -->
-    <div class="video-player-wrap" id="videoPlayerWrap">
-      <!-- Overlay: user ko click karna hoga autoplay policy ki wajah se -->
-      <div class="video-overlay" id="videoOverlay">
-        <div class="video-overlay-icon">📺</div>
-        <div class="video-overlay-text">Video ad ready hai!</div>
-        <button class="play-btn" onclick="startVideoAd()">▶ Ad Chalao — Coins Kamao</button>
+    <!-- VIDEO PLAYER -->
+    <div class="video-player-wrap">
+      <!-- Play Overlay — user click ke bina autoplay nahi hota -->
+      <div class="play-overlay" id="playOverlay">
+        <div class="ov-icon">&#x1F4FA;</div>
+        <div class="ov-text">Video ad ready hai — dekho aur coins kamao!</div>
+        <button class="ov-btn" onclick="startVastAd()">&#x25B6; Ad Chalao &mdash; Coins Kamao</button>
       </div>
-      <!-- Content video (IMA ke peeche chalta hai) -->
-      <video id="contentVideo" playsinline muted></video>
-      <!-- IMA ad container — overlays video -->
-      <div id="adContainer"></div>
+      <!-- VideoJS element -->
+      <video id="myVideoPlayer"
+             class="video-js vjs-default-skin"
+             playsinline
+             preload="auto">
+      </video>
     </div>
 
-    <!-- Next Ad Button (ad khatam hone ke baad dikhega) -->
-    <button class="next-ad-btn" id="nextAdBtn" onclick="loadNextAd()">
-      ▶ Agli Ad Dekho (+2 🪙)
+    <!-- Video playing status -->
+    <div class="video-status-bar" id="videoStatusBar">
+      &#x25B6; Video ad chal rahi hai &mdash; dekhte raho, coins aa rahe hain!
+    </div>
+
+    <!-- Next Ad Button -->
+    <button class="next-ad-btn" id="nextAdBtn" onclick="loadNextVastAd()">
+      &#x25B6; Agli Ad Dekho (+2 &#x1F4B0;)
     </button>
 
     <!-- AD SLOT 1 -->
@@ -376,7 +412,7 @@
       </div>
       <div class="timer-box">
         <div class="coins-label">&#x23F1; Next coins in</div>
-        <div class="timer-value" id="timerDisplay">30</div>
+        <div class="timer-value" id="timerDisplay">--</div>
       </div>
     </div>
 
@@ -387,13 +423,13 @@
 
     <!-- STATUS -->
     <div class="status-box" id="statusBox">
-      ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
+      &#x23F3; Pehle video ad chalao &mdash; phir coins milenge!
     </div>
 
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon">👁</div>
+        <div class="stat-icon">&#x1F441;</div>
         <div class="stat-value" id="adsWatched">0</div>
         <div class="stat-label">Ads Watched</div>
       </div>
@@ -403,7 +439,7 @@
         <div class="stat-label">Total Earned</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">⏰</div>
+        <div class="stat-icon">&#x23F0;</div>
         <div class="stat-value" id="timeWatched">0</div>
         <div class="stat-label">Minutes</div>
       </div>
@@ -425,7 +461,7 @@
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
-    <!-- AD SLOT 4 (extra banner) -->
+    <!-- AD SLOT 4 -->
     <div class="ad-slot">
       <script>
         atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':90,'width':728,'params':{}};
@@ -434,11 +470,11 @@
     </div>
 
     <div class="footer-note">
-      &#x1F6E1;&#xFE0F; AdsEarn — Ads dekho, real coins kamao!<br>
-      Page band mat karo — coins milte rahenge!
+      &#x1F6E1;&#xFE0F; AdsEarn &mdash; Ads dekho, real coins kamao!<br>
+      Video ad dekhne ke baad hi coins milenge!
     </div>
 
-  </div>
+  </div><!-- /container -->
 
   <!-- BOTTOM STICKY (Adsterra Social Bar) -->
   <div class="ad-bottom-sticky">
@@ -519,175 +555,236 @@
   <!-- CLICKADILLA JS (display ads) -->
   <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
 
+  <!-- Video.js Core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
+  <!-- Contrib-Ads (vast plugin ke liye dependency) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.3.2/videojs.ads.min.js"></script>
+  <!-- VAST Plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-vast-plugin/2.0.5/videojs.vast.min.js"></script>
+
   <!-- =============================================
-       GOOGLE IMA SDK — VAST VIDEO PLAYER LOGIC
+       VAST VIDEO PLAYER + COINS LOGIC
        ============================================= -->
   <script>
-  // ClickAdilla VAST tag
-  const VAST_TAG_URL = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
+  // ClickAdilla VAST URL
+  const VAST_TAG = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
 
-  let adsManager;
-  let adsLoader;
-  let adDisplayContainer;
-  let adStarted = false;
-  let adCompleted = false;
+  const COINS_PER_CYCLE = 2;  // har 30 sec mein kitne coins
+  const CYCLE_SECS = 30;      // seconds
 
-  // IMA initialize karo
-  function initIMA() {
-    const videoElement = document.getElementById('contentVideo');
-    const adContainerEl = document.getElementById('adContainer');
+  let vjsPlayer = null;
+  let coinTimer = null;
+  let remaining = CYCLE_SECS;
+  let isAdPlaying = false;    // KEY FIX: coins sirf tab milenge jab ad chal rahi ho
+  let sessionCoins = 0;
+  let adsCount = 0;
 
-    // AdDisplayContainer banao
-    adDisplayContainer = new google.ima.AdDisplayContainer(adContainerEl, videoElement);
+  const coinsEl    = document.getElementById('coinsDisplay');
+  const timerEl    = document.getElementById('timerDisplay');
+  const progressEl = document.getElementById('progressBar');
+  const adsEl      = document.getElementById('adsWatched');
+  const totalEl    = document.getElementById('totalCoins');
+  const statusBox  = document.getElementById('statusBox');
+  const vStatusBar = document.getElementById('videoStatusBar');
+  const nextBtn    = document.getElementById('nextAdBtn');
+  const overlay    = document.getElementById('playOverlay');
 
-    // AdsLoader banao
-    adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+  // ── COIN TIMER ──
+  // Timer sirf tab chalta hai jab isAdPlaying = true
+  function startCoinTimer() {
+    if (coinTimer) return; // pehle se chal raha hai
+    remaining = CYCLE_SECS;
+    timerEl.textContent = remaining;
+    progressEl.style.width = '0%';
 
-    // Events
-    adsLoader.addEventListener(
-      google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-      onAdsManagerLoaded, false
-    );
-    adsLoader.addEventListener(
-      google.ima.AdErrorEvent.Type.AD_ERROR,
-      onAdError, false
-    );
+    coinTimer = setInterval(() => {
+      if (!isAdPlaying) {
+        // Ad rok gayi — timer pause karo
+        stopCoinTimer();
+        timerEl.textContent = '--';
+        progressEl.style.width = '0%';
+        statusBox.className = 'status-box warning';
+        statusBox.textContent = '&#x23F8; Ad ruk gayi — coins band hain. Dobara chalao!';
+        return;
+      }
+      remaining--;
+      timerEl.textContent = remaining;
+      progressEl.style.width = ((CYCLE_SECS - remaining) / CYCLE_SECS * 100) + '%';
 
-    // Video ended event
-    videoElement.addEventListener('ended', function() {
-      adsLoader.contentComplete();
-    });
+      if (remaining <= 0) {
+        remaining = CYCLE_SECS;
+        progressEl.style.width = '0%';
+        awardCoins(COINS_PER_CYCLE);
+      }
+    }, 1000);
   }
 
-  // User ne button click kiya — ad start karo
-  function startVideoAd() {
-    if (adStarted) return;
-    adStarted = true;
-
-    // Overlay hide karo
-    document.getElementById('videoOverlay').style.display = 'none';
-
-    // IMA initialize
-    initIMA();
-
-    // AdDisplayContainer initialize (user gesture ke andar zaruri)
-    adDisplayContainer.initialize();
-
-    // Ad request banao
-    const adsRequest = new google.ima.AdsRequest();
-    adsRequest.adTagUrl = VAST_TAG_URL;
-
-    // Player size
-    const wrap = document.getElementById('videoPlayerWrap');
-    adsRequest.linearAdSlotWidth  = wrap.offsetWidth  || 480;
-    adsRequest.linearAdSlotHeight = wrap.offsetHeight || 220;
-    adsRequest.nonLinearAdSlotWidth  = wrap.offsetWidth  || 480;
-    adsRequest.nonLinearAdSlotHeight = 90;
-
-    adsLoader.requestAds(adsRequest);
-
-    // Status update
-    document.getElementById('statusBox').textContent = '📺 Video ad load ho rahi hai...';
+  function stopCoinTimer() {
+    if (coinTimer) { clearInterval(coinTimer); coinTimer = null; }
   }
 
-  function onAdsManagerLoaded(adsManagerLoadedEvent) {
-    const videoElement = document.getElementById('contentVideo');
+  function awardCoins(n) {
+    sessionCoins += n;
+    adsCount++;
+    coinsEl.textContent = sessionCoins;
+    totalEl.textContent = sessionCoins;
+    adsEl.textContent   = adsCount;
+    showCoinPop(n);
+    saveCoinsToFirebase(n);
+    if (window.CoinChannel) window.CoinChannel.postMessage(n.toString());
+  }
 
-    // AdsManager settings
-    const adsRenderingSettings = new google.ima.AdsRenderingSettings();
-    adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
+  function showCoinPop(n) {
+    const el = document.createElement('div');
+    el.className = 'coin-pop';
+    el.textContent = '+' + n + ' \uD83D\uDCB0';
+    el.style.left = (Math.random() * 60 + 20) + '%';
+    el.style.top  = '50%';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  }
 
-    adsManager = adsManagerLoadedEvent.getAdsManager(videoElement, adsRenderingSettings);
+  // ── VAST PLAYER ──
+  function startVastAd() {
+    overlay.style.display = 'none';
+    nextBtn.style.display = 'none';
 
-    // Ad events
-    adsManager.addEventListener(google.ima.AdEvent.Type.STARTED,        onAdStarted);
-    adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE,       onAdComplete);
-    adsManager.addEventListener(google.ima.AdEvent.Type.SKIPPED,        onAdSkipped);
-    adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, onAllAdsCompleted);
-    adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR,  onAdError);
+    // VideoJS player initialize karo (agar pehle nahi hua)
+    if (!vjsPlayer) {
+      vjsPlayer = videojs('myVideoPlayer', {
+        controls: true,
+        autoplay: false,
+        preload: 'auto',
+        muted: false,
+        fluid: false,
+        width: '100%',
+        height: 220
+      });
 
-    try {
-      const wrap = document.getElementById('videoPlayerWrap');
-      adsManager.init(wrap.offsetWidth || 480, wrap.offsetHeight || 220, google.ima.ViewMode.NORMAL);
-      adsManager.start();
-      document.getElementById('statusBox').textContent = '✅ Video ad chal rahi hai — dekhte raho!';
-    } catch(e) {
-      console.error('IMA start error:', e);
-      onAdError();
+      // VAST plugin setup
+      try {
+        vjsPlayer.vast({
+          url: VAST_TAG,
+          skip: 5,          // 5 sec baad skip button aayega
+          timeout: 8000     // 8 sec mein ad load na ho to skip
+        });
+      } catch(e) {
+        console.error('VAST plugin error:', e);
+        onAdError();
+        return;
+      }
+
+      // ── AD EVENTS ──
+
+      // Ad shuru hui
+      vjsPlayer.on('ads-ad-started', function() {
+        console.log('Ad started!');
+        isAdPlaying = true;
+        vStatusBar.style.display = 'block';
+        vStatusBar.innerHTML = '&#x25B6; Video ad chal rahi hai &mdash; coins aa rahe hain! &#x1F4B0;';
+        statusBox.className = 'status-box';
+        statusBox.textContent = '\u2705 Ad dekho \u2014 har 30 sec mein coins milenge!';
+        startCoinTimer();
+      });
+
+      // Ad khatam hui (completed ya skipped)
+      vjsPlayer.on('ads-ad-ended', function() {
+        console.log('Ad ended');
+        onAdFinished();
+      });
+      vjsPlayer.on('adended', function() {
+        onAdFinished();
+      });
+      vjsPlayer.on('vast.adEnd', function() {
+        onAdFinished();
+      });
+
+      // Skip hua
+      vjsPlayer.on('vast.adSkip', function() {
+        onAdFinished();
+      });
+
+      // Error
+      vjsPlayer.on('vast.aderror', function() {
+        onAdError();
+      });
+      vjsPlayer.on('ads-error', function() {
+        onAdError();
+      });
+
+    } else {
+      // Player pehle se hai — naya VAST request karo
+      try {
+        vjsPlayer.vast({
+          url: VAST_TAG + '&t=' + Date.now(),
+          skip: 5,
+          timeout: 8000
+        });
+      } catch(e) {
+        onAdError();
+      }
     }
+
+    // Player play karo
+    vjsPlayer.play().catch(function(e) {
+      console.log('Autoplay blocked:', e);
+      // User ne manually play kiya tha to ye nahi hoga
+    });
+
+    statusBox.className = 'status-box';
+    statusBox.textContent = '\uD83D\uDCFA Ad load ho rahi hai...';
   }
 
-  function onAdStarted(e) {
-    console.log('Ad started');
-    document.getElementById('statusBox').textContent = '▶ Video ad chal rahi hai — coins aa rahe hain!';
+  function onAdFinished() {
+    isAdPlaying = false;
+    stopCoinTimer();
+    vStatusBar.innerHTML = '\u2705 Ad khatam! Agli ad ke liye button dabao.';
+    statusBox.className = 'status-box';
+    statusBox.textContent = '\u2705 Ad khatam! Agli ad dekho +2 \uD83D\uDCB0';
+    nextBtn.style.display = 'block';
+    timerEl.textContent = '--';
+    progressEl.style.width = '0%';
   }
 
-  function onAdComplete(e) {
-    console.log('Ad complete');
-    adCompleted = true;
-    // Coins dene ka kaam timer se hoga — yahan sirf "next ad" button dikhao
-    document.getElementById('nextAdBtn').style.display = 'block';
-    document.getElementById('statusBox').textContent = '✅ Ad khatam! Agli ad ke liye button dabao.';
-  }
+  function onAdError() {
+    isAdPlaying = false;
+    stopCoinTimer();
+    vStatusBar.style.display = 'none';
+    timerEl.textContent = '--';
+    progressEl.style.width = '0%';
+    statusBox.className = 'status-box warning';
+    statusBox.textContent = '\u26A0\uFE0F Ad load nahi hui \u2014 retry karo';
 
-  function onAdSkipped(e) {
-    console.log('Ad skipped');
-    document.getElementById('nextAdBtn').style.display = 'block';
-    document.getElementById('statusBox').textContent = '⏭ Ad skip ki — agli ad dekho!';
-  }
-
-  function onAllAdsCompleted(e) {
-    console.log('All ads complete');
-    document.getElementById('nextAdBtn').style.display = 'block';
-  }
-
-  function onAdError(e) {
-    console.error('Ad error:', e && e.getError ? e.getError() : e);
-    if (adsManager) adsManager.destroy();
-
-    // Error pe overlay wapas dikhao with retry
-    const overlay = document.getElementById('videoOverlay');
+    // Overlay wapas dikhao retry ke saath
     overlay.style.display = 'flex';
     overlay.innerHTML = `
-      <div style="font-size:40px">📺</div>
-      <div style="font-size:12px;color:#8BA0C0">Ad load nahi hui — dobara try karo</div>
-      <button class="play-btn" onclick="retryAd()">🔄 Retry</button>
+      <div class="ov-icon">&#x1F4FA;</div>
+      <div class="ov-text" style="color:#fbbf24;">Ad load nahi hui &mdash; dobara try karo</div>
+      <button class="ov-btn" onclick="startVastAd()">&#x1F504; Retry &mdash; Ad Chalao</button>
     `;
-    document.getElementById('statusBox').textContent = '⚠️ Ad error — retry karo ya page refresh karo';
   }
 
-  function retryAd() {
-    adStarted = false;
-    adCompleted = false;
-    // Overlay reset
-    document.getElementById('videoOverlay').innerHTML = `
-      <div class="video-overlay-icon">📺</div>
-      <div class="video-overlay-text">Video ad ready hai!</div>
-      <button class="play-btn" onclick="startVideoAd()">▶ Ad Chalao — Coins Kamao</button>
+  function loadNextVastAd() {
+    nextBtn.style.display = 'none';
+    vStatusBar.style.display = 'none';
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `
+      <div class="ov-icon">&#x1F4FA;</div>
+      <div class="ov-text">Agli ad ready hai!</div>
+      <button class="ov-btn" onclick="startVastAd()">&#x25B6; Agli Ad Chalao &mdash; +2 &#x1F4B0;</button>
     `;
-    document.getElementById('videoOverlay').style.display = 'flex';
-    document.getElementById('nextAdBtn').style.display = 'none';
+    statusBox.className = 'status-box';
+    statusBox.textContent = '\u23F3 Agli ad ke liye button dabao!';
   }
 
-  // Next ad load karo
-  function loadNextAd() {
-    document.getElementById('nextAdBtn').style.display = 'none';
-    adStarted = false;
-    adCompleted = false;
-    if (adsManager) { adsManager.destroy(); adsManager = null; }
-
-    // Overlay wapas dikhao
-    document.getElementById('videoOverlay').style.display = 'flex';
-    document.getElementById('videoOverlay').innerHTML = `
-      <div class="video-overlay-icon">📺</div>
-      <div class="video-overlay-text">Agli ad ready hai!</div>
-      <button class="play-btn" onclick="startVideoAd()">▶ Ad Chalao — Coins Kamao</button>
-    `;
-    document.getElementById('statusBox').textContent = '📺 Agli ad ke liye button dabao!';
-  }
+  // Minutes tracker
+  setInterval(() => {
+    const el = document.getElementById('timeWatched');
+    el.textContent = parseInt(el.textContent || '0') + 1;
+  }, 60000);
   </script>
 
-  <!-- FIREBASE + COINS LOGIC -->
+  <!-- FIREBASE — Coins Save -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, get, set }
@@ -706,77 +803,33 @@
     const db   = getDatabase(app);
     const auth = getAuth(app);
 
-    const COINS_PER_CYCLE = 2;
-    const CYCLE_SECS = 30;
-
-    let coins = 0;
-    let adsWatched = 0;
-    let totalMinutes = 0;
-    let remaining = CYCLE_SECS;
     let currentUser = null;
 
-    const coinsEl    = document.getElementById('coinsDisplay');
-    const timerEl    = document.getElementById('timerDisplay');
-    const progressEl = document.getElementById('progressBar');
-    const adsEl      = document.getElementById('adsWatched');
-    const totalEl    = document.getElementById('totalCoins');
-    const timeEl     = document.getElementById('timeWatched');
-
     onAuthStateChanged(auth, (user) => {
-      if(user){
+      if (user) {
         currentUser = user;
         document.getElementById('statusBox').textContent =
-          '✅ ' + (user.displayName || user.email) + ' — Ads dekho coins kamao!';
+          '\u2705 ' + (user.displayName || user.email) + ' \u2014 Ad chalao coins kamao!';
       } else {
         document.getElementById('statusBox').textContent =
-          '⚠️ Login karo coins save karne ke liye!';
+          '\u26A0\uFE0F Login karo coins save karne ke liye!';
       }
     });
 
-    async function saveCoins(n){
-      if(!currentUser) return;
+    // Global function taake VAST script se call ho sake
+    window.saveCoinsToFirebase = async function(n) {
+      if (!currentUser) return;
       try {
-        const r = ref(db, 'users/'+currentUser.uid+'/coins');
-        const s = await get(r);
-        await set(r, (s.val()||0) + n);
-        const hr = ref(db, 'users/'+currentUser.uid+'/watchHistory');
+        const r  = ref(db, 'users/' + currentUser.uid + '/coins');
+        const s  = await get(r);
+        await set(r, (s.val() || 0) + n);
+        const hr = ref(db, 'users/' + currentUser.uid + '/watchHistory');
         const hs = await get(hr);
-        await set(hr, (hs.val()||0) + 1);
+        await set(hr, (hs.val() || 0) + 1);
       } catch(e) {
         console.error('Firebase save error:', e);
       }
-    }
-
-    // Har 30 second mein coins dena (page pe ads hain — timer based earning)
-    setInterval(()=>{
-      remaining--;
-      timerEl.textContent = remaining;
-      progressEl.style.width = ((CYCLE_SECS-remaining)/CYCLE_SECS*100)+'%';
-      if(remaining <= 0){
-        remaining = CYCLE_SECS;
-        progressEl.style.width = '0%';
-        coins += COINS_PER_CYCLE;
-        adsWatched++;
-        coinsEl.textContent = coins;
-        adsEl.textContent   = adsWatched;
-        totalEl.textContent = coins;
-        showCoinPop();
-        saveCoins(COINS_PER_CYCLE);
-        if(window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
-      }
-    }, 1000);
-
-    setInterval(()=>{ totalMinutes++; timeEl.textContent = totalMinutes; }, 60000);
-
-    function showCoinPop(){
-      const el = document.createElement('div');
-      el.className = 'coin-pop';
-      el.textContent = '+'+COINS_PER_CYCLE+' \uD83D\uDCB0';
-      el.style.left = (Math.random()*60+20)+'%';
-      el.style.top  = '50%';
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(), 1200);
-    }
+    };
   </script>
 
 </body>
