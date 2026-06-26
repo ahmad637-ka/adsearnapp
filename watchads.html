@@ -1,3 +1,4 @@
+cat > /home/claude/watch-ads.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,10 +20,9 @@
     /* TOP BANNER */
     .ad-top {
       width: 100%;
-      max-width: 728px;
-      min-height: 60px;
       background: #1a1a2e;
       border-bottom: 1px solid #2a2a4a;
+      min-height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -31,60 +31,96 @@
     /* SIDE BANNERS */
     .side-left, .side-right {
       position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 160px;
+      top: 0;
+      bottom: 60px;
+      width: 165px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       z-index: 100;
+      padding: 8px 4px;
+      overflow: hidden;
     }
-    .side-left  { left: 8px; }
-    .side-right { right: 8px; }
+    .side-left  { left: 0; }
+    .side-right { right: 0; }
+
     .side-banner-box {
       background: #1a1a2e;
       border: 1px solid #2a2a4a;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 300px;
-    }
-    @media (max-width: 900px) {
-      .side-left, .side-right { display: none; }
+      width: 160px;
+      height: 300px;
+      flex-shrink: 0;
     }
 
+    /* Video Slider containers fixed at bottom corners */
+    .dao-slider-wrap {
+      position: fixed;
+      bottom: 60px;
+      left: 4px;
+      z-index: 200;
+      width: 240px;
+    }
+    .hilltop-slider-wrap {
+      position: fixed;
+      bottom: 60px;
+      right: 4px;
+      z-index: 200;
+      width: 240px;
+    }
+
+    @media (max-width: 900px) {
+      .side-left, .side-right { display: none; }
+      .dao-slider-wrap { left: 0; }
+      .hilltop-slider-wrap { right: 0; }
+    }
+
+    /* MAIN CONTENT */
     .container {
       width: 100%;
-      max-width: 480px;
-      padding: 16px 16px 90px 16px;
+      max-width: 500px;
+      padding: 14px 14px 90px 14px;
       text-align: center;
     }
 
-    .logo { font-size: 24px; font-weight: 800; margin-bottom: 4px; margin-top: 12px; }
+    .logo { font-size: 24px; font-weight: 800; margin: 10px 0 4px; }
     .logo span { color: #FFD700; }
-    .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 16px; }
+    .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
-    /* TV Screen */
-    .tv-screen {
+    /* VIDEO PLAYER */
+    .video-player-wrap {
       width: 100%;
       background: #000;
-      border-radius: 16px;
+      border-radius: 14px;
       border: 3px solid #1a3a6b;
-      min-height: 180px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .video-player-wrap video {
+      width: 100%;
+      display: block;
+      max-height: 220px;
+      background: #000;
+    }
+    .video-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
+      background: rgba(0,0,0,0.6);
+      flex-direction: column;
+      gap: 8px;
     }
-    .tv-content { text-align: center; padding: 20px; }
-    .tv-icon { font-size: 50px; margin-bottom: 10px; }
-    .tv-text { font-size: 13px; color: #8BA0C0; line-height: 1.6; }
+    .video-overlay-icon { font-size: 50px; }
+    .video-overlay-text { font-size: 13px; color: #8BA0C0; }
 
-    /* Ad slots */
+    /* AD SLOTS */
     .ad-slot {
       background: #12122a;
       border: 1px solid #2a2a4a;
@@ -97,29 +133,29 @@
       overflow: hidden;
     }
 
-    /* Coins + Timer */
+    /* COINS BOX */
     .coins-box {
       background: #1a2f52;
       border: 1px solid #FFD700;
       border-radius: 16px;
       padding: 14px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .coins-label { font-size: 12px; color: #8BA0C0; }
-    .coins-value { font-size: 22px; font-weight: 800; color: #FFD700; }
+    .coins-value { font-size: 24px; font-weight: 800; color: #FFD700; }
     .timer-box { text-align: right; }
-    .timer-value { font-size: 20px; font-weight: 700; color: #a855f7; }
+    .timer-value { font-size: 22px; font-weight: 700; color: #a855f7; }
 
-    /* Progress */
+    /* PROGRESS */
     .progress-wrap {
       background: #1a1a2e;
       border-radius: 999px;
-      height: 8px;
+      height: 10px;
       width: 100%;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       overflow: hidden;
     }
     .progress-bar {
@@ -130,22 +166,22 @@
       transition: width 1s linear;
     }
 
-    /* Status */
+    /* STATUS */
     .status-box {
       background: rgba(0,200,100,0.1);
       border: 1px solid rgba(0,200,100,0.3);
       border-radius: 12px;
       padding: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       font-size: 12px;
       color: #4ade80;
     }
 
-    /* Stats */
+    /* STATS */
     .stats-row {
       display: flex;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .stat-card {
       flex: 1;
@@ -165,7 +201,7 @@
       line-height: 1.6;
     }
 
-    /* BOTTOM STICKY AD */
+    /* BOTTOM STICKY */
     .ad-bottom-sticky {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -195,89 +231,90 @@
 </head>
 <body>
 
-  <!-- TOP BANNER (Adsterra) -->
+  <!-- TOP BANNER -->
   <div class="ad-top">
     <script>
-      atOptions = {
-        'key' : '054b7c1a4cbb13266b09c565eb61513e',
-        'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
-      };
+      atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
     </script>
     <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
   </div>
 
-  <!-- LEFT SIDE BANNERS (Adsterra) -->
+  <!-- LEFT SIDE BANNERS -->
   <div class="side-left">
     <div class="side-banner-box">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
   </div>
 
-  <!-- RIGHT SIDE BANNERS (Adsterra) -->
+  <!-- RIGHT SIDE BANNERS -->
   <div class="side-right">
     <div class="side-banner-box">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+    <div class="side-banner-box">
+      <script>
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
   </div>
 
+  <!-- DAO.AD VIDEO SLIDER — BOTTOM LEFT -->
+  <div class="dao-slider-wrap" id="vi-d-ad-container"></div>
+
+  <!-- HILLTOP VIDEO SLIDER — BOTTOM RIGHT (via script) -->
+  <div class="hilltop-slider-wrap" id="hilltop-container"></div>
+
+  <!-- MAIN CONTAINER -->
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
     <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
 
-    <!-- TV Screen -->
-    <div class="tv-screen">
-      <div class="tv-content" id="tvContent">
-        <div class="tv-icon">📺</div>
-        <div class="tv-text">
-          Ads load ho rahe hain...<br>
-          <small style="color:#555;">Video Slider bottom-right mein dikhega!</small>
-        </div>
+    <!-- VIDEO PLAYER (ClickAdilla VAST) -->
+    <div class="video-player-wrap">
+      <div class="video-overlay" id="videoOverlay">
+        <div class="video-overlay-icon">📺</div>
+        <div class="video-overlay-text">Video ad load ho rahi hai...</div>
       </div>
+      <video id="vastPlayer" controls autoplay muted playsinline
+        style="width:100%;max-height:220px;background:#000;">
+      </video>
     </div>
 
-    <!-- AD SLOT 1 (Adsterra Banner) -->
+    <!-- AD SLOT 1 -->
     <div class="ad-slot">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
-    <!-- Coins + Timer -->
+    <!-- COINS BOX -->
     <div class="coins-box">
       <div>
         <div class="coins-label">🪙 Coins Earned</div>
@@ -289,17 +326,17 @@
       </div>
     </div>
 
-    <!-- Progress Bar -->
+    <!-- PROGRESS -->
     <div class="progress-wrap">
       <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- Status -->
+    <!-- STATUS -->
     <div class="status-box" id="statusBox">
       ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
     </div>
 
-    <!-- Stats -->
+    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-icon">👁</div>
@@ -318,13 +355,18 @@
       </div>
     </div>
 
-    <!-- AD SLOT 2 (Adsterra Banner) -->
+    <!-- AD SLOT 2 -->
     <div class="ad-slot">
       <script>
-        atOptions = {
-          'key' : '054b7c1a4cbb13266b09c565eb61513e',
-          'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {}
-        };
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
+      </script>
+      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    </div>
+
+    <!-- AD SLOT 3 -->
+    <div class="ad-slot">
+      <script>
+        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
       </script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
@@ -336,7 +378,7 @@
 
   </div>
 
-  <!-- BOTTOM STICKY AD (Adsterra Social Bar) -->
+  <!-- BOTTOM STICKY (Adsterra Social Bar) -->
   <div class="ad-bottom-sticky">
     <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
   </div>
@@ -346,49 +388,117 @@
     <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
   </div>
 
-  <!-- HILLTOPADS VIDEO SLIDER -->
+  <!-- HILLTOPADS VIDEO SLIDER — BOTTOM RIGHT -->
   <script>
   (function(iia){
-  var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
-  s.settings = iia || {};
-  s.src = "\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
-  s.async = true;
-  s.referrerPolicy = 'no-referrer-when-downgrade';
-  l.parentNode.insertBefore(s, l);
+    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length-1];
+    s.settings = iia || {};
+    s.src = "\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s, l);
   })({})
   </script>
 
-  <!-- DAO.AD VIDEO SLIDER -->
+  <!-- DAO.AD VIDEO SLIDER — BOTTOM LEFT -->
   <script type="text/javascript" src="https://video.agenteimmobiliare.info/d-video.js?b=32"></script>
-  <script>function dviInit(){
-  if (typeof DaoVideo === "undefined") return;
-  window.daoVideoSlider = new DaoVideo({"sourceId":62512,"tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"});
-  daoVideoSlider.loadAd(function(){
-    daoVideoSlider.slider({"containerId":"vi-d-ad-container","positionY":"bottom","positionX":"left","volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"tada","pulseInterval":5}});
-  });} if(document.readyState === "complete" || document.readyState !== "loading") dviInit(); else document.addEventListener('DOMContentLoaded', dviInit);
+  <script>
+  function dviInit(){
+    if (typeof DaoVideo === 'undefined') return;
+    window.daoVideoSlider = new DaoVideo({
+      "sourceId":62512,
+      "tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"
+    });
+    daoVideoSlider.loadAd(function(){
+      daoVideoSlider.slider({
+        "containerId":"vi-d-ad-container",
+        "positionY":"bottom",
+        "positionX":"left",
+        "volume":0,"muteButton":true,"size":240,
+        "maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,
+        "animation":{"create":"bounceInDown","remove":"bounceOutLeft","pulse":"tada","pulseInterval":5}
+      });
+    });
+  }
+  if(document.readyState==="complete"||document.readyState!=="loading") dviInit();
+  else document.addEventListener('DOMContentLoaded', dviInit);
   </script>
 
   <!-- DAO.AD INPAGE PUSH -->
   <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
-  <script>function dippInit(){
-  if (typeof DaoInPagePush === "undefined") return;let dIppObj = new DaoInPagePush({"sourceId":62514,"maxCount":2,"startDelay":5,"showInterval":30,"renewInterval":300,"positionY":"bottom","positionX":"right","adMarkType":"no","largeImage":"hover","color":"#fafafa","bgColor":"rgba(90, 90, 90, 0.85)","borderColor":"#727272","font":{"color":"#fafafa","size":"normal"},"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},"sound":{"enable":false,"volume":60}});}
-  if(document.readyState === "complete" || document.readyState !== "loading") dippInit(); else document.addEventListener('DOMContentLoaded', dippInit);
+  <script>
+  function dippInit(){
+    if (typeof DaoInPagePush === 'undefined') return;
+    let dIppObj = new DaoInPagePush({
+      "sourceId":62514,"maxCount":2,"startDelay":5,"showInterval":30,
+      "renewInterval":300,"positionY":"top","positionX":"right",
+      "adMarkType":"no","largeImage":"hover","color":"#fafafa",
+      "bgColor":"rgba(90,90,90,0.85)","borderColor":"#727272",
+      "font":{"color":"#fafafa","size":"normal"},
+      "animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},
+      "sound":{"enable":false,"volume":60}
+    });
+  }
+  if(document.readyState==="complete"||document.readyState!=="loading") dippInit();
+  else document.addEventListener('DOMContentLoaded', dippInit);
   </script>
 
   <!-- DAO.AD POPUNDER -->
   <script src="https://onetouch4.com/sl/pnm/62513.js"></script>
   <script>
-  window.addEventListener('load', function() {
-    if (typeof firstAggOmg !== 'undefined') {
-      firstAggOmg.make("https://daleelerah.info/pop-go/62513", {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000});
+  window.addEventListener('load', function(){
+    if(typeof firstAggOmg !== 'undefined'){
+      firstAggOmg.make("https://daleelerah.info/pop-go/62513",
+        {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000});
     }
   });
   </script>
 
-  <!-- Firebase + Coins Logic -->
+  <!-- CLICKADILLA JS -->
+  <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
+
+  <!-- VAST VIDEO PLAYER LOGIC -->
+  <script>
+  window.addEventListener('load', function(){
+    const VAST_URL = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
+    const video = document.getElementById('vastPlayer');
+    const overlay = document.getElementById('videoOverlay');
+
+    function loadVastAd(){
+      fetch(VAST_URL)
+        .then(r => r.text())
+        .then(xml => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(xml, 'text/xml');
+          const mediaFiles = doc.querySelectorAll('MediaFile');
+          let videoUrl = '';
+          mediaFiles.forEach(mf => {
+            if(mf.textContent && !videoUrl){
+              videoUrl = mf.textContent.trim();
+            }
+          });
+          if(videoUrl){
+            video.src = videoUrl;
+            overlay.style.display = 'none';
+            video.play().catch(()=>{});
+          }
+        })
+        .catch(()=>{
+          overlay.innerHTML = '<div style="font-size:40px">📺</div><div style="font-size:12px;color:#555">Video ad load ho rahi hai...<br>HilltopAds + Dao.Ad sliders chal rahe hain!</div>';
+        });
+    }
+
+    loadVastAd();
+
+    // Reload ad every 60 seconds
+    setInterval(loadVastAd, 60000);
+  });
+  </script>
+
+  <!-- FIREBASE + COINS LOGIC -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, get, set, update }
+    import { getDatabase, ref, get, set }
       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
     import { getAuth, onAuthStateChanged }
       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -420,9 +530,8 @@
     const totalEl    = document.getElementById('totalCoins');
     const timeEl     = document.getElementById('timeWatched');
 
-    // User check karo
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if(user){
         currentUser = user;
         document.getElementById('statusBox').textContent =
           '✅ ' + (user.displayName || user.email) + ' — Ads dekho coins kamao!';
@@ -432,70 +541,48 @@
       }
     });
 
-    // Coins Firebase mein save karo
-    async function saveCoinsToFirebase(newCoins) {
-      if (!currentUser) return;
-      const userRef = ref(db, 'users/' + currentUser.uid + '/coins');
-      const snap = await get(userRef);
-      const current = snap.val() || 0;
-      await set(userRef, current + newCoins);
-
-      // Watch history bhi save karo
-      const historyRef = ref(db, 'users/' + currentUser.uid + '/watchHistory');
-      const histSnap = await get(historyRef);
-      const hist = histSnap.val() || 0;
-      await set(historyRef, hist + 1);
+    async function saveCoins(n){
+      if(!currentUser) return;
+      const r = ref(db, 'users/'+currentUser.uid+'/coins');
+      const s = await get(r);
+      await set(r, (s.val()||0) + n);
+      const hr = ref(db, 'users/'+currentUser.uid+'/watchHistory');
+      const hs = await get(hr);
+      await set(hr, (hs.val()||0) + 1);
     }
 
-    // Timer
-    setInterval(() => {
+    setInterval(()=>{
       remaining--;
       timerEl.textContent = remaining;
-      const pct = ((CYCLE_SECS - remaining) / CYCLE_SECS) * 100;
-      progressEl.style.width = pct + '%';
-
-      if (remaining <= 0) {
+      progressEl.style.width = ((CYCLE_SECS-remaining)/CYCLE_SECS*100)+'%';
+      if(remaining <= 0){
         remaining = CYCLE_SECS;
         progressEl.style.width = '0%';
-
         coins += COINS_PER_CYCLE;
         adsWatched++;
         coinsEl.textContent = coins;
         adsEl.textContent   = adsWatched;
         totalEl.textContent = coins;
-
         showCoinPop();
-
-        // Firebase mein save karo
-        saveCoinsToFirebase(COINS_PER_CYCLE);
-
-        // Flutter app ko notify karo
-        if (window.CoinChannel) {
-          window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
-        }
+        saveCoins(COINS_PER_CYCLE);
+        if(window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
       }
     }, 1000);
 
-    // Minutes counter
-    setInterval(() => {
-      totalMinutes++;
-      timeEl.textContent = totalMinutes;
-    }, 60000);
+    setInterval(()=>{ totalMinutes++; timeEl.textContent = totalMinutes; }, 60000);
 
-    // Coin pop animation
-    function showCoinPop() {
+    function showCoinPop(){
       const el = document.createElement('div');
       el.className = 'coin-pop';
-      el.textContent = '+' + COINS_PER_CYCLE + ' 🪙';
-      el.style.left = (Math.random() * 60 + 20) + '%';
+      el.textContent = '+'+COINS_PER_CYCLE+' 🪙';
+      el.style.left = (Math.random()*60+20)+'%';
       el.style.top  = '50%';
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1200);
+      setTimeout(()=>el.remove(), 1200);
     }
   </script>
 
-  <!-- CLICKADILLA VIDEO + BANNER -->
-  <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
-
 </body>
 </html>
+HTMLEOF
+echo "Done!"
