@@ -1,15 +1,11 @@
+cat > /home/claude/watch-ads.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AdsEarn - Watch Ads & Earn</title>
-
-  <!-- Video.js CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video-js.min.css" rel="stylesheet">
-  <!-- Contrib-ads CSS (zaruri hai vast plugin ke liye) -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.3.2/videojs.ads.css" rel="stylesheet">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -22,7 +18,6 @@
       align-items: center;
     }
 
-    /* TOP BANNER */
     .ad-top {
       width: 100%;
       background: #1a1a2e;
@@ -31,12 +26,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 6px;
       padding: 4px;
     }
 
-    /* SIDE BANNERS */
     .side-left, .side-right {
       position: fixed;
       top: 0;
@@ -49,7 +41,7 @@
       padding: 8px 4px;
       overflow: hidden;
     }
-    .side-left  { left: 0; }
+    .side-left { left: 0; }
     .side-right { right: 0; }
     .side-banner-box {
       background: #1a1a2e;
@@ -64,29 +56,10 @@
       flex-shrink: 0;
     }
 
-    /* Video Slider containers — bottom corners */
-    .dao-slider-wrap {
-      position: fixed;
-      bottom: 60px;
-      left: 4px;
-      z-index: 200;
-      width: 240px;
-    }
-    .hilltop-slider-wrap {
-      position: fixed;
-      bottom: 60px;
-      right: 4px;
-      z-index: 200;
-      width: 240px;
-    }
-
     @media (max-width: 900px) {
       .side-left, .side-right { display: none; }
-      .dao-slider-wrap { left: 0; }
-      .hilltop-slider-wrap { right: 0; }
     }
 
-    /* MAIN CONTENT */
     .container {
       width: 100%;
       max-width: 500px;
@@ -98,9 +71,10 @@
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
-    /* VIDEO PLAYER WRAPPER */
+    /* VIDEO PLAYER — Fixed size */
     .video-player-wrap {
       width: 100%;
+      height: 200px;
       background: #000;
       border-radius: 14px;
       border: 3px solid #1a3a6b;
@@ -109,52 +83,44 @@
       position: relative;
     }
 
-    /* VideoJS player size */
     #myVideoPlayer {
       width: 100% !important;
-      height: 220px !important;
+      height: 200px !important;
     }
     .video-js {
       width: 100% !important;
-      height: 220px !important;
-      background: #000;
+      height: 200px !important;
+      background: #000 !important;
     }
+    /* Hide big play button */
+    .video-js .vjs-big-play-button { display: none !important; }
+    .video-js .vjs-control-bar { background: rgba(0,0,0,0.7); }
 
-    /* Play Button Overlay (user gesture ke liye) */
-    .play-overlay {
+    /* Loading overlay */
+    .video-loading {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.82);
-      z-index: 50;
+      background: rgba(0,0,0,0.85);
+      z-index: 10;
       gap: 10px;
-      cursor: pointer;
       border-radius: 11px;
     }
-    .play-overlay .ov-icon { font-size: 48px; }
-    .play-overlay .ov-text { font-size: 13px; color: #8BA0C0; }
-    .play-overlay .ov-btn {
-      background: linear-gradient(135deg, #FFD700, #ff8c00);
-      color: #000;
-      border: none;
-      border-radius: 30px;
-      padding: 10px 28px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-top: 4px;
-      box-shadow: 0 4px 18px rgba(255,215,0,0.5);
-      animation: glow 1.5s infinite;
+    .video-loading .ld-icon { font-size: 40px; }
+    .video-loading .ld-text { font-size: 12px; color: #8BA0C0; }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #2a2a4a;
+      border-top-color: #FFD700;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
-    @keyframes glow {
-      0%,100% { box-shadow: 0 4px 18px rgba(255,215,0,0.5); }
-      50% { box-shadow: 0 6px 28px rgba(255,140,0,0.9); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Status badge jab video chal rahi ho */
+    /* Ad status bar */
     .video-status-bar {
       background: rgba(108,71,255,0.15);
       border: 1px solid rgba(108,71,255,0.35);
@@ -163,26 +129,9 @@
       margin-bottom: 12px;
       font-size: 12px;
       color: #a78bfa;
-      display: none;
       text-align: center;
     }
 
-    /* Next Ad Button */
-    .next-ad-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #6c47ff, #a855f7);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    /* AD SLOTS */
     .ad-slot {
       background: #12122a;
       border: 1px solid #2a2a4a;
@@ -195,7 +144,6 @@
       overflow: hidden;
     }
 
-    /* COINS BOX */
     .coins-box {
       background: #1a2f52;
       border: 1px solid #FFD700;
@@ -211,7 +159,6 @@
     .timer-box { text-align: right; }
     .timer-value { font-size: 22px; font-weight: 700; color: #a855f7; }
 
-    /* PROGRESS */
     .progress-wrap {
       background: #1a1a2e;
       border-radius: 999px;
@@ -228,7 +175,6 @@
       transition: width 1s linear;
     }
 
-    /* STATUS */
     .status-box {
       background: rgba(0,200,100,0.1);
       border: 1px solid rgba(0,200,100,0.3);
@@ -238,13 +184,7 @@
       font-size: 12px;
       color: #4ade80;
     }
-    .status-box.warning {
-      background: rgba(255,150,0,0.1);
-      border-color: rgba(255,150,0,0.3);
-      color: #fbbf24;
-    }
 
-    /* STATS */
     .stats-row {
       display: flex;
       gap: 10px;
@@ -268,7 +208,6 @@
       line-height: 1.6;
     }
 
-    /* BOTTOM STICKY */
     .ad-bottom-sticky {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -295,12 +234,18 @@
       z-index: 9999;
     }
 
-    /* VideoJS skin tweaks */
-    .video-js .vjs-big-play-button {
-      display: none !important;
-    }
-    .video-js .vjs-control-bar {
-      background: rgba(0,0,0,0.7);
+    /* Refresh countdown badge */
+    .refresh-badge {
+      position: fixed;
+      top: 70px;
+      right: 10px;
+      background: rgba(108,71,255,0.2);
+      border: 1px solid #6c47ff;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: #a78bfa;
+      z-index: 500;
     }
   </style>
 </head>
@@ -317,21 +262,15 @@
   <!-- LEFT SIDE BANNERS -->
   <div class="side-left">
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
   </div>
@@ -339,46 +278,34 @@
   <!-- RIGHT SIDE BANNERS -->
   <div class="side-right">
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
     <div class="side-banner-box">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
   </div>
 
-  <!-- DAO.AD VIDEO SLIDER — BOTTOM LEFT -->
-  <div class="dao-slider-wrap" id="vi-d-ad-container"></div>
-
-  <!-- HILLTOP VIDEO SLIDER — BOTTOM RIGHT -->
-  <div class="hilltop-slider-wrap" id="hilltop-container"></div>
+  <!-- Refresh Badge -->
+  <div class="refresh-badge" id="refreshBadge">🔄 Next refresh: 35s</div>
 
   <!-- MAIN CONTAINER -->
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
-    <div class="subtitle">&#x1F4FA; Ads dekho &#x2014; real coins kamao!</div>
+    <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
 
     <!-- VIDEO PLAYER -->
     <div class="video-player-wrap">
-      <!-- Play Overlay — user click ke bina autoplay nahi hota -->
-      <div class="play-overlay" id="playOverlay">
-        <div class="ov-icon">&#x1F4FA;</div>
-        <div class="ov-text">Video ad ready hai — dekho aur coins kamao!</div>
-        <button class="ov-btn" onclick="startVastAd()">&#x25B6; Ad Chalao &mdash; Coins Kamao</button>
+      <div class="video-loading" id="videoLoading">
+        <div class="spinner"></div>
+        <div class="ld-text">Video ad load ho rahi hai...</div>
       </div>
-      <!-- VideoJS element -->
       <video id="myVideoPlayer"
              class="video-js vjs-default-skin"
              playsinline
@@ -386,33 +313,26 @@
       </video>
     </div>
 
-    <!-- Video playing status -->
+    <!-- Video Status -->
     <div class="video-status-bar" id="videoStatusBar">
-      &#x25B6; Video ad chal rahi hai &mdash; dekhte raho, coins aa rahe hain!
+      ▶ Video ad chal rahi hai — coins aa rahe hain! 🪙
     </div>
-
-    <!-- Next Ad Button -->
-    <button class="next-ad-btn" id="nextAdBtn" onclick="loadNextVastAd()">
-      &#x25B6; Agli Ad Dekho (+2 &#x1F4B0;)
-    </button>
 
     <!-- AD SLOT 1 -->
     <div class="ad-slot">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
     <!-- COINS BOX -->
     <div class="coins-box">
       <div>
-        <div class="coins-label">&#x1F4B0; Coins Earned</div>
+        <div class="coins-label">🪙 Coins Earned</div>
         <div class="coins-value" id="coinsDisplay">0</div>
       </div>
       <div class="timer-box">
-        <div class="coins-label">&#x23F1; Next coins in</div>
-        <div class="timer-value" id="timerDisplay">--</div>
+        <div class="coins-label">⏱ Next coins in</div>
+        <div class="timer-value" id="timerDisplay">30</div>
       </div>
     </div>
 
@@ -423,23 +343,23 @@
 
     <!-- STATUS -->
     <div class="status-box" id="statusBox">
-      &#x23F3; Pehle video ad chalao &mdash; phir coins milenge!
+      ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
     </div>
 
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon">&#x1F441;</div>
+        <div class="stat-icon">👁</div>
         <div class="stat-value" id="adsWatched">0</div>
         <div class="stat-label">Ads Watched</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">&#x1F4B0;</div>
+        <div class="stat-icon">🪙</div>
         <div class="stat-value" id="totalCoins">0</div>
         <div class="stat-label">Total Earned</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">&#x23F0;</div>
+        <div class="stat-icon">⏰</div>
         <div class="stat-value" id="timeWatched">0</div>
         <div class="stat-label">Minutes</div>
       </div>
@@ -447,36 +367,24 @@
 
     <!-- AD SLOT 2 -->
     <div class="ad-slot">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
     <!-- AD SLOT 3 -->
     <div class="ad-slot">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
-      </script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
-    </div>
-
-    <!-- AD SLOT 4 -->
-    <div class="ad-slot">
-      <script>
-        atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':90,'width':728,'params':{}};
-      </script>
+      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
     <div class="footer-note">
-      &#x1F6E1;&#xFE0F; AdsEarn &mdash; Ads dekho, real coins kamao!<br>
-      Video ad dekhne ke baad hi coins milenge!
+      🛡️ AdsEarn — Ads dekho, real coins kamao!<br>
+      Page band mat karo — coins milte rahenge!
     </div>
 
-  </div><!-- /container -->
+  </div>
 
-  <!-- BOTTOM STICKY (Adsterra Social Bar) -->
+  <!-- BOTTOM STICKY -->
   <div class="ad-bottom-sticky">
     <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
   </div>
@@ -489,12 +397,11 @@
   <!-- HILLTOPADS VIDEO SLIDER — BOTTOM RIGHT -->
   <script>
   (function(iia){
-    var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length-1];
-    s.settings = iia || {};
-    s.src = "\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
-    s.async = true;
-    s.referrerPolicy = 'no-referrer-when-downgrade';
-    l.parentNode.insertBefore(s, l);
+    var d=document,s=d.createElement('script'),l=d.scripts[d.scripts.length-1];
+    s.settings=iia||{};
+    s.src="\/\/relieved-understanding.com\/bRX.VpsKdxG\/lE0nYKW\/cL\/CedmR9Nu\/ZyU\/lgkFPMT-c\/x\/NvjfU-1\/NzjFULtrNQzsEl2hNrTjUV2gOxQR";
+    s.async=true;s.referrerPolicy='no-referrer-when-downgrade';
+    l.parentNode.insertBefore(s,l);
   })({})
   </script>
 
@@ -502,82 +409,57 @@
   <script type="text/javascript" src="https://video.agenteimmobiliare.info/d-video.js?b=32"></script>
   <script>
   function dviInit(){
-    if (typeof DaoVideo === 'undefined') return;
-    window.daoVideoSlider = new DaoVideo({
-      "sourceId":62512,
-      "tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"
-    });
+    if(typeof DaoVideo==='undefined') return;
+    window.daoVideoSlider=new DaoVideo({"sourceId":62512,"tagUrl":"https:\/\/video.agenteimmobiliare.info\/api\/video\/tag?sourceId=62512&tmax=500&video-skipafter=5&count=2"});
     daoVideoSlider.loadAd(function(){
-      daoVideoSlider.slider({
-        "containerId":"vi-d-ad-container",
-        "positionY":"bottom",
-        "positionX":"left",
-        "volume":0,"muteButton":true,"size":240,
-        "maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,
-        "animation":{"create":"bounceInDown","remove":"bounceOutLeft","pulse":"tada","pulseInterval":5}
-      });
+      daoVideoSlider.slider({"containerId":"vi-d-ad-container","positionY":"bottom","positionX":"left","volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":10,"renewAdInterval":20,"animation":{"create":"bounceInDown","remove":"bounceOutLeft","pulse":"tada","pulseInterval":5}});
     });
   }
   if(document.readyState==="complete"||document.readyState!=="loading") dviInit();
-  else document.addEventListener('DOMContentLoaded', dviInit);
+  else document.addEventListener('DOMContentLoaded',dviInit);
   </script>
+  <div id="vi-d-ad-container" style="position:fixed;bottom:60px;left:4px;z-index:200;width:240px;"></div>
 
   <!-- DAO.AD INPAGE PUSH -->
   <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
   <script>
   function dippInit(){
-    if (typeof DaoInPagePush === 'undefined') return;
-    let dIppObj = new DaoInPagePush({
-      "sourceId":62514,"maxCount":2,"startDelay":5,"showInterval":30,
-      "renewInterval":300,"positionY":"top","positionX":"right",
-      "adMarkType":"no","largeImage":"hover","color":"#fafafa",
-      "bgColor":"rgba(90,90,90,0.85)","borderColor":"#727272",
-      "font":{"color":"#fafafa","size":"normal"},
-      "animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},
-      "sound":{"enable":false,"volume":60}
-    });
+    if(typeof DaoInPagePush==='undefined') return;
+    new DaoInPagePush({"sourceId":62514,"maxCount":2,"startDelay":5,"showInterval":30,"renewInterval":300,"positionY":"top","positionX":"right","adMarkType":"no","largeImage":"hover","color":"#fafafa","bgColor":"rgba(90,90,90,0.85)","borderColor":"#727272","font":{"color":"#fafafa","size":"normal"},"animation":{"create":"bounceInDown","remove":"bounceOutRight","pulse":"shake","pulseInterval":12},"sound":{"enable":false,"volume":60}});
   }
   if(document.readyState==="complete"||document.readyState!=="loading") dippInit();
-  else document.addEventListener('DOMContentLoaded', dippInit);
+  else document.addEventListener('DOMContentLoaded',dippInit);
   </script>
 
   <!-- DAO.AD POPUNDER -->
   <script src="https://onetouch4.com/sl/pnm/62513.js"></script>
   <script>
-  window.addEventListener('load', function(){
-    if(typeof firstAggOmg !== 'undefined'){
-      firstAggOmg.make("https://daleelerah.info/pop-go/62513",
-        {"newTab":false,"blur":false,"cookieExpires":60,"delay":1000});
+  window.addEventListener('load',function(){
+    if(typeof firstAggOmg!=='undefined'){
+      firstAggOmg.make("https://daleelerah.info/pop-go/62513",{"newTab":false,"blur":false,"cookieExpires":60,"delay":1000});
     }
   });
   </script>
 
-  <!-- CLICKADILLA JS (display ads) -->
+  <!-- CLICKADILLA -->
   <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
 
-  <!-- Video.js Core -->
+  <!-- VIDEO.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
-  <!-- Contrib-Ads (vast plugin ke liye dependency) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.3.2/videojs.ads.min.js"></script>
-  <!-- VAST Plugin -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-vast-plugin/2.0.5/videojs.vast.min.js"></script>
 
-  <!-- =============================================
-       VAST VIDEO PLAYER + COINS LOGIC
-       ============================================= -->
+  <!-- MAIN LOGIC -->
   <script>
-  // ClickAdilla VAST URL
-  const VAST_TAG = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
+  const VAST_URL = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
+  const COINS_PER_CYCLE = 2;
+  const CYCLE_SECS = 30;
+  const REFRESH_SECS = 35;
 
-  const COINS_PER_CYCLE = 2;  // har 30 sec mein kitne coins
-  const CYCLE_SECS = 30;      // seconds
-
-  let vjsPlayer = null;
-  let coinTimer = null;
-  let remaining = CYCLE_SECS;
-  let isAdPlaying = false;    // KEY FIX: coins sirf tab milenge jab ad chal rahi ho
   let sessionCoins = 0;
   let adsCount = 0;
+  let coinRemaining = CYCLE_SECS;
+  let refreshRemaining = REFRESH_SECS;
+  let vjsPlayer = null;
+  let adLoopTimer = null;
 
   const coinsEl    = document.getElementById('coinsDisplay');
   const timerEl    = document.getElementById('timerDisplay');
@@ -586,205 +468,144 @@
   const totalEl    = document.getElementById('totalCoins');
   const statusBox  = document.getElementById('statusBox');
   const vStatusBar = document.getElementById('videoStatusBar');
-  const nextBtn    = document.getElementById('nextAdBtn');
-  const overlay    = document.getElementById('playOverlay');
+  const loadingEl  = document.getElementById('videoLoading');
+  const refreshBadge = document.getElementById('refreshBadge');
 
-  // ── COIN TIMER ──
-  // Timer sirf tab chalta hai jab isAdPlaying = true
-  function startCoinTimer() {
-    if (coinTimer) return; // pehle se chal raha hai
-    remaining = CYCLE_SECS;
-    timerEl.textContent = remaining;
-    progressEl.style.width = '0%';
+  // ── COIN TIMER — har 30 sec ──
+  setInterval(function(){
+    coinRemaining--;
+    timerEl.textContent = coinRemaining;
+    progressEl.style.width = ((CYCLE_SECS - coinRemaining) / CYCLE_SECS * 100) + '%';
+    if(coinRemaining <= 0){
+      coinRemaining = CYCLE_SECS;
+      progressEl.style.width = '0%';
+      sessionCoins += COINS_PER_CYCLE;
+      adsCount++;
+      coinsEl.textContent = sessionCoins;
+      totalEl.textContent = sessionCoins;
+      adsEl.textContent   = adsCount;
+      showCoinPop();
+      if(window.saveCoinsToFirebase) window.saveCoinsToFirebase(COINS_PER_CYCLE);
+      if(window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
+    }
+  }, 1000);
 
-    coinTimer = setInterval(() => {
-      if (!isAdPlaying) {
-        // Ad rok gayi — timer pause karo
-        stopCoinTimer();
-        timerEl.textContent = '--';
-        progressEl.style.width = '0%';
-        statusBox.className = 'status-box warning';
-        statusBox.textContent = '&#x23F8; Ad ruk gayi — coins band hain. Dobara chalao!';
-        return;
-      }
-      remaining--;
-      timerEl.textContent = remaining;
-      progressEl.style.width = ((CYCLE_SECS - remaining) / CYCLE_SECS * 100) + '%';
+  // ── REFRESH TIMER — har 35 sec ──
+  setInterval(function(){
+    refreshRemaining--;
+    refreshBadge.textContent = '🔄 Refresh in: ' + refreshRemaining + 's';
+    if(refreshRemaining <= 0){
+      // Coins localStorage mein save karo before refresh
+      localStorage.setItem('pendingCoins', sessionCoins);
+      location.reload();
+    }
+  }, 1000);
 
-      if (remaining <= 0) {
-        remaining = CYCLE_SECS;
-        progressEl.style.width = '0%';
-        awardCoins(COINS_PER_CYCLE);
-      }
-    }, 1000);
-  }
+  // ── MINUTES TRACKER ──
+  setInterval(function(){
+    var el = document.getElementById('timeWatched');
+    el.textContent = parseInt(el.textContent||'0') + 1;
+  }, 60000);
 
-  function stopCoinTimer() {
-    if (coinTimer) { clearInterval(coinTimer); coinTimer = null; }
-  }
-
-  function awardCoins(n) {
-    sessionCoins += n;
-    adsCount++;
-    coinsEl.textContent = sessionCoins;
-    totalEl.textContent = sessionCoins;
-    adsEl.textContent   = adsCount;
-    showCoinPop(n);
-    saveCoinsToFirebase(n);
-    if (window.CoinChannel) window.CoinChannel.postMessage(n.toString());
-  }
-
-  function showCoinPop(n) {
-    const el = document.createElement('div');
+  // ── COIN POP ANIMATION ──
+  function showCoinPop(){
+    var el = document.createElement('div');
     el.className = 'coin-pop';
-    el.textContent = '+' + n + ' \uD83D\uDCB0';
-    el.style.left = (Math.random() * 60 + 20) + '%';
+    el.textContent = '+' + COINS_PER_CYCLE + ' 🪙';
+    el.style.left = (Math.random()*60+20) + '%';
     el.style.top  = '50%';
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1200);
+    setTimeout(function(){ el.remove(); }, 1200);
   }
 
-  // ── VAST PLAYER ──
-  function startVastAd() {
-    overlay.style.display = 'none';
-    nextBtn.style.display = 'none';
+  // ── VAST VIDEO PLAYER ──
+  function initVastPlayer(){
+    loadingEl.style.display = 'flex';
 
-    // VideoJS player initialize karo (agar pehle nahi hua)
-    if (!vjsPlayer) {
-      vjsPlayer = videojs('myVideoPlayer', {
-        controls: true,
-        autoplay: false,
-        preload: 'auto',
-        muted: false,
-        fluid: false,
-        width: '100%',
-        height: 220
-      });
-
-      // VAST plugin setup
-      try {
-        vjsPlayer.vast({
-          url: VAST_TAG,
-          skip: 5,          // 5 sec baad skip button aayega
-          timeout: 8000     // 8 sec mein ad load na ho to skip
-        });
-      } catch(e) {
-        console.error('VAST plugin error:', e);
-        onAdError();
-        return;
-      }
-
-      // ── AD EVENTS ──
-
-      // Ad shuru hui
-      vjsPlayer.on('ads-ad-started', function() {
-        console.log('Ad started!');
-        isAdPlaying = true;
-        vStatusBar.style.display = 'block';
-        vStatusBar.innerHTML = '&#x25B6; Video ad chal rahi hai &mdash; coins aa rahe hain! &#x1F4B0;';
-        statusBox.className = 'status-box';
-        statusBox.textContent = '\u2705 Ad dekho \u2014 har 30 sec mein coins milenge!';
-        startCoinTimer();
-      });
-
-      // Ad khatam hui (completed ya skipped)
-      vjsPlayer.on('ads-ad-ended', function() {
-        console.log('Ad ended');
-        onAdFinished();
-      });
-      vjsPlayer.on('adended', function() {
-        onAdFinished();
-      });
-      vjsPlayer.on('vast.adEnd', function() {
-        onAdFinished();
-      });
-
-      // Skip hua
-      vjsPlayer.on('vast.adSkip', function() {
-        onAdFinished();
-      });
-
-      // Error
-      vjsPlayer.on('vast.aderror', function() {
-        onAdError();
-      });
-      vjsPlayer.on('ads-error', function() {
-        onAdError();
-      });
-
-    } else {
-      // Player pehle se hai — naya VAST request karo
-      try {
-        vjsPlayer.vast({
-          url: VAST_TAG + '&t=' + Date.now(),
-          skip: 5,
-          timeout: 8000
-        });
-      } catch(e) {
-        onAdError();
-      }
-    }
-
-    // Player play karo
-    vjsPlayer.play().catch(function(e) {
-      console.log('Autoplay blocked:', e);
-      // User ne manually play kiya tha to ye nahi hoga
+    vjsPlayer = videojs('myVideoPlayer', {
+      controls: true,
+      autoplay: true,
+      muted: true,
+      preload: 'auto',
+      fluid: false,
+      width: 500,
+      height: 200,
+      techOrder: ['html5']
     });
 
-    statusBox.className = 'status-box';
-    statusBox.textContent = '\uD83D\uDCFA Ad load ho rahi hai...';
+    loadVastAd();
   }
 
-  function onAdFinished() {
-    isAdPlaying = false;
-    stopCoinTimer();
-    vStatusBar.innerHTML = '\u2705 Ad khatam! Agli ad ke liye button dabao.';
-    statusBox.className = 'status-box';
-    statusBox.textContent = '\u2705 Ad khatam! Agli ad dekho +2 \uD83D\uDCB0';
-    nextBtn.style.display = 'block';
-    timerEl.textContent = '--';
-    progressEl.style.width = '0%';
+  function loadVastAd(){
+    loadingEl.style.display = 'flex';
+    vStatusBar.textContent = '⏳ Ad load ho rahi hai...';
+
+    var bustUrl = VAST_URL + '&cb=' + Date.now();
+
+    fetch(bustUrl)
+      .then(function(r){ return r.text(); })
+      .then(function(xml){
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, 'text/xml');
+        var mediaFiles = doc.querySelectorAll('MediaFile');
+        var videoUrl = '';
+
+        mediaFiles.forEach(function(mf){
+          var type = mf.getAttribute('type') || '';
+          var url = mf.textContent.trim();
+          if(url && !videoUrl){
+            if(type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || url.indexOf('.mp4') > -1){
+              videoUrl = url;
+            }
+          }
+        });
+
+        // Fallback — koi bhi url lo
+        if(!videoUrl && mediaFiles.length > 0){
+          videoUrl = mediaFiles[0].textContent.trim();
+        }
+
+        if(videoUrl){
+          vjsPlayer.src({type:'video/mp4', src: videoUrl});
+          vjsPlayer.play().catch(function(){
+            vjsPlayer.muted(true);
+            vjsPlayer.play();
+          });
+          loadingEl.style.display = 'none';
+          vStatusBar.textContent = '▶ Video ad chal rahi hai — coins aa rahe hain! 🪙';
+          statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+        } else {
+          onAdError();
+        }
+      })
+      .catch(function(){
+        onAdError();
+      });
+
+    // Ad khatam — naya ad load karo
+    vjsPlayer.on('ended', function(){
+      vStatusBar.textContent = '✅ Ad khatam! Agli ad load ho rahi hai...';
+      setTimeout(loadVastAd, 2000);
+    });
+
+    vjsPlayer.on('error', function(){
+      onAdError();
+    });
   }
 
-  function onAdError() {
-    isAdPlaying = false;
-    stopCoinTimer();
-    vStatusBar.style.display = 'none';
-    timerEl.textContent = '--';
-    progressEl.style.width = '0%';
-    statusBox.className = 'status-box warning';
-    statusBox.textContent = '\u26A0\uFE0F Ad load nahi hui \u2014 retry karo';
-
-    // Overlay wapas dikhao retry ke saath
-    overlay.style.display = 'flex';
-    overlay.innerHTML = `
-      <div class="ov-icon">&#x1F4FA;</div>
-      <div class="ov-text" style="color:#fbbf24;">Ad load nahi hui &mdash; dobara try karo</div>
-      <button class="ov-btn" onclick="startVastAd()">&#x1F504; Retry &mdash; Ad Chalao</button>
-    `;
+  function onAdError(){
+    loadingEl.style.display = 'none';
+    vStatusBar.textContent = '⚠️ Ad load nahi hui — 5 sec mein retry...';
+    setTimeout(loadVastAd, 5000);
   }
 
-  function loadNextVastAd() {
-    nextBtn.style.display = 'none';
-    vStatusBar.style.display = 'none';
-    overlay.style.display = 'flex';
-    overlay.innerHTML = `
-      <div class="ov-icon">&#x1F4FA;</div>
-      <div class="ov-text">Agli ad ready hai!</div>
-      <button class="ov-btn" onclick="startVastAd()">&#x25B6; Agli Ad Chalao &mdash; +2 &#x1F4B0;</button>
-    `;
-    statusBox.className = 'status-box';
-    statusBox.textContent = '\u23F3 Agli ad ke liye button dabao!';
-  }
-
-  // Minutes tracker
-  setInterval(() => {
-    const el = document.getElementById('timeWatched');
-    el.textContent = parseInt(el.textContent || '0') + 1;
-  }, 60000);
+  // Page load pe player start karo
+  window.addEventListener('load', function(){
+    setTimeout(initVastPlayer, 1000);
+  });
   </script>
 
-  <!-- FIREBASE — Coins Save -->
+  <!-- FIREBASE -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, get, set }
@@ -802,35 +623,39 @@
     const app  = initializeApp(firebaseConfig);
     const db   = getDatabase(app);
     const auth = getAuth(app);
-
     let currentUser = null;
 
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if(user){
         currentUser = user;
         document.getElementById('statusBox').textContent =
-          '\u2705 ' + (user.displayName || user.email) + ' \u2014 Ad chalao coins kamao!';
+          '✅ ' + (user.displayName || user.email) + ' — Ad dekho coins kamao!';
+
+        // Pending coins restore karo agar refresh se aaye
+        const pending = localStorage.getItem('pendingCoins');
+        if(pending && parseInt(pending) > 0){
+          localStorage.removeItem('pendingCoins');
+        }
       } else {
         document.getElementById('statusBox').textContent =
-          '\u26A0\uFE0F Login karo coins save karne ke liye!';
+          '⚠️ Login karo coins save karne ke liye!';
       }
     });
 
-    // Global function taake VAST script se call ho sake
-    window.saveCoinsToFirebase = async function(n) {
-      if (!currentUser) return;
-      try {
-        const r  = ref(db, 'users/' + currentUser.uid + '/coins');
-        const s  = await get(r);
-        await set(r, (s.val() || 0) + n);
-        const hr = ref(db, 'users/' + currentUser.uid + '/watchHistory');
+    window.saveCoinsToFirebase = async function(n){
+      if(!currentUser) return;
+      try{
+        const r = ref(db, 'users/'+currentUser.uid+'/coins');
+        const s = await get(r);
+        await set(r, (s.val()||0) + n);
+        const hr = ref(db, 'users/'+currentUser.uid+'/watchHistory');
         const hs = await get(hr);
-        await set(hr, (hs.val() || 0) + 1);
-      } catch(e) {
-        console.error('Firebase save error:', e);
-      }
+        await set(hr, (hs.val()||0) + 1);
+      } catch(e){ console.error(e); }
     };
   </script>
 
 </body>
 </html>
+HTMLEOF
+echo "Done!"
