@@ -1,4 +1,3 @@
-cat > /home/claude/watch-ads.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -536,61 +535,79 @@ cat > /home/claude/watch-ads.html << 'HTMLEOF'
     loadVastAd();
   }
 
-  function loadVastAd(){
-    loadingEl.style.display = 'flex';
-    vStatusBar.textContent = '⏳ Ad load ho rahi hai...';
+  // VAST parser — Wrapper bhi follow karta hai (max 3 hops)
+  function parseVast(url, depth){
+    if(!depth) depth = 0;
+    if(depth > 3){ onAdError(); return; }
 
-    var bustUrl = VAST_URL + '&cb=' + Date.now();
-
-    fetch(bustUrl)
+    var fetchUrl = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cb=' + Date.now();
+    fetch(fetchUrl)
       .then(function(r){ return r.text(); })
       .then(function(xml){
         var parser = new DOMParser();
         var doc = parser.parseFromString(xml, 'text/xml');
+
+        // MediaFile dhundo
         var mediaFiles = doc.querySelectorAll('MediaFile');
         var videoUrl = '';
-
         mediaFiles.forEach(function(mf){
-          var type = mf.getAttribute('type') || '';
-          var url = mf.textContent.trim();
-          if(url && !videoUrl){
-            if(type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || url.indexOf('.mp4') > -1){
-              videoUrl = url;
-            }
+          if(videoUrl) return;
+          var type = (mf.getAttribute('type') || '').toLowerCase();
+          var src  = mf.textContent.trim();
+          if(src && (type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || src.indexOf('.mp4') > -1)){
+            videoUrl = src;
           }
         });
-
-        // Fallback — koi bhi url lo
         if(!videoUrl && mediaFiles.length > 0){
           videoUrl = mediaFiles[0].textContent.trim();
         }
 
         if(videoUrl){
-          vjsPlayer.src({type:'video/mp4', src: videoUrl});
-          vjsPlayer.play().catch(function(){
-            vjsPlayer.muted(true);
-            vjsPlayer.play();
-          });
-          loadingEl.style.display = 'none';
-          vStatusBar.textContent = '▶ Video ad chal rahi hai — coins aa rahe hain! 🪙';
-          statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+          playVideo(videoUrl);
         } else {
+          // Wrapper follow karo
+          var wrapperEl = doc.querySelector('VASTAdTagURI');
+          if(wrapperEl){
+            var wrapperUrl = wrapperEl.textContent.trim();
+            if(wrapperUrl){
+              vStatusBar.textContent = '⏳ Ad load ho rahi hai... (' + (depth+1) + ')';
+              setTimeout(function(){ parseVast(wrapperUrl, depth + 1); }, 500);
+              return;
+            }
+          }
           onAdError();
         }
       })
-      .catch(function(){
-        onAdError();
+      .catch(function(){ onAdError(); });
+  }
+
+  function playVideo(videoUrl){
+    vjsPlayer.src({type:'video/mp4', src: videoUrl});
+    vjsPlayer.play().catch(function(){
+      vjsPlayer.muted(true);
+      vjsPlayer.play().catch(function(){});
+    });
+    loadingEl.style.display = 'none';
+    vStatusBar.textContent = '▶ Video ad chal rahi hai — coins aa rahe hain! 🪙';
+    statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+  }
+
+  function loadVastAd(){
+    loadingEl.style.display = 'flex';
+    vStatusBar.textContent = '⏳ Ad load ho rahi hai...';
+
+    if(!vjsPlayer._vastEventsSet){
+      vjsPlayer._vastEventsSet = true;
+      vjsPlayer.on('ended', function(){
+        vStatusBar.textContent = '✅ Ad khatam! Agli ad load ho rahi hai...';
+        setTimeout(loadVastAd, 2000);
       });
+      vjsPlayer.on('error', function(){
+        setTimeout(loadVastAd, 5000);
+      });
+    }
 
-    // Ad khatam — naya ad load karo
-    vjsPlayer.on('ended', function(){
-      vStatusBar.textContent = '✅ Ad khatam! Agli ad load ho rahi hai...';
-      setTimeout(loadVastAd, 2000);
-    });
-
-    vjsPlayer.on('error', function(){
-      onAdError();
-    });
+    parseVast(VAST_URL, 0);
   }
 
   function onAdError(){
@@ -657,5 +674,3 @@ cat > /home/claude/watch-ads.html << 'HTMLEOF'
 
 </body>
 </html>
-HTMLEOF
-echo "Done!"
