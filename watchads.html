@@ -470,11 +470,85 @@
   const loadingEl  = document.getElementById('videoLoading');
   const refreshBadge = document.getElementById('refreshBadge');
 
-  // ── COIN TIMER — har 30 sec ──
+  // ── VIDEO PLAYING CHECK ──
+  function isAnyVideoPlaying(){
+    // 1. VAST player check
+    try {
+      if(vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0){
+        return true;
+      }
+    } catch(e){}
+
+    // 2. Koi bhi video element check (HilltopAds + Dao.Ad sliders)
+    try {
+      var allVideos = document.querySelectorAll('video');
+      for(var i = 0; i < allVideos.length; i++){
+        var v = allVideos[i];
+        if(!v.paused && !v.ended && v.currentTime > 0 && v.readyState > 2){
+          return true;
+        }
+      }
+    } catch(e){}
+
+    return false;
+  }
+
+  // ── VIDEO SLIDER SOFT REFRESH ──
+  // Har 60 sec mein sirf slider ko reload karo — full page reload nahi
+  var sliderRefreshCount = 0;
   setInterval(function(){
+    if(isAnyVideoPlaying()) return; // video chal rahi hai — skip
+
+    sliderRefreshCount++;
+
+    // Dao.Ad slider reload
+    try {
+      if(window.daoVideoSlider){
+        window.daoVideoSlider.loadAd(function(){
+          window.daoVideoSlider.slider({
+            "containerId":"vi-d-ad-container",
+            "positionY":"bottom","positionX":"left",
+            "volume":0,"muteButton":true,"size":240,
+            "maxAdCount":3,"pauseOnEnd":5,"renewAdInterval":10
+          });
+        });
+      }
+    } catch(e){}
+
+    // VAST player bhi naya ad lo
+    try {
+      if(vjsPlayer && vjsPlayer.paused()){
+        loadVastAd();
+      }
+    } catch(e){}
+
+  }, 60000);
+
+  // ── COIN TIMER — sirf tab chale jab video chal rahi ho ──
+  setInterval(function(){
+    var videoPlaying = isAnyVideoPlaying();
+
+    if(!videoPlaying){
+      // Video nahi chal rahi — timer pause, coins nahi
+      timerEl.textContent = '⏸';
+      progressEl.style.width = '0%';
+      statusBox.textContent = '⚠️ Video chal rahi nahi — coins band hain!';
+      statusBox.style.background = 'rgba(255,150,0,0.1)';
+      statusBox.style.borderColor = 'rgba(255,150,0,0.3)';
+      statusBox.style.color = '#fbbf24';
+      coinRemaining = CYCLE_SECS; // reset
+      return;
+    }
+
+    // Video chal rahi hai — coins countdown
+    statusBox.style.background = 'rgba(0,200,100,0.1)';
+    statusBox.style.borderColor = 'rgba(0,200,100,0.3)';
+    statusBox.style.color = '#4ade80';
+
     coinRemaining--;
     timerEl.textContent = coinRemaining;
     progressEl.style.width = ((CYCLE_SECS - coinRemaining) / CYCLE_SECS * 100) + '%';
+
     if(coinRemaining <= 0){
       coinRemaining = CYCLE_SECS;
       progressEl.style.width = '0%';
@@ -483,6 +557,7 @@
       coinsEl.textContent = sessionCoins;
       totalEl.textContent = sessionCoins;
       adsEl.textContent   = adsCount;
+      statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
       showCoinPop();
       if(window.saveCoinsToFirebase) window.saveCoinsToFirebase(COINS_PER_CYCLE);
       if(window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
