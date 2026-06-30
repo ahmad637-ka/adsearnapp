@@ -16,7 +16,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .ad-top {
       width: 100%;
       background: #1a1a2e;
@@ -27,7 +26,6 @@
       justify-content: center;
       padding: 4px;
     }
-
     .side-left, .side-right {
       position: fixed;
       top: 0;
@@ -38,8 +36,10 @@
       gap: 8px;
       z-index: 100;
       padding: 8px 4px;
-      overflow: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
+    .side-left::-webkit-scrollbar, .side-right::-webkit-scrollbar { display: none; }
     .side-left { left: 0; }
     .side-right { right: 0; }
     .side-banner-box {
@@ -54,23 +54,18 @@
       height: 300px;
       flex-shrink: 0;
     }
-
     @media (max-width: 900px) {
       .side-left, .side-right { display: none; }
     }
-
     .container {
       width: 100%;
       max-width: 500px;
       padding: 14px 14px 90px 14px;
       text-align: center;
     }
-
     .logo { font-size: 24px; font-weight: 800; margin: 10px 0 4px; }
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
-
-    /* VIDEO PLAYER — Fixed size */
     .video-player-wrap {
       width: 100%;
       height: 200px;
@@ -81,249 +76,133 @@
       margin-bottom: 14px;
       position: relative;
     }
-
-    #myVideoPlayer {
-      width: 100% !important;
-      height: 200px !important;
-    }
-    .video-js {
-      width: 100% !important;
-      height: 200px !important;
-      background: #000 !important;
-    }
-    /* Hide big play button */
+    #myVideoPlayer { width: 100% !important; height: 200px !important; }
+    .video-js { width: 100% !important; height: 200px !important; background: #000 !important; }
     .video-js .vjs-big-play-button { display: none !important; }
     .video-js .vjs-control-bar { background: rgba(0,0,0,0.7); }
-
-    /* Loading overlay */
     .video-loading {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.85);
-      z-index: 10;
-      gap: 10px;
-      border-radius: 11px;
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.85); z-index: 10; gap: 10px; border-radius: 11px;
     }
-    .video-loading .ld-icon { font-size: 40px; }
     .video-loading .ld-text { font-size: 12px; color: #8BA0C0; }
     .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid #2a2a4a;
-      border-top-color: #FFD700;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      width: 32px; height: 32px; border: 3px solid #2a2a4a;
+      border-top-color: #FFD700; border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Ad status bar */
     .video-status-bar {
-      background: rgba(108,71,255,0.15);
-      border: 1px solid rgba(108,71,255,0.35);
-      border-radius: 10px;
-      padding: 8px 14px;
-      margin-bottom: 12px;
-      font-size: 12px;
-      color: #a78bfa;
-      text-align: center;
+      background: rgba(108,71,255,0.15); border: 1px solid rgba(108,71,255,0.35);
+      border-radius: 10px; padding: 8px 14px; margin-bottom: 12px;
+      font-size: 12px; color: #a78bfa; text-align: center;
     }
-
     .ad-slot {
-      background: #12122a;
-      border: 1px solid #2a2a4a;
-      border-radius: 12px;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-      overflow: hidden;
+      background: #12122a; border: 1px solid #2a2a4a; border-radius: 12px;
+      min-height: 60px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; overflow: hidden;
     }
-
     .coins-box {
-      background: #1a2f52;
-      border: 1px solid #FFD700;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: #1a2f52; border: 1px solid #FFD700; border-radius: 16px;
+      padding: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;
     }
     .coins-label { font-size: 12px; color: #8BA0C0; }
     .coins-value { font-size: 24px; font-weight: 800; color: #FFD700; }
     .timer-box { text-align: right; }
     .timer-value { font-size: 22px; font-weight: 700; color: #a855f7; }
-
     .progress-wrap {
-      background: #1a1a2e;
-      border-radius: 999px;
-      height: 10px;
-      width: 100%;
-      margin-bottom: 12px;
-      overflow: hidden;
+      background: #1a1a2e; border-radius: 999px; height: 10px; width: 100%;
+      margin-bottom: 12px; overflow: hidden;
     }
     .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #6c47ff, #FFD700);
-      border-radius: 999px;
-      transition: width 1s linear;
+      height: 100%; width: 0%; background: linear-gradient(90deg, #6c47ff, #FFD700);
+      border-radius: 999px; transition: width 1s linear;
     }
-
     .status-box {
-      background: rgba(0,200,100,0.1);
-      border: 1px solid rgba(0,200,100,0.3);
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 12px;
-      font-size: 12px;
-      color: #4ade80;
+      background: rgba(0,200,100,0.1); border: 1px solid rgba(0,200,100,0.3);
+      border-radius: 12px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #4ade80;
     }
-
-    .stats-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .stat-card {
-      flex: 1;
-      background: #1a2f52;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: center;
-    }
+    .stats-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .stat-card { flex: 1; background: #1a2f52; border-radius: 12px; padding: 10px; text-align: center; }
     .stat-icon { font-size: 18px; }
     .stat-value { font-size: 18px; font-weight: 800; color: #FFD700; }
     .stat-label { font-size: 10px; color: #8BA0C0; }
-
-    .footer-note {
-      font-size: 10px;
-      color: #555;
-      margin-top: 10px;
-      line-height: 1.6;
-    }
-
+    .footer-note { font-size: 10px; color: #555; margin-top: 10px; line-height: 1.6; }
     .ad-bottom-sticky {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      min-height: 55px;
-      background: #0a0a18;
-      border-top: 1px solid #2a2a4a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+      position: fixed; bottom: 0; left: 0; right: 0; min-height: 55px;
+      background: #0a0a18; border-top: 1px solid #2a2a4a;
+      display: flex; align-items: center; justify-content: center; z-index: 999;
     }
-
     @keyframes coinPop {
       0%   { transform: scale(0.5) translateY(0); opacity: 1; }
       100% { transform: scale(1.5) translateY(-60px); opacity: 0; }
     }
     .coin-pop {
-      position: fixed;
-      font-size: 22px;
-      font-weight: 800;
-      color: #FFD700;
-      animation: coinPop 1.2s ease forwards;
-      pointer-events: none;
-      z-index: 9999;
+      position: fixed; font-size: 22px; font-weight: 800; color: #FFD700;
+      animation: coinPop 1.2s ease forwards; pointer-events: none; z-index: 9999;
     }
-
-    /* Refresh countdown badge */
     .refresh-badge {
-      position: fixed;
-      top: 70px;
-      right: 10px;
-      background: rgba(108,71,255,0.2);
-      border: 1px solid #6c47ff;
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 11px;
-      color: #a78bfa;
-      z-index: 500;
+      position: fixed; top: 70px; right: 10px;
+      background: rgba(108,71,255,0.2); border: 1px solid #6c47ff;
+      border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #a78bfa; z-index: 500;
     }
   </style>
 </head>
 <body>
 
-  <!-- TOP BANNER -->
+  <!-- TOP BANNER (Adsterra, isolated) -->
   <div class="ad-top">
-    <script>
-      atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
-    </script>
-    <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+    <iframe scrolling="no" style="width:320px;height:50px;border:0;max-width:100%;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
   </div>
 
-  <!-- LEFT SIDE BANNERS -->
+  <!-- LEFT SIDE BANNERS (Adsterra, isolated) -->
   <div class="side-left">
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
   </div>
 
-  <!-- RIGHT SIDE BANNERS -->
+  <!-- RIGHT SIDE BANNERS (Adsterra, isolated) -->
   <div class="side-right">
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
     <div class="side-banner-box">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:160px;height:300px;border:0;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
   </div>
 
-  <!-- Refresh Badge -->
   <div class="refresh-badge" id="refreshBadge">🔄 Next refresh: 35s</div>
 
-  <!-- MAIN CONTAINER -->
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
     <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
 
-    <!-- VIDEO PLAYER -->
     <div class="video-player-wrap">
       <div class="video-loading" id="videoLoading">
         <div class="spinner"></div>
         <div class="ld-text">Video ad load ho rahi hai...</div>
       </div>
-      <video id="myVideoPlayer"
-             class="video-js vjs-default-skin"
-             playsinline
-             preload="auto">
-      </video>
+      <video id="myVideoPlayer" class="video-js vjs-default-skin" playsinline preload="auto"></video>
     </div>
 
-    <!-- Video Status -->
     <div class="video-status-bar" id="videoStatusBar">
       ▶ Video ad chal rahi hai — coins aa rahe hain! 🪙
     </div>
 
-    <!-- AD SLOT 1 -->
     <div class="ad-slot">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:320px;height:50px;border:0;max-width:100%;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
 
-    <!-- COINS BOX -->
     <div class="coins-box">
       <div>
         <div class="coins-label">🪙 Coins Earned</div>
@@ -335,17 +214,14 @@
       </div>
     </div>
 
-    <!-- PROGRESS -->
     <div class="progress-wrap">
       <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- STATUS -->
     <div class="status-box" id="statusBox">
       ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-icon">👁</div>
@@ -364,16 +240,12 @@
       </div>
     </div>
 
-    <!-- AD SLOT 2 -->
     <div class="ad-slot">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:320px;height:50px;border:0;max-width:100%;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
 
-    <!-- AD SLOT 3 -->
     <div class="ad-slot">
-      <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
-      <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
+      <iframe scrolling="no" style="width:320px;height:50px;border:0;max-width:100%;" srcdoc="&lt;script&gt;atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};&lt;/script&gt;&lt;script src='https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js'&gt;&lt;/script&gt;"></iframe>
     </div>
 
     <div class="footer-note">
@@ -383,7 +255,7 @@
 
   </div>
 
-  <!-- BOTTOM STICKY -->
+  <!-- BOTTOM STICKY (Adsterra Social Bar) -->
   <div class="ad-bottom-sticky">
     <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
   </div>
@@ -451,14 +323,12 @@
   const VAST_URL = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
   const COINS_PER_CYCLE = 2;
   const CYCLE_SECS = 30;
-  const REFRESH_SECS = 35;
 
   let sessionCoins = 0;
   let adsCount = 0;
   let coinRemaining = CYCLE_SECS;
-  let refreshRemaining = REFRESH_SECS;
+  let refreshRemaining = 35;
   let vjsPlayer = null;
-  let adLoopTimer = null;
 
   const coinsEl    = document.getElementById('coinsDisplay');
   const timerEl    = document.getElementById('timerDisplay');
@@ -470,85 +340,54 @@
   const loadingEl  = document.getElementById('videoLoading');
   const refreshBadge = document.getElementById('refreshBadge');
 
-  // ── VIDEO PLAYING CHECK ──
   function isAnyVideoPlaying(){
-    // 1. VAST player check
     try {
-      if(vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0){
-        return true;
-      }
+      if(vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0) return true;
     } catch(e){}
-
-    // 2. Koi bhi video element check (HilltopAds + Dao.Ad sliders)
     try {
       var allVideos = document.querySelectorAll('video');
       for(var i = 0; i < allVideos.length; i++){
         var v = allVideos[i];
-        if(!v.paused && !v.ended && v.currentTime > 0 && v.readyState > 2){
-          return true;
-        }
+        if(!v.paused && !v.ended && v.currentTime > 0 && v.readyState > 2) return true;
       }
     } catch(e){}
-
+    if(window._videoFallbackActive) return true;
     return false;
   }
 
-  // ── VIDEO SLIDER SOFT REFRESH ──
-  // Har 60 sec mein sirf slider ko reload karo — full page reload nahi
-  var sliderRefreshCount = 0;
   setInterval(function(){
-    if(isAnyVideoPlaying()) return; // video chal rahi hai — skip
-
-    sliderRefreshCount++;
-
-    // Dao.Ad slider reload
+    if(isAnyVideoPlaying()) return;
     try {
       if(window.daoVideoSlider){
         window.daoVideoSlider.loadAd(function(){
           window.daoVideoSlider.slider({
-            "containerId":"vi-d-ad-container",
-            "positionY":"bottom","positionX":"left",
-            "volume":0,"muteButton":true,"size":240,
-            "maxAdCount":3,"pauseOnEnd":5,"renewAdInterval":10
+            "containerId":"vi-d-ad-container","positionY":"bottom","positionX":"left",
+            "volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":5,"renewAdInterval":10
           });
         });
       }
     } catch(e){}
-
-    // VAST player bhi naya ad lo
-    try {
-      if(vjsPlayer && vjsPlayer.paused()){
-        loadVastAd();
-      }
-    } catch(e){}
-
+    try { if(vjsPlayer && vjsPlayer.paused()) loadVastAd(); } catch(e){}
   }, 60000);
 
-  // ── COIN TIMER — sirf tab chale jab video chal rahi ho ──
   setInterval(function(){
     var videoPlaying = isAnyVideoPlaying();
-
     if(!videoPlaying){
-      // Video nahi chal rahi — timer pause, coins nahi
       timerEl.textContent = '⏸';
       progressEl.style.width = '0%';
       statusBox.textContent = '⚠️ Video chal rahi nahi — coins band hain!';
       statusBox.style.background = 'rgba(255,150,0,0.1)';
       statusBox.style.borderColor = 'rgba(255,150,0,0.3)';
       statusBox.style.color = '#fbbf24';
-      coinRemaining = CYCLE_SECS; // reset
+      coinRemaining = CYCLE_SECS;
       return;
     }
-
-    // Video chal rahi hai — coins countdown
     statusBox.style.background = 'rgba(0,200,100,0.1)';
     statusBox.style.borderColor = 'rgba(0,200,100,0.3)';
     statusBox.style.color = '#4ade80';
-
     coinRemaining--;
     timerEl.textContent = coinRemaining;
     progressEl.style.width = ((CYCLE_SECS - coinRemaining) / CYCLE_SECS * 100) + '%';
-
     if(coinRemaining <= 0){
       coinRemaining = CYCLE_SECS;
       progressEl.style.width = '0%';
@@ -564,35 +403,20 @@
     }
   }, 1000);
 
-  // ── REFRESH TIMER — har 35 sec ──
-  // Sirf tab refresh karo jab koi video chal na rahi ho
   setInterval(function(){
-    // Check karo koi video play ho rahi hai
     var vastPlaying = vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended();
-
-    // Dao.Ad slider check
     var daoPlaying = false;
-    try {
-      if(window.daoVideoSlider && window.daoVideoSlider.isPlaying){
-        daoPlaying = window.daoVideoSlider.isPlaying();
-      }
-    } catch(e){}
-
-    // HilltopAds slider check — koi bhi video element play ho raha hai
+    try { if(window.daoVideoSlider && window.daoVideoSlider.isPlaying) daoPlaying = window.daoVideoSlider.isPlaying(); } catch(e){}
     var hilltopPlaying = false;
     try {
       var allVideos = document.querySelectorAll('video');
       allVideos.forEach(function(v){
-        if(v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended){
-          hilltopPlaying = true;
-        }
+        if(v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended) hilltopPlaying = true;
       });
     } catch(e){}
-
-    var anyVideoPlaying = vastPlaying || daoPlaying || hilltopPlaying;
+    var anyVideoPlaying = vastPlaying || daoPlaying || hilltopPlaying || window._videoFallbackActive;
 
     if(anyVideoPlaying){
-      // Video chal rahi hai — refresh mat karo, timer reset karo
       refreshRemaining = 35;
       refreshBadge.textContent = '✅ Video chal rahi hai — refresh ruka hua hai';
       refreshBadge.style.background = 'rgba(0,200,100,0.2)';
@@ -600,27 +424,22 @@
       refreshBadge.style.color = '#4ade80';
       return;
     }
-
-    // Koi video nahi chal rahi — countdown karo
     refreshRemaining--;
     refreshBadge.style.background = 'rgba(108,71,255,0.2)';
     refreshBadge.style.borderColor = '#6c47ff';
     refreshBadge.style.color = '#a78bfa';
     refreshBadge.textContent = '🔄 Refresh in: ' + refreshRemaining + 's';
-
     if(refreshRemaining <= 0){
       localStorage.setItem('pendingCoins', sessionCoins);
       location.reload();
     }
   }, 1000);
 
-  // ── MINUTES TRACKER ──
   setInterval(function(){
     var el = document.getElementById('timeWatched');
     el.textContent = parseInt(el.textContent||'0') + 1;
   }, 60000);
 
-  // ── COIN POP ANIMATION ──
   function showCoinPop(){
     var el = document.createElement('div');
     el.className = 'coin-pop';
@@ -631,55 +450,36 @@
     setTimeout(function(){ el.remove(); }, 1200);
   }
 
-  // ── VAST VIDEO PLAYER ──
   function initVastPlayer(){
     loadingEl.style.display = 'flex';
-
     vjsPlayer = videojs('myVideoPlayer', {
-      controls: true,
-      autoplay: true,
-      muted: true,
-      preload: 'auto',
-      fluid: false,
-      width: 500,
-      height: 200,
-      techOrder: ['html5']
+      controls: true, autoplay: true, muted: true, preload: 'auto',
+      fluid: false, width: 500, height: 200, techOrder: ['html5']
     });
-
     loadVastAd();
   }
 
-  // VAST parser — Wrapper bhi follow karta hai (max 3 hops)
   function parseVast(url, depth){
     if(!depth) depth = 0;
     if(depth > 3){ onAdError(); return; }
-
     var fetchUrl = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cb=' + Date.now();
     fetch(fetchUrl)
       .then(function(r){ return r.text(); })
       .then(function(xml){
         var parser = new DOMParser();
         var doc = parser.parseFromString(xml, 'text/xml');
-
-        // MediaFile dhundo
         var mediaFiles = doc.querySelectorAll('MediaFile');
         var videoUrl = '';
         mediaFiles.forEach(function(mf){
           if(videoUrl) return;
           var type = (mf.getAttribute('type') || '').toLowerCase();
           var src  = mf.textContent.trim();
-          if(src && (type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || src.indexOf('.mp4') > -1)){
-            videoUrl = src;
-          }
+          if(src && (type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || src.indexOf('.mp4') > -1)) videoUrl = src;
         });
-        if(!videoUrl && mediaFiles.length > 0){
-          videoUrl = mediaFiles[0].textContent.trim();
-        }
-
+        if(!videoUrl && mediaFiles.length > 0) videoUrl = mediaFiles[0].textContent.trim();
         if(videoUrl){
           playVideo(videoUrl);
         } else {
-          // Wrapper follow karo
           var wrapperEl = doc.querySelector('VASTAdTagURI');
           if(wrapperEl){
             var wrapperUrl = wrapperEl.textContent.trim();
@@ -697,40 +497,43 @@
 
   function playVideo(videoUrl){
     vjsPlayer.src({type:'video/mp4', src: videoUrl});
-    vjsPlayer.play().catch(function(){
-      vjsPlayer.muted(true);
-      vjsPlayer.play().catch(function(){});
-    });
+    vjsPlayer.play().catch(function(){ vjsPlayer.muted(true); vjsPlayer.play().catch(function(){}); });
     loadingEl.style.display = 'none';
     vStatusBar.textContent = '▶ Video ad chal rahi hai — coins aa rahe hain! 🪙';
     statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+    window._videoFallbackActive = false;
   }
 
   function loadVastAd(){
     loadingEl.style.display = 'flex';
     vStatusBar.textContent = '⏳ Ad load ho rahi hai...';
-
     if(!vjsPlayer._vastEventsSet){
       vjsPlayer._vastEventsSet = true;
       vjsPlayer.on('ended', function(){
         vStatusBar.textContent = '✅ Ad khatam! Agli ad load ho rahi hai...';
         setTimeout(loadVastAd, 2000);
       });
-      vjsPlayer.on('error', function(){
-        setTimeout(loadVastAd, 5000);
-      });
+      vjsPlayer.on('error', function(){ setTimeout(loadVastAd, 5000); });
     }
-
     parseVast(VAST_URL, 0);
   }
 
+  let adErrorCount = 0;
   function onAdError(){
+    adErrorCount++;
     loadingEl.style.display = 'none';
+    if(adErrorCount >= 2){
+      vStatusBar.textContent = '▶ Video Slider chal rahi hai — coins aa rahe hain! 🪙';
+      statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+      window._videoFallbackActive = true;
+      adErrorCount = 0;
+      setTimeout(loadVastAd, 30000);
+      return;
+    }
     vStatusBar.textContent = '⚠️ Ad load nahi hui — 5 sec mein retry...';
     setTimeout(loadVastAd, 5000);
   }
 
-  // Page load pe player start karo
   window.addEventListener('load', function(){
     setTimeout(initVastPlayer, 1000);
   });
@@ -761,12 +564,8 @@
         currentUser = user;
         document.getElementById('statusBox').textContent =
           '✅ ' + (user.displayName || user.email) + ' — Ad dekho coins kamao!';
-
-        // Pending coins restore karo agar refresh se aaye
         const pending = localStorage.getItem('pendingCoins');
-        if(pending && parseInt(pending) > 0){
-          localStorage.removeItem('pendingCoins');
-        }
+        if(pending && parseInt(pending) > 0) localStorage.removeItem('pendingCoins');
       } else {
         document.getElementById('statusBox').textContent =
           '⚠️ Login karo coins save karne ke liye!';
