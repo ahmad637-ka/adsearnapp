@@ -70,7 +70,6 @@
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
-    /* VIDEO PLAYER — Fixed size */
     .video-player-wrap {
       width: 100%;
       height: 200px;
@@ -91,11 +90,9 @@
       height: 200px !important;
       background: #000 !important;
     }
-    /* Hide big play button */
     .video-js .vjs-big-play-button { display: none !important; }
     .video-js .vjs-control-bar { background: rgba(0,0,0,0.7); }
 
-    /* Loading overlay */
     .video-loading {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -108,7 +105,6 @@
       gap: 10px;
       border-radius: 11px;
     }
-    .video-loading .ld-icon { font-size: 40px; }
     .video-loading .ld-text { font-size: 12px; color: #8BA0C0; }
     .spinner {
       width: 32px; height: 32px;
@@ -119,7 +115,20 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Ad status bar */
+    /* Network badge - konsa network chal raha hai */
+    .network-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.75);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 10px;
+      color: #FFD700;
+      z-index: 20;
+      display: none;
+    }
+
     .video-status-bar {
       background: rgba(108,71,255,0.15);
       border: 1px solid rgba(108,71,255,0.35);
@@ -184,6 +193,22 @@
       color: #4ade80;
     }
 
+    /* Performance stats for networks */
+    .network-stats {
+      background: rgba(108,71,255,0.08);
+      border: 1px solid rgba(108,71,255,0.2);
+      border-radius: 12px;
+      padding: 8px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 10px;
+      color: #8BA0C0;
+    }
+    .net-stat { text-align: center; }
+    .net-stat-val { font-size: 13px; font-weight: 700; color: #a78bfa; }
+    .net-stat-name { font-size: 9px; color: #555; margin-top: 2px; }
+
     .stats-row {
       display: flex;
       gap: 10px;
@@ -233,7 +258,6 @@
       z-index: 9999;
     }
 
-    /* Refresh countdown badge */
     .refresh-badge {
       position: fixed;
       top: 70px;
@@ -272,17 +296,14 @@
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
-    <!-- NEW: HilltopAds banner -->
+    <!-- HilltopAds banner -->
     <div class="side-banner-box">
       <script>
       (function(khkjvz){
-      var d = document,
-          s = d.createElement('script'),
-          l = d.scripts[d.scripts.length - 1];
+      var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
       s.settings = khkjvz || {};
       s.src = "\/\/relieved-understanding.com\/b\/XXVGsvd.GZl_0SYyWJcI\/Te\/mH9fuCZfUVlLk\/PWT\/cRxeOPDvEjyDNNjRE\/tENUziEn4jMlTAIf2XN\/Q_";
-      s.async = true;
-      s.referrerPolicy = 'no-referrer-when-downgrade';
+      s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade';
       l.parentNode.insertBefore(s, l);
       })({})
       </script>
@@ -303,17 +324,14 @@
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
-    <!-- NEW: HilltopAds banner -->
+    <!-- HilltopAds banner -->
     <div class="side-banner-box">
       <script>
       (function(khkjvz){
-      var d = document,
-          s = d.createElement('script'),
-          l = d.scripts[d.scripts.length - 1];
+      var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];
       s.settings = khkjvz || {};
       s.src = "\/\/relieved-understanding.com\/b\/XXVGsvd.GZl_0SYyWJcI\/Te\/mH9fuCZfUVlLk\/PWT\/cRxeOPDvEjyDNNjRE\/tENUziEn4jMlTAIf2XN\/Q_";
-      s.async = true;
-      s.referrerPolicy = 'no-referrer-when-downgrade';
+      s.async = true; s.referrerPolicy = 'no-referrer-when-downgrade';
       l.parentNode.insertBefore(s, l);
       })({})
       </script>
@@ -333,8 +351,10 @@
     <div class="video-player-wrap">
       <div class="video-loading" id="videoLoading">
         <div class="spinner"></div>
-        <div class="ld-text">Video ad load ho rahi hai...</div>
+        <div class="ld-text" id="loadingText">Video ad load ho rahi hai...</div>
       </div>
+      <!-- Network badge — konsa chal raha hai -->
+      <div class="network-badge" id="networkBadge">📡 HilltopAds</div>
       <video id="myVideoPlayer"
              class="video-js vjs-default-skin"
              playsinline
@@ -373,6 +393,26 @@
     <!-- STATUS -->
     <div class="status-box" id="statusBox">
       ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
+    </div>
+
+    <!-- NETWORK PERFORMANCE STATS -->
+    <div class="network-stats">
+      <div class="net-stat">
+        <div class="net-stat-val" id="htFillEl">0</div>
+        <div class="net-stat-name">🟢 HilltopAds fills</div>
+      </div>
+      <div class="net-stat">
+        <div class="net-stat-val" id="htFailEl">0</div>
+        <div class="net-stat-name">🔴 HilltopAds fails</div>
+      </div>
+      <div class="net-stat">
+        <div class="net-stat-val" id="caFillEl">0</div>
+        <div class="net-stat-name">🟢 Clickadilla fills</div>
+      </div>
+      <div class="net-stat">
+        <div class="net-stat-val" id="caFailEl">0</div>
+        <div class="net-stat-name">🔴 Clickadilla fails</div>
+      </div>
     </div>
 
     <!-- STATS -->
@@ -476,110 +516,149 @@
   <!-- VIDEO.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 
-  <!-- MAIN LOGIC -->
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN LOGIC — Smart Dual VAST Rotation
+       ─────────────────────────────────────────────────────────
+       2 VAST networks:
+         [0] HilltopAds  — primary (generally higher CPM for PK/IN)
+         [1] Clickadilla — fallback / rotation
+
+       Priority logic:
+         • Pehle HilltopAds try karo
+         • Agar HilltopAds fail ho (3 baar) → Clickadilla pe switch
+         • Agar Clickadilla bhi fail ho → wapas HilltopAds
+         • Jo network zyada fill kare wo automatically zyada play hoga
+           (weighted rotation: fill rate ke hisaab se)
+         • Har successful play ke baad next ad ke liye best network choose
+  ═══════════════════════════════════════════════════════════ -->
   <script>
-  const VAST_URL = 'https://vast.yomeno.xyz/vast?spot_id=1494956';
-  const COINS_PER_CYCLE = 2;
-  const CYCLE_SECS = 30;
-  const REFRESH_SECS = 35;
+  // ── VAST NETWORK CONFIG ──
+  var VAST_NETWORKS = [
+    {
+      name: 'HilltopAds',
+      url:  'https://surefootedpause.com/dim.FHzgdJGFNSv/Z/GOUz/Ke/mH9xu/ZbURlrkcPdTCcDx_OEDKQ/yWMRDkUJt/NuzGED4PNnDQI/wAOwQi',
+      fills:       0,
+      fails:       0,
+      consecutiveFails: 0
+    },
+    {
+      name: 'Clickadilla',
+      url:  'https://vast.yomeno.xyz/vast?spot_id=1494956',
+      fills:       0,
+      fails:       0,
+      consecutiveFails: 0
+    }
+  ];
 
-  let sessionCoins = 0;
-  let adsCount = 0;
-  let coinRemaining = CYCLE_SECS;
-  let refreshRemaining = REFRESH_SECS;
-  let vjsPlayer = null;
-  let adLoopTimer = null;
+  // Max consecutive fails pehle switch karo
+  var MAX_CONSEC_FAILS = 3;
 
-  const coinsEl    = document.getElementById('coinsDisplay');
-  const timerEl    = document.getElementById('timerDisplay');
-  const progressEl = document.getElementById('progressBar');
-  const adsEl      = document.getElementById('adsWatched');
-  const totalEl    = document.getElementById('totalCoins');
-  const statusBox  = document.getElementById('statusBox');
-  const vStatusBar = document.getElementById('videoStatusBar');
-  const loadingEl  = document.getElementById('videoLoading');
-  const refreshBadge = document.getElementById('refreshBadge');
+  // Current active network index (0 = HilltopAds, 1 = Clickadilla)
+  var activeNetIdx = 0;
+
+  // ─────────────────────────────────────────
+  // Smart network chooser — fill rate based
+  // ─────────────────────────────────────────
+  function chooseBestNetwork() {
+    var ht = VAST_NETWORKS[0];
+    var ca = VAST_NETWORKS[1];
+
+    // Agar ek network ne consecutive fails di hain — doosra try karo
+    if (ht.consecutiveFails >= MAX_CONSEC_FAILS) return 1;
+    if (ca.consecutiveFails >= MAX_CONSEC_FAILS) return 0;
+
+    // Fill rate calculate karo
+    var htTotal = ht.fills + ht.fails;
+    var caTotal = ca.fills + ca.fails;
+
+    // Agar dono mein koi data nahi — HilltopAds se shuru karo (primary)
+    if (htTotal === 0 && caTotal === 0) return 0;
+    if (htTotal === 0) return 0; // HilltopAds ko try karne ka mauka do
+    if (caTotal === 0) return 1; // Clickadilla ko bhi try karo
+
+    var htRate = ht.fills / htTotal; // HilltopAds fill rate
+    var caRate = ca.fills / caTotal; // Clickadilla fill rate
+
+    // Weighted random — zyada fill rate wala zyada chances
+    // Example: HT=80% fill, CA=50% fill
+    // HT weight = 0.8, CA weight = 0.5 → HT 61% chance, CA 39% chance
+    var totalWeight = htRate + caRate;
+    if (totalWeight === 0) return 0;
+    var rand = Math.random() * totalWeight;
+    return (rand < htRate) ? 0 : 1;
+  }
+
+  // ── UI ELEMENTS ──
+  var coinsEl      = document.getElementById('coinsDisplay');
+  var timerEl      = document.getElementById('timerDisplay');
+  var progressEl   = document.getElementById('progressBar');
+  var adsEl        = document.getElementById('adsWatched');
+  var totalEl      = document.getElementById('totalCoins');
+  var statusBox    = document.getElementById('statusBox');
+  var vStatusBar   = document.getElementById('videoStatusBar');
+  var loadingEl    = document.getElementById('videoLoading');
+  var loadingText  = document.getElementById('loadingText');
+  var refreshBadge = document.getElementById('refreshBadge');
+  var networkBadge = document.getElementById('networkBadge');
+  var htFillEl     = document.getElementById('htFillEl');
+  var htFailEl     = document.getElementById('htFailEl');
+  var caFillEl     = document.getElementById('caFillEl');
+  var caFailEl     = document.getElementById('caFailEl');
+
+  // ── SESSION VARS ──
+  var COINS_PER_CYCLE = 2;
+  var CYCLE_SECS      = 30;
+  var REFRESH_SECS    = 35;
+
+  var sessionCoins    = 0;
+  var adsCount        = 0;
+  var coinRemaining   = CYCLE_SECS;
+  var refreshRemaining= REFRESH_SECS;
+  var vjsPlayer       = null;
+
+  // ── UPDATE NETWORK STATS UI ──
+  function updateNetworkUI() {
+    htFillEl.textContent = VAST_NETWORKS[0].fills;
+    htFailEl.textContent = VAST_NETWORKS[0].fails;
+    caFillEl.textContent = VAST_NETWORKS[1].fills;
+    caFailEl.textContent = VAST_NETWORKS[1].fails;
+  }
 
   // ── VIDEO PLAYING CHECK ──
-  function isAnyVideoPlaying(){
-    // 1. VAST player check
+  function isAnyVideoPlaying() {
     try {
-      if(vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0){
-        return true;
-      }
-    } catch(e){}
-
-    // 2. Koi bhi video element check (HilltopAds + Dao.Ad sliders)
+      if (vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0) return true;
+    } catch(e) {}
     try {
       var allVideos = document.querySelectorAll('video');
-      for(var i = 0; i < allVideos.length; i++){
+      for (var i = 0; i < allVideos.length; i++) {
         var v = allVideos[i];
-        if(!v.paused && !v.ended && v.currentTime > 0 && v.readyState > 2){
-          return true;
-        }
+        if (!v.paused && !v.ended && v.currentTime > 0 && v.readyState > 2) return true;
       }
-    } catch(e){}
-
+    } catch(e) {}
     return false;
   }
 
-  // ── VIDEO SLIDER SOFT REFRESH ──
-  // Har 60 sec mein sirf slider ko reload karo — full page reload nahi
-  var sliderRefreshCount = 0;
-  setInterval(function(){
-    if(isAnyVideoPlaying()) return; // video chal rahi hai — skip
-
-    sliderRefreshCount++;
-
-    // Dao.Ad slider reload
-    try {
-      if(window.daoVideoSlider){
-        window.daoVideoSlider.loadAd(function(){
-          window.daoVideoSlider.slider({
-            "containerId":"vi-d-ad-container",
-            "positionY":"bottom","positionX":"left",
-            "volume":0,"muteButton":true,"size":240,
-            "maxAdCount":3,"pauseOnEnd":5,"renewAdInterval":10
-          });
-        });
-      }
-    } catch(e){}
-
-    // VAST player bhi naya ad lo
-    try {
-      if(vjsPlayer && vjsPlayer.paused()){
-        loadVastAd();
-      }
-    } catch(e){}
-
-  }, 60000);
-
-  // ── COIN TIMER — sirf tab chale jab video chal rahi ho ──
-  setInterval(function(){
+  // ── COIN TIMER ──
+  setInterval(function() {
     var videoPlaying = isAnyVideoPlaying();
-
-    if(!videoPlaying){
-      // Video nahi chal rahi — timer pause, coins nahi
+    if (!videoPlaying) {
       timerEl.textContent = '⏸';
       progressEl.style.width = '0%';
       statusBox.textContent = '⚠️ Video chal rahi nahi — coins band hain!';
-      statusBox.style.background = 'rgba(255,150,0,0.1)';
-      statusBox.style.borderColor = 'rgba(255,150,0,0.3)';
-      statusBox.style.color = '#fbbf24';
-      coinRemaining = CYCLE_SECS; // reset
+      statusBox.style.background   = 'rgba(255,150,0,0.1)';
+      statusBox.style.borderColor  = 'rgba(255,150,0,0.3)';
+      statusBox.style.color        = '#fbbf24';
+      coinRemaining = CYCLE_SECS;
       return;
     }
-
-    // Video chal rahi hai — coins countdown
-    statusBox.style.background = 'rgba(0,200,100,0.1)';
+    statusBox.style.background  = 'rgba(0,200,100,0.1)';
     statusBox.style.borderColor = 'rgba(0,200,100,0.3)';
-    statusBox.style.color = '#4ade80';
-
+    statusBox.style.color       = '#4ade80';
     coinRemaining--;
     timerEl.textContent = coinRemaining;
     progressEl.style.width = ((CYCLE_SECS - coinRemaining) / CYCLE_SECS * 100) + '%';
-
-    if(coinRemaining <= 0){
+    if (coinRemaining <= 0) {
       coinRemaining = CYCLE_SECS;
       progressEl.style.width = '0%';
       sessionCoins += COINS_PER_CYCLE;
@@ -587,198 +666,234 @@
       coinsEl.textContent = sessionCoins;
       totalEl.textContent = sessionCoins;
       adsEl.textContent   = adsCount;
-      statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
+      statusBox.textContent = '✅ Coins mil gaye! Agle 30 sec mein aur milenge!';
       showCoinPop();
-      if(window.saveCoinsToFirebase) window.saveCoinsToFirebase(COINS_PER_CYCLE);
-      if(window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
+      if (window.saveCoinsToFirebase) window.saveCoinsToFirebase(COINS_PER_CYCLE);
+      if (window.CoinChannel) window.CoinChannel.postMessage(COINS_PER_CYCLE.toString());
     }
   }, 1000);
 
-  // ── REFRESH TIMER — har 35 sec ──
-  // Sirf tab refresh karo jab koi video chal na rahi ho
-  setInterval(function(){
-    // Check karo koi video play ho rahi hai
+  // ── REFRESH TIMER ──
+  setInterval(function() {
     var vastPlaying = vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended();
-
-    // Dao.Ad slider check
-    var daoPlaying = false;
-    try {
-      if(window.daoVideoSlider && window.daoVideoSlider.isPlaying){
-        daoPlaying = window.daoVideoSlider.isPlaying();
-      }
-    } catch(e){}
-
-    // HilltopAds slider check — koi bhi video element play ho raha hai
+    var daoPlaying  = false;
+    try { if (window.daoVideoSlider && window.daoVideoSlider.isPlaying) daoPlaying = window.daoVideoSlider.isPlaying(); } catch(e) {}
     var hilltopPlaying = false;
     try {
-      var allVideos = document.querySelectorAll('video');
-      allVideos.forEach(function(v){
-        if(v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended){
-          hilltopPlaying = true;
-        }
+      document.querySelectorAll('video').forEach(function(v) {
+        if (v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended) hilltopPlaying = true;
       });
-    } catch(e){}
+    } catch(e) {}
 
-    var anyVideoPlaying = vastPlaying || daoPlaying || hilltopPlaying;
-
-    if(anyVideoPlaying){
-      // Video chal rahi hai — refresh mat karo, timer reset karo
+    if (vastPlaying || daoPlaying || hilltopPlaying) {
       refreshRemaining = 35;
       refreshBadge.textContent = '✅ Video chal rahi hai — refresh ruka hua hai';
-      refreshBadge.style.background = 'rgba(0,200,100,0.2)';
-      refreshBadge.style.borderColor = 'rgba(0,200,100,0.5)';
-      refreshBadge.style.color = '#4ade80';
+      refreshBadge.style.background   = 'rgba(0,200,100,0.2)';
+      refreshBadge.style.borderColor  = 'rgba(0,200,100,0.5)';
+      refreshBadge.style.color        = '#4ade80';
       return;
     }
-
-    // Koi video nahi chal rahi — countdown karo
     refreshRemaining--;
-    refreshBadge.style.background = 'rgba(108,71,255,0.2)';
+    refreshBadge.style.background  = 'rgba(108,71,255,0.2)';
     refreshBadge.style.borderColor = '#6c47ff';
-    refreshBadge.style.color = '#a78bfa';
+    refreshBadge.style.color       = '#a78bfa';
     refreshBadge.textContent = '🔄 Refresh in: ' + refreshRemaining + 's';
-
-    if(refreshRemaining <= 0){
+    if (refreshRemaining <= 0) {
       localStorage.setItem('pendingCoins', sessionCoins);
       location.reload();
     }
   }, 1000);
 
+  // ── SLIDER SOFT REFRESH ──
+  setInterval(function() {
+    if (isAnyVideoPlaying()) return;
+    try {
+      if (window.daoVideoSlider) {
+        window.daoVideoSlider.loadAd(function() {
+          window.daoVideoSlider.slider({"containerId":"vi-d-ad-container","positionY":"bottom","positionX":"left","volume":0,"muteButton":true,"size":240,"maxAdCount":3,"pauseOnEnd":5,"renewAdInterval":10});
+        });
+      }
+    } catch(e) {}
+    try { if (vjsPlayer && vjsPlayer.paused()) loadVastAd(); } catch(e) {}
+  }, 60000);
+
   // ── MINUTES TRACKER ──
-  setInterval(function(){
+  setInterval(function() {
     var el = document.getElementById('timeWatched');
-    el.textContent = parseInt(el.textContent||'0') + 1;
+    el.textContent = parseInt(el.textContent || '0') + 1;
   }, 60000);
 
   // ── COIN POP ANIMATION ──
-  function showCoinPop(){
+  function showCoinPop() {
     var el = document.createElement('div');
     el.className = 'coin-pop';
     el.textContent = '+' + COINS_PER_CYCLE + ' 🪙';
-    el.style.left = (Math.random()*60+20) + '%';
+    el.style.left = (Math.random() * 60 + 20) + '%';
     el.style.top  = '50%';
     document.body.appendChild(el);
-    setTimeout(function(){ el.remove(); }, 1200);
+    setTimeout(function() { el.remove(); }, 1200);
   }
 
-  // ── VAST VIDEO PLAYER ──
-  function initVastPlayer(){
-    loadingEl.style.display = 'flex';
+  // ════════════════════════════════════════
+  // VAST PLAYER — Smart Dual Network
+  // ════════════════════════════════════════
 
+  function initVastPlayer() {
+    loadingEl.style.display = 'flex';
     vjsPlayer = videojs('myVideoPlayer', {
       controls: true,
       autoplay: true,
-      muted: true,
-      preload: 'auto',
-      fluid: false,
-      width: 500,
-      height: 200,
-      techOrder: ['html5']
+      muted:    true,
+      preload:  'auto',
+      fluid:    false,
+      width:    500,
+      height:   200,
+      techOrder:['html5']
     });
-
     loadVastAd();
   }
 
-  // VAST parser — Wrapper bhi follow karta hai (max 3 hops)
-  function parseVast(url, depth){
-    if(!depth) depth = 0;
-    if(depth > 3){ onAdError(); return; }
-
-    var fetchUrl = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cb=' + Date.now();
-    fetch(fetchUrl)
-      .then(function(r){ return r.text(); })
-      .then(function(xml){
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(xml, 'text/xml');
-
-        // MediaFile dhundo
-        var mediaFiles = doc.querySelectorAll('MediaFile');
-        var videoUrl = '';
-        mediaFiles.forEach(function(mf){
-          if(videoUrl) return;
-          var type = (mf.getAttribute('type') || '').toLowerCase();
-          var src  = mf.textContent.trim();
-          if(src && (type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || src.indexOf('.mp4') > -1)){
-            videoUrl = src;
-          }
-        });
-        if(!videoUrl && mediaFiles.length > 0){
-          videoUrl = mediaFiles[0].textContent.trim();
-        }
-
-        if(videoUrl){
-          playVideo(videoUrl);
-        } else {
-          // Wrapper follow karo
-          var wrapperEl = doc.querySelector('VASTAdTagURI');
-          if(wrapperEl){
-            var wrapperUrl = wrapperEl.textContent.trim();
-            if(wrapperUrl){
-              vStatusBar.textContent = '⏳ Ad load ho rahi hai... (' + (depth+1) + ')';
-              setTimeout(function(){ parseVast(wrapperUrl, depth + 1); }, 500);
-              return;
-            }
-          }
-          onAdError();
-        }
-      })
-      .catch(function(){ onAdError(); });
-  }
-
-  function playVideo(videoUrl){
-    vjsPlayer.src({type:'video/mp4', src: videoUrl});
-    vjsPlayer.play().catch(function(){
-      vjsPlayer.muted(true);
-      vjsPlayer.play().catch(function(){});
-    });
-    loadingEl.style.display = 'none';
-    vStatusBar.textContent = '▶ Video ad chal rahi hai — coins aa rahe hain! 🪙';
-    statusBox.textContent = '✅ Ad dekho — har 30 sec mein coins milenge!';
-  }
-
-  function loadVastAd(){
+  // VAST load — smart network picker
+  function loadVastAd() {
     loadingEl.style.display = 'flex';
-    vStatusBar.textContent = '⏳ Ad load ho rahi hai...';
 
-    if(!vjsPlayer._vastEventsSet){
+    // Best network choose karo
+    activeNetIdx = chooseBestNetwork();
+    var network  = VAST_NETWORKS[activeNetIdx];
+
+    // Badge update
+    networkBadge.textContent = '📡 ' + network.name;
+    networkBadge.style.display = 'block';
+
+    loadingText.textContent = network.name + ' se ad aa rahi hai...';
+    vStatusBar.textContent  = '⏳ ' + network.name + ' — ad load ho rahi hai...';
+
+    // Events sirf ek baar attach karo
+    if (!vjsPlayer._vastEventsSet) {
       vjsPlayer._vastEventsSet = true;
-      vjsPlayer.on('ended', function(){
+      vjsPlayer.on('ended', function() {
+        networkBadge.style.display = 'none';
         vStatusBar.textContent = '✅ Ad khatam! Agli ad load ho rahi hai...';
         setTimeout(loadVastAd, 2000);
       });
-      vjsPlayer.on('error', function(){
-        setTimeout(loadVastAd, 5000);
+      vjsPlayer.on('error', function() {
+        onAdError(activeNetIdx);
       });
     }
 
-    parseVast(VAST_URL, 0);
+    parseVast(network.url, 0, activeNetIdx);
   }
 
-  function onAdError(){
+  // VAST parser — wrapper follow karta hai (max 3 hops)
+  function parseVast(url, depth, netIdx) {
+    if (depth > 3) { onAdError(netIdx); return; }
+
+    var fetchUrl = url + (url.indexOf('?') > -1 ? '&' : '?') + 'cb=' + Date.now();
+    fetch(fetchUrl)
+      .then(function(r) { return r.text(); })
+      .then(function(xml) {
+        var parser = new DOMParser();
+        var doc    = parser.parseFromString(xml, 'text/xml');
+
+        // MediaFile dhundo
+        var mediaFiles = doc.querySelectorAll('MediaFile');
+        var videoUrl   = '';
+        mediaFiles.forEach(function(mf) {
+          if (videoUrl) return;
+          var type = (mf.getAttribute('type') || '').toLowerCase();
+          var src  = mf.textContent.trim();
+          if (src && (type.indexOf('mp4') > -1 || type.indexOf('video') > -1 || src.indexOf('.mp4') > -1)) {
+            videoUrl = src;
+          }
+        });
+        if (!videoUrl && mediaFiles.length > 0) videoUrl = mediaFiles[0].textContent.trim();
+
+        if (videoUrl) {
+          // ✅ Fill — is network ka fill count badha do
+          VAST_NETWORKS[netIdx].fills++;
+          VAST_NETWORKS[netIdx].consecutiveFails = 0;
+          updateNetworkUI();
+          playVideo(videoUrl, netIdx);
+        } else {
+          // Wrapper follow karo
+          var wrapperEl = doc.querySelector('VASTAdTagURI');
+          if (wrapperEl) {
+            var wrapperUrl = wrapperEl.textContent.trim();
+            if (wrapperUrl) {
+              vStatusBar.textContent = '⏳ Ad load ho rahi hai... (hop ' + (depth + 1) + ')';
+              setTimeout(function() { parseVast(wrapperUrl, depth + 1, netIdx); }, 500);
+              return;
+            }
+          }
+          // No fill — fail count badha do, doosra network try karo
+          onAdError(netIdx);
+        }
+      })
+      .catch(function() { onAdError(netIdx); });
+  }
+
+  function playVideo(videoUrl, netIdx) {
+    vjsPlayer.src({ type: 'video/mp4', src: videoUrl });
+    vjsPlayer.play().catch(function() {
+      vjsPlayer.muted(true);
+      vjsPlayer.play().catch(function() {});
+    });
     loadingEl.style.display = 'none';
-    vStatusBar.textContent = '⚠️ Ad load nahi hui — 5 sec mein retry...';
-    setTimeout(loadVastAd, 5000);
+    vStatusBar.textContent  = '▶ ' + VAST_NETWORKS[netIdx].name + ' — video chal rahi hai! 🪙';
+    statusBox.textContent   = '✅ Ad dekho — har 30 sec mein coins milenge!';
+  }
+
+  function onAdError(netIdx) {
+    // Fail count update karo
+    VAST_NETWORKS[netIdx].fails++;
+    VAST_NETWORKS[netIdx].consecutiveFails++;
+    updateNetworkUI();
+
+    var failedNet  = VAST_NETWORKS[netIdx];
+    var otherIdx   = netIdx === 0 ? 1 : 0;
+    var otherNet   = VAST_NETWORKS[otherIdx];
+
+    // Agar failed network ne 3 consecutive fails di hain — doosre pe switch karo
+    if (failedNet.consecutiveFails >= MAX_CONSEC_FAILS && otherNet.consecutiveFails < MAX_CONSEC_FAILS) {
+      loadingEl.style.display = 'flex';
+      loadingText.textContent = otherNet.name + ' try kar rahe hain...';
+      vStatusBar.textContent  = '⚠️ ' + failedNet.name + ' fail — ' + otherNet.name + ' try kar rahe hain...';
+      networkBadge.textContent = '📡 ' + otherNet.name;
+      activeNetIdx = otherIdx;
+      setTimeout(function() { parseVast(otherNet.url, 0, otherIdx); }, 1000);
+    } else if (failedNet.consecutiveFails >= MAX_CONSEC_FAILS && otherNet.consecutiveFails >= MAX_CONSEC_FAILS) {
+      // Dono fail — thodi der baad retry karo, consecutive resets
+      vStatusBar.textContent = '⚠️ Dono networks fail — 10 sec mein retry...';
+      loadingEl.style.display = 'flex';
+      loadingText.textContent = 'Retry ho rahi hai...';
+      VAST_NETWORKS[0].consecutiveFails = 0;
+      VAST_NETWORKS[1].consecutiveFails = 0;
+      setTimeout(loadVastAd, 10000);
+    } else {
+      // Normal fail — 5 sec mein retry (best network se)
+      vStatusBar.textContent = '⚠️ Ad nahi aayi — 5 sec mein retry...';
+      loadingEl.style.display = 'flex';
+      setTimeout(loadVastAd, 5000);
+    }
   }
 
   // Page load pe player start karo
-  window.addEventListener('load', function(){
+  window.addEventListener('load', function() {
     setTimeout(initVastPlayer, 1000);
   });
   </script>
 
   <!-- FIREBASE -->
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, get, set }
-      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-    import { getAuth, onAuthStateChanged }
-      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
-      authDomain: "this-is-my-first-app-99e55.firebaseapp.com",
+      apiKey:      "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
+      authDomain:  "this-is-my-first-app-99e55.firebaseapp.com",
       databaseURL: "https://this-is-my-first-app-99e55-default-rtdb.firebaseio.com",
-      projectId: "this-is-my-first-app-99e55"
+      projectId:   "this-is-my-first-app-99e55"
     };
 
     const app  = initializeApp(firebaseConfig);
@@ -787,32 +902,27 @@
     let currentUser = null;
 
     onAuthStateChanged(auth, (user) => {
-      if(user){
+      if (user) {
         currentUser = user;
         document.getElementById('statusBox').textContent =
           '✅ ' + (user.displayName || user.email) + ' — Ad dekho coins kamao!';
-
-        // Pending coins restore karo agar refresh se aaye
         const pending = localStorage.getItem('pendingCoins');
-        if(pending && parseInt(pending) > 0){
-          localStorage.removeItem('pendingCoins');
-        }
+        if (pending && parseInt(pending) > 0) localStorage.removeItem('pendingCoins');
       } else {
-        document.getElementById('statusBox').textContent =
-          '⚠️ Login karo coins save karne ke liye!';
+        document.getElementById('statusBox').textContent = '⚠️ Login karo coins save karne ke liye!';
       }
     });
 
-    window.saveCoinsToFirebase = async function(n){
-      if(!currentUser) return;
-      try{
-        const r = ref(db, 'users/'+currentUser.uid+'/coins');
-        const s = await get(r);
-        await set(r, (s.val()||0) + n);
-        const hr = ref(db, 'users/'+currentUser.uid+'/watchHistory');
+    window.saveCoinsToFirebase = async function(n) {
+      if (!currentUser) return;
+      try {
+        const r  = ref(db, 'users/' + currentUser.uid + '/coins');
+        const s  = await get(r);
+        await set(r, (s.val() || 0) + n);
+        const hr = ref(db, 'users/' + currentUser.uid + '/watchHistory');
         const hs = await get(hr);
-        await set(hr, (hs.val()||0) + 1);
-      } catch(e){ console.error(e); }
+        await set(hr, (hs.val() || 0) + 1);
+      } catch(e) { console.error(e); }
     };
   </script>
 
