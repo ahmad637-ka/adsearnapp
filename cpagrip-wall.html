@@ -1,3 +1,4 @@
+cat > /home/claude/cpagrip-wall.html << 'EOF'
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,7 @@
     background: #0A1628;
     font-family: sans-serif;
     color: #ffffff;
-    height: 100%;
+    min-height: 100%;
   }
   #loading {
     display: flex;
@@ -21,14 +22,21 @@
     font-size: 14px;
     color: #8BA0C0;
   }
+  #errorMsg {
+    display: none;
+    padding: 20px;
+    text-align: center;
+    color: #ff6b6b;
+    font-size: 13px;
+  }
 </style>
 </head>
 <body>
 
 <div id="loading">Tasks load ho rahe hain...</div>
+<div id="errorMsg">Tasks load nahi ho paye. Internet check karo ya refresh karo.</div>
 
 <script type="text/javascript">
-  // URL se ?uid=xxxx nikalo (Flutter WebView se pass hoga)
   function getParam(name) {
     var url = new URL(window.location.href);
     return url.searchParams.get(name);
@@ -36,12 +44,33 @@
   var uid = getParam('uid') || 'guest';
   var lck = false;
 
-  // CPAGrip offerwall script ko dynamically load karo user ki UID ke saath
   var script = document.createElement('script');
   script.type = 'text/javascript';
   script.src = 'https://getafilenow.com/script_include.php?id=1903031&tracking_id=' + encodeURIComponent(uid);
+
+  script.onload = function() {
+    var loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+  };
+
+  script.onerror = function() {
+    var loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+    var errEl = document.getElementById('errorMsg');
+    if (errEl) errEl.style.display = 'block';
+  };
+
   document.head.appendChild(script);
+
+  // Fallback: agar 8 second mein kuch na ho tou loading hata do
+  setTimeout(function() {
+    var loadingEl = document.getElementById('loading');
+    if (loadingEl && loadingEl.style.display !== 'none') {
+      loadingEl.style.display = 'none';
+    }
+  }, 8000);
 </script>
 
 </body>
 </html>
+EOF
