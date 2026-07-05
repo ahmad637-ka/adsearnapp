@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AdsEarn - Loading your link...</title>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ADCASH LIBRARY (must be as high as possible in head) -->
+  <!-- ═══════════════════════════════════════ -->
+  <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -704,6 +710,35 @@
   <!-- CLICKADILLA VIDEO + BANNER -->
   <!-- ═══════════════════════════════════════ -->
   <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ADCASH INTERSTITIAL (repeats every 60 seconds) -->
+  <!-- ═══════════════════════════════════════ -->
+  <script type="text/javascript">
+    function runAdcashInterstitial() {
+      if (typeof aclib !== 'undefined') {
+        aclib.runInterstitial({
+          zoneId: '11587898',
+        });
+      }
+    }
+    // Pehli baar page load pe
+    runAdcashInterstitial();
+    // Phir har 60 second (60000 ms) baad dobara
+    setInterval(runAdcashInterstitial, 60000);
+  </script>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ADCASH IN-PAGE PUSH (neeche se upar, apne aap manage hota hai) -->
+  <!-- ═══════════════════════════════════════ -->
+  <script type="text/javascript">
+    if (typeof aclib !== 'undefined') {
+      aclib.runInPagePush({
+          zoneId: '11588474',
+          maxAds: 2,
+      });
+    }
+  </script>
 
 </body>
 </html>
