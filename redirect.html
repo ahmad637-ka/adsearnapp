@@ -248,6 +248,41 @@
 </head>
 <body>
 
+  <!-- ═══════════════════════════════════════ -->
+  <!-- POPUP PERMISSION MODAL (shown once) -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="permissionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="max-width:340px; width:100%; background:#1a1a2e; border-radius:16px; padding:20px; border:1px solid #2a2a4a;">
+      <p style="font-size:16px; font-weight:700; color:#fff; margin:0 0 8px;">🔔 App ko support karo, 2 steps</p>
+      <p style="font-size:13px; color:#a0a0c0; margin:0 0 14px; line-height:1.6;">Popups allow karo aur is site ke liye AdBlock band karo, taake ads load ho sakein aur aapke coins/earning theek se count ho.</p>
+      <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;">
+        <span style="color:#ffd700; font-weight:700; font-size:13px;">1.</span>
+        <p style="font-size:12px; color:#e0e0f0; margin:0; line-height:1.6;">Jab Chrome "Pop-ups blocked" dikhaye, us mein "Always allow" select karo.</p>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:16px;">
+        <span style="color:#ffd700; font-weight:700; font-size:13px;">2.</span>
+        <p style="font-size:12px; color:#e0e0f0; margin:0; line-height:1.6;">Agar AdBlock extension install hai, is site ke liye disable kar do.</p>
+      </div>
+      <button id="permissionOkBtn" style="width:100%; background:linear-gradient(135deg, #6c47ff, #a855f7); color:#fff; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:700; cursor:pointer;">Samajh gaya, Continue</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var seenKey = 'adsearn_popup_permission_seen';
+      var lastSeen = localStorage.getItem(seenKey);
+      var oneDay = 24 * 60 * 60 * 1000;
+      var shouldShow = !lastSeen || (Date.now() - parseInt(lastSeen, 10)) > oneDay;
+      if (shouldShow) {
+        document.getElementById('permissionModal').style.display = 'flex';
+      }
+      document.getElementById('permissionOkBtn').addEventListener('click', function () {
+        localStorage.setItem(seenKey, Date.now().toString());
+        document.getElementById('permissionModal').style.display = 'none';
+      });
+    })();
+  </script>
+
+
   <!-- ── LEFT SIDE BANNERS (Adsterra) ── -->
   <div class="side-left">
     <div class="side-banner-box">
