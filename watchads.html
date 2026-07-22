@@ -69,9 +69,10 @@
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
+    /* VIDEO PLAYER — 40% bara kiya gaya: 200px -> 280px */
     .video-player-wrap {
       width: 100%;
-      height: 200px;
+      height: 280px;
       background: #000;
       border-radius: 14px;
       border: 3px solid #1a3a6b;
@@ -79,10 +80,13 @@
       margin-bottom: 14px;
       position: relative;
     }
-    #myVideoPlayer { width: 100% !important; height: 200px !important; }
-    .video-js { width: 100% !important; height: 200px !important; background: #000 !important; }
+    #myVideoPlayer { width: 100% !important; height: 280px !important; }
+    .video-js { width: 100% !important; height: 280px !important; background: #000 !important; }
     .video-js .vjs-big-play-button { display: none !important; }
     .video-js .vjs-control-bar { background: rgba(0,0,0,0.7); }
+
+    #youtubePlayerBox { width: 100%; height: 280px; border-radius: 11px; overflow: hidden; }
+    #ytPlayer { width: 100%; height: 100%; }
 
     .video-loading {
       position: absolute;
@@ -319,6 +323,11 @@
              playsinline
              preload="auto">
       </video>
+
+      <!-- YouTube player yahan overlay hoga jab content-video segment chal raha ho -->
+      <div id="youtubePlayerBox" style="display:none;">
+        <div id="ytPlayer"></div>
+      </div>
     </div>
 
     <!-- Video Status -->
@@ -455,6 +464,9 @@
   <!-- VIDEO.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 
+  <!-- YOUTUBE IFRAME API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
   <!-- ═══════════════════════════════════════════════════════
        MAIN LOGIC
        ───────────────────────────────────────────────────────
@@ -465,6 +477,10 @@
           jab tak doosre 10 ads na dekh le
        4. Fail → doosra network try karo automatically
        5. No network name shown anywhere
+       6. YouTube content player — 2-min segments, beech mein
+          apna khud ka VAST ad (YouTube ke bahar, apne UI mein)
+       7. SMART REFRESH — sirf tab visible + user active ho tab
+          hi countdown chalta hai; blind background reload nahi
   ═══════════════════════════════════════════════════════ -->
   <script>
   // ── VAST NETWORKS (no names shown to user) ──
@@ -482,35 +498,27 @@
   ];
 
   // ── AD DEDUPLICATION ──
-  // Played URLs ka set — jab tak 10 naye ads na dekh le
-  // same URL dobara nahi aayega
-  var playedUrls   = [];       // already dekhi hui ad URLs
-  var DEDUP_WINDOW = 10;       // itne ads ke baad same URL dobara aa sakti hai
-  var MAX_DEDUP_RETRIES = 6;   // agar 6 baar same URL aayi to accept karo (supply kam hai)
+  var playedUrls   = [];
+  var DEDUP_WINDOW = 10;
+  var MAX_DEDUP_RETRIES = 6;
 
   function isAlreadyPlayed(url) {
-    // Last DEDUP_WINDOW URLs mein check karo
     var recent = playedUrls.slice(-DEDUP_WINDOW);
     return recent.indexOf(url) !== -1;
   }
 
   function markPlayed(url) {
     playedUrls.push(url);
-    // Memory limit — sirf last 50 URLs rakhna
     if (playedUrls.length > 50) playedUrls.shift();
   }
 
   // ── NETWORK PICKER — strict alternating ──
-  // HilltopAds → Clickadilla → HilltopAds → ... 
-  // Agar ek fail ho to doosra try karo
-  var lastNetIdx = -1; // -1 = abhi tak koi nahi chala
+  var lastNetIdx = -1;
 
   function getNextNetworkIdx() {
-    // Strict alternate — agar dono theek hain
     if (VAST_NETWORKS[0].consecutiveFails < 3 && VAST_NETWORKS[1].consecutiveFails < 3) {
       return lastNetIdx === 0 ? 1 : 0;
     }
-    // Ek fail hai — doosra use karo
     if (VAST_NETWORKS[0].consecutiveFails >= 3) return 1;
     if (VAST_NETWORKS[1].consecutiveFails >= 3) return 0;
     return 0;
@@ -527,7 +535,6 @@
   var refreshRemaining = REFRESH_SECS;
   var vjsPlayer        = null;
 
-  // Current ad load state
   var currentNetIdx    = 0;
   var dedupRetryCount  = 0;
 
@@ -542,6 +549,26 @@
   var loadingEl    = document.getElementById('videoLoading');
   var loadingText  = document.getElementById('loadingText');
   var refreshBadge = document.getElementById('refreshBadge');
+
+  // ══════════════════════════════════════════════
+  // SMART ACTIVITY TRACKING — refresh sirf real users ke liye
+  // ══════════════════════════════════════════════
+  var lastActivityTime = Date.now();
+  var ACTIVITY_TIMEOUT = 60000; // 60 sec — isse zyada idle to "inactive" maana jayega
+
+  ['mousemove', 'mousedown', 'touchstart', 'keydown', 'scroll', 'click'].forEach(function(evt) {
+    document.addEventListener(evt, function() {
+      lastActivityTime = Date.now();
+    }, { passive: true });
+  });
+
+  function isUserActive() {
+    return (Date.now() - lastActivityTime) < ACTIVITY_TIMEOUT;
+  }
+
+  function isTabVisible() {
+    return document.visibilityState === 'visible';
+  }
 
   // ── VIDEO PLAYING CHECK ──
   function isAnyVideoPlaying() {
@@ -558,8 +585,9 @@
     return false;
   }
 
-  // ── COIN TIMER — sirf video play hone par ──
+  // ── COIN TIMER — sirf video play hone par, tab visible ho tab hi ──
   setInterval(function() {
+    if (!isTabVisible()) return; // background tab mein coins accrue na ho
     var playing = isAnyVideoPlaying();
     if (!playing) {
       timerEl.textContent = '⏸';
@@ -592,29 +620,49 @@
     }
   }, 1000);
 
-  // ── REFRESH TIMER ──
+  // ══════════════════════════════════════════════
+  // SMART REFRESH TIMER
+  // Purana behavior: har 35 sec blind location.reload() — chahe
+  // user dekh raha ho ya na ho, tab background mein ho ya na ho.
+  // Naya behavior: countdown sirf tab tak chalta hai jab tab
+  // VISIBLE ho AUR user ne last 60 sec mein koi activity ki ho.
+  // Agar tab hidden ho ya user idle ho — countdown pause,
+  // koi reload nahi hota jab tak user wapis active na ho.
+  // ══════════════════════════════════════════════
   setInterval(function() {
-    var anyPlaying = false;
-    try { if (vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended()) anyPlaying = true; } catch(e) {}
+    var videoPlaying = false;
+    try { if (vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended()) videoPlaying = true; } catch(e) {}
     try {
       if (window.daoVideoSlider && window.daoVideoSlider.isPlaying) {
-        if (window.daoVideoSlider.isPlaying()) anyPlaying = true;
+        if (window.daoVideoSlider.isPlaying()) videoPlaying = true;
       }
     } catch(e) {}
     try {
       document.querySelectorAll('video').forEach(function(v) {
-        if (v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended) anyPlaying = true;
+        if (v !== document.getElementById('myVideoPlayer') && !v.paused && !v.ended) videoPlaying = true;
       });
     } catch(e) {}
 
-    if (anyPlaying) {
-      refreshRemaining = 35;
+    // Video chal rahi ho to refresh pura pause
+    if (videoPlaying) {
+      refreshRemaining = REFRESH_SECS;
       refreshBadge.textContent = '✅ Video chal rahi hai — refresh ruka hua hai';
       refreshBadge.style.background  = 'rgba(0,200,100,0.2)';
       refreshBadge.style.borderColor = 'rgba(0,200,100,0.5)';
       refreshBadge.style.color       = '#4ade80';
       return;
     }
+
+    // Tab hidden ya user idle — countdown pause, reload mat karo
+    if (!isTabVisible() || !isUserActive()) {
+      refreshBadge.textContent = '⏸ Refresh paused (inactive)';
+      refreshBadge.style.background  = 'rgba(150,150,150,0.15)';
+      refreshBadge.style.borderColor = '#666';
+      refreshBadge.style.color       = '#999';
+      return;
+    }
+
+    // Real active user + visible tab — normal countdown
     refreshRemaining--;
     refreshBadge.style.background  = 'rgba(108,71,255,0.2)';
     refreshBadge.style.borderColor = '#6c47ff';
@@ -628,6 +676,7 @@
 
   // ── SLIDER SOFT REFRESH ──
   setInterval(function() {
+    if (!isTabVisible() || !isUserActive()) return;
     if (isAnyVideoPlaying()) return;
     try {
       if (window.daoVideoSlider) {
@@ -641,6 +690,7 @@
 
   // ── MINUTES TRACKER ──
   setInterval(function() {
+    if (!isTabVisible()) return;
     var el = document.getElementById('timeWatched');
     el.textContent = parseInt(el.textContent || '0') + 1;
   }, 60000);
@@ -669,13 +719,12 @@
       preload:   'auto',
       fluid:     false,
       width:     500,
-      height:    200,
+      height:    280,
       techOrder: ['html5']
     });
-    // Events ek baar attach karo
     vjsPlayer.on('ended', function() {
       vStatusBar.textContent = '⏳ Nayi ad aa rahi hai...';
-      dedupRetryCount = 0; // reset retry count har ad ke baad
+      dedupRetryCount = 0;
       setTimeout(loadVastAd, 1500);
     });
     vjsPlayer.on('error', function() {
@@ -684,17 +733,14 @@
     loadVastAd();
   }
 
-  // ── LOAD VAST AD — network pick karo, cachebust karo ──
   function loadVastAd() {
     loadingEl.style.display = 'flex';
     loadingText.textContent = 'Nayi ad load ho rahi hai...';
     vStatusBar.textContent  = '⏳ Ad aa rahi hai...';
 
-    // Next network pick karo (alternating)
     currentNetIdx = getNextNetworkIdx();
     lastNetIdx    = currentNetIdx;
 
-    // Cache bust — har baar fresh ad request
     var url = VAST_NETWORKS[currentNetIdx].url;
     var sep = url.indexOf('?') > -1 ? '&' : '?';
     var bustUrl = url + sep + 'cb=' + Date.now() + '&rnd=' + Math.floor(Math.random() * 999999);
@@ -702,7 +748,6 @@
     parseVast(bustUrl, 0, currentNetIdx);
   }
 
-  // ── VAST PARSER — wrapper bhi follow karo (max 4 hops) ──
   function parseVast(url, depth, netIdx) {
     if (depth > 4) { onNetworkFail(netIdx); return; }
 
@@ -715,15 +760,12 @@
         var parser = new DOMParser();
         var doc    = parser.parseFromString(xml, 'text/xml');
 
-        // Sabse pehle — koi parse error?
         var parseErr = doc.querySelector('parsererror');
         if (parseErr) { onNetworkFail(netIdx); return; }
 
-        // MediaFile dhundo — MP4 prefer karo
         var mediaFiles = doc.querySelectorAll('MediaFile');
         var videoUrl   = '';
 
-        // Priority 1: MP4
         mediaFiles.forEach(function(mf) {
           if (videoUrl) return;
           var type = (mf.getAttribute('type') || '').toLowerCase();
@@ -733,7 +775,6 @@
           }
         });
 
-        // Priority 2: koi bhi video
         if (!videoUrl) {
           mediaFiles.forEach(function(mf) {
             if (videoUrl) return;
@@ -743,16 +784,13 @@
         }
 
         if (videoUrl) {
-          // ── DEDUPLICATION CHECK ──
           if (isAlreadyPlayed(videoUrl)) {
             dedupRetryCount++;
             if (dedupRetryCount >= MAX_DEDUP_RETRIES) {
-              // Itni baar retry kar chuke — accept karo (supply kam hai)
               dedupRetryCount = 0;
               markPlayed(videoUrl);
               playVideo(videoUrl, netIdx);
             } else {
-              // Doosre network se naya ad try karo
               var otherIdx = netIdx === 0 ? 1 : 0;
               lastNetIdx   = otherIdx;
               var otherUrl = VAST_NETWORKS[otherIdx].url;
@@ -762,7 +800,6 @@
               setTimeout(function() { parseVast(bustUrl, 0, otherIdx); }, 800);
             }
           } else {
-            // ✅ Naya ad mila!
             dedupRetryCount = 0;
             VAST_NETWORKS[netIdx].fills++;
             VAST_NETWORKS[netIdx].consecutiveFails = 0;
@@ -770,7 +807,6 @@
             playVideo(videoUrl, netIdx);
           }
         } else {
-          // Wrapper check karo
           var wrapperEl = doc.querySelector('VASTAdTagURI');
           if (wrapperEl) {
             var wrapperUrl = wrapperEl.textContent.trim();
@@ -779,7 +815,6 @@
               return;
             }
           }
-          // No fill — doosra network try karo
           onNetworkFail(netIdx);
         }
       })
@@ -804,7 +839,6 @@
     VAST_NETWORKS[netIdx].consecutiveFails++;
     var otherIdx = netIdx === 0 ? 1 : 0;
 
-    // Doosra network try karo
     if (VAST_NETWORKS[otherIdx].consecutiveFails < 3) {
       lastNetIdx = otherIdx;
       var otherUrl = VAST_NETWORKS[otherIdx].url;
@@ -814,12 +848,87 @@
       vStatusBar.textContent  = '⏳ Ad load ho rahi hai...';
       setTimeout(function() { parseVast(bustUrl, 0, otherIdx); }, 1500);
     } else {
-      // Dono fail — thodi der baad reset aur retry
       VAST_NETWORKS[0].consecutiveFails = 0;
       VAST_NETWORKS[1].consecutiveFails = 0;
       vStatusBar.textContent  = '⏳ Ad aa rahi hai...';
       loadingText.textContent = 'Thoda wait karo...';
       setTimeout(loadVastAd, 8000);
+    }
+  }
+
+  // ══════════════════════════════════════════════
+  // YOUTUBE CONTENT PLAYER
+  // 2-min segments; segment khatam hone par YouTube pause
+  // hoti hai aur apna khud ka VAST ad (upar wala system)
+  // chalta hai. Ad khatam -> YouTube resume.
+  // Video list yahan curated rakho (embedding-allowed IDs).
+  // ══════════════════════════════════════════════
+  var CONTENT_VIDEO_IDS = [
+    // "dQw4w9WgXcQ", "xxxxxxxxxxx" -- apni curated list yahan daalo
+  ];
+  var currentVideoIndex = 0;
+  var ytPlayer = null;
+  var YT_SEGMENT_SECONDS = 120;
+  var ytSegmentTimer = null;
+  var ytReady = false;
+
+  function onYouTubeIframeAPIReady() {
+    ytReady = true;
+  }
+
+  function startContentVideo() {
+    if (!ytReady || CONTENT_VIDEO_IDS.length === 0) return;
+    var videoId = CONTENT_VIDEO_IDS[currentVideoIndex];
+    document.getElementById('youtubePlayerBox').style.display = 'block';
+    document.getElementById('myVideoPlayer').style.display = 'none';
+
+    if (ytPlayer) {
+      ytPlayer.loadVideoById(videoId);
+    } else {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '280',
+        width: '100%',
+        videoId: videoId,
+        playerVars: { 'playsinline': 1, 'controls': 1, 'rel': 0, 'modestbranding': 1 },
+        events: {
+          'onReady': function(e) { e.target.playVideo(); startYtSegmentTimer(); },
+          'onStateChange': onYtStateChange
+        }
+      });
+    }
+  }
+
+  function startYtSegmentTimer() {
+    clearTimeout(ytSegmentTimer);
+    ytSegmentTimer = setTimeout(function() {
+      if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+      showAdBreakForContentVideo();
+    }, YT_SEGMENT_SECONDS * 1000);
+  }
+
+  function showAdBreakForContentVideo() {
+    // Apna VAST ad player wapis dikhao, YouTube ko chhupao
+    document.getElementById('youtubePlayerBox').style.display = 'none';
+    document.getElementById('myVideoPlayer').style.display = 'block';
+    loadVastAd();
+    // Jab ye ad "ended" event fire kare (upar wala vjsPlayer 'ended' listener),
+    // resumeContentVideo() ko wahan se call karwa dena is file mein.
+  }
+
+  function resumeContentVideo() {
+    document.getElementById('myVideoPlayer').style.display = 'none';
+    document.getElementById('youtubePlayerBox').style.display = 'block';
+    if (ytPlayer) {
+      ytPlayer.playVideo();
+      startYtSegmentTimer();
+    }
+  }
+
+  function onYtStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+      clearTimeout(ytSegmentTimer);
+      currentVideoIndex = (currentVideoIndex + 1) % CONTENT_VIDEO_IDS.length;
+      startContentVideo();
     }
   }
 
