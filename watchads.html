@@ -31,7 +31,7 @@
     .side-left, .side-right {
       position: fixed;
       top: 0;
-      bottom: 60px;
+      bottom: 0;
       width: 165px;
       display: flex;
       flex-direction: column;
@@ -71,7 +71,7 @@
 
     .video-player-wrap {
       width: 100%;
-      height: 280px;
+      height: 320px;
       background: #000;
       border-radius: 14px;
       border: 3px solid #1a3a6b;
@@ -79,12 +79,13 @@
       margin-bottom: 14px;
       position: relative;
     }
-    #myVideoPlayer { width: 100% !important; height: 280px !important; }
-    .video-js { width: 100% !important; height: 280px !important; background: #000 !important; }
+    #myVideoPlayer { width: 100% !important; height: 320px !important; }
+    .video-js { width: 100% !important; height: 320px !important; background: #000 !important; }
     .video-js .vjs-big-play-button { display: none !important; }
     .video-js .vjs-control-bar { background: rgba(0,0,0,0.7); }
+    .video-js .vjs-fullscreen-control { display: none !important; }
 
-    #youtubePlayerBox { width: 100%; height: 280px; border-radius: 11px; overflow: hidden; }
+    #youtubePlayerBox { width: 100%; height: 320px; border-radius: 11px; overflow: hidden; }
     #ytPlayer { width: 100%; height: 100%; }
 
     .video-loading {
@@ -301,13 +302,6 @@
 </head>
 <body>
 
-  <div class="ad-top">
-    <script>
-      atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
-    </script>
-    <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
-  </div>
-
   <div class="side-left">
     <div class="side-banner-box">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
@@ -449,10 +443,6 @@
 
   </div>
 
-  <div class="ad-bottom-sticky">
-    <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
-  </div>
-
   <div style="display:none;">
     <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
   </div>
@@ -479,7 +469,7 @@
   if(document.readyState==="complete"||document.readyState!=="loading") dviInit();
   else document.addEventListener('DOMContentLoaded',dviInit);
   </script>
-  <div id="vi-d-ad-container" style="position:fixed;bottom:60px;left:4px;z-index:200;width:240px;"></div>
+  <div id="vi-d-ad-container" style="position:fixed;bottom:10px;left:4px;z-index:200;width:240px;"></div>
 
   <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
   <script>
@@ -563,7 +553,7 @@
     return 0;
   }
 
-  var COINS_PER_CYCLE  = 2;
+  var COINS_PER_CYCLE  = 5;
   var CYCLE_SECS       = 30;
   var REFRESH_SECS     = 35;
 
