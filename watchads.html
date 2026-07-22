@@ -723,8 +723,26 @@
       techOrder: ['html5']
     });
     vjsPlayer.on('ended', function() {
-      vStatusBar.textContent = '⏳ Nayi ad aa rahi hai...';
       dedupRetryCount = 0;
+      // Agar ye ad YouTube content ke beech wala "ad-break" tha,
+      // to ab wapis YouTube video resume karo
+      if (isContentAdBreak) {
+        isContentAdBreak = false;
+        vStatusBar.textContent = '▶ Video wapis chal rahi hai...';
+        setTimeout(resumeContentVideo, 1000);
+        return;
+      }
+      // Agar curated content videos configured hain aur abhi
+      // content mode start nahi hua, to pehli ad ke baad
+      // YouTube content video shuru karo
+      if (!contentModeStarted && CONTENT_VIDEO_IDS.length > 0) {
+        contentModeStarted = true;
+        vStatusBar.textContent = '⏳ Video load ho rahi hai...';
+        setTimeout(startContentVideo, 1000);
+        return;
+      }
+      // Warna normal cycle — agli ad load karo
+      vStatusBar.textContent = '⏳ Nayi ad aa rahi hai...';
       setTimeout(loadVastAd, 1500);
     });
     vjsPlayer.on('error', function() {
@@ -871,6 +889,8 @@
   var YT_SEGMENT_SECONDS = 120;
   var ytSegmentTimer = null;
   var ytReady = false;
+  var contentModeStarted = false; // true jab pehli baar YouTube content shuru ho chuka ho
+  var isContentAdBreak   = false; // true jab abhi content-video ke beech wala ad chal raha ho
 
   function onYouTubeIframeAPIReady() {
     ytReady = true;
@@ -908,11 +928,12 @@
 
   function showAdBreakForContentVideo() {
     // Apna VAST ad player wapis dikhao, YouTube ko chhupao
+    isContentAdBreak = true;
     document.getElementById('youtubePlayerBox').style.display = 'none';
     document.getElementById('myVideoPlayer').style.display = 'block';
     loadVastAd();
-    // Jab ye ad "ended" event fire kare (upar wala vjsPlayer 'ended' listener),
-    // resumeContentVideo() ko wahan se call karwa dena is file mein.
+    // Jab ye ad "ended" event fire karega, vjsPlayer 'ended' listener
+    // isContentAdBreak flag check karke resumeContentVideo() khud call kar dega.
   }
 
   function resumeContentVideo() {
