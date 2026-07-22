@@ -69,7 +69,6 @@
     .logo span { color: #FFD700; }
     .subtitle { font-size: 13px; color: #8BA0C0; margin-bottom: 14px; }
 
-    /* VIDEO PLAYER — 40% bara kiya gaya: 200px -> 280px */
     .video-player-wrap {
       width: 100%;
       height: 280px;
@@ -119,6 +118,69 @@
       font-size: 12px;
       color: #a78bfa;
       text-align: center;
+    }
+
+    .section-title {
+      text-align: left;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin: 4px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      margin-bottom: 14px;
+      padding-right: 2px;
+    }
+    .movie-card {
+      background: #12122a;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s ease;
+    }
+    .movie-card:active { border-color: #FFD700; }
+    .movie-card.active-card { border-color: #FFD700; }
+    .movie-thumb-wrap {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+    }
+    .movie-thumb-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .movie-play-badge {
+      position: absolute;
+      bottom: 4px; right: 4px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .movie-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e5e9f0;
+      padding: 6px 8px 8px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .ad-slot {
@@ -239,7 +301,6 @@
 </head>
 <body>
 
-  <!-- TOP BANNER -->
   <div class="ad-top">
     <script>
       atOptions = {'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};
@@ -247,7 +308,6 @@
     <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
   </div>
 
-  <!-- LEFT SIDE BANNERS -->
   <div class="side-left">
     <div class="side-banner-box">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
@@ -261,7 +321,6 @@
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
-    <!-- HilltopAds banner -->
     <div class="side-banner-box">
       <script>
       (function(khkjvz){
@@ -275,7 +334,6 @@
     </div>
   </div>
 
-  <!-- RIGHT SIDE BANNERS -->
   <div class="side-right">
     <div class="side-banner-box">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
@@ -289,7 +347,6 @@
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':300,'width':160,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
-    <!-- HilltopAds banner -->
     <div class="side-banner-box">
       <script>
       (function(khkjvz){
@@ -303,16 +360,13 @@
     </div>
   </div>
 
-  <!-- Refresh Badge -->
   <div class="refresh-badge" id="refreshBadge">🔄 Next refresh: 35s</div>
 
-  <!-- MAIN CONTAINER -->
   <div class="container">
 
     <div class="logo">Ads<span>Earn</span></div>
     <div class="subtitle">📺 Ads dekho — real coins kamao!</div>
 
-    <!-- VIDEO PLAYER -->
     <div class="video-player-wrap">
       <div class="video-loading" id="videoLoading">
         <div class="spinner"></div>
@@ -324,24 +378,23 @@
              preload="auto">
       </video>
 
-      <!-- YouTube player yahan overlay hoga jab content-video segment chal raha ho -->
       <div id="youtubePlayerBox" style="display:none;">
         <div id="ytPlayer"></div>
       </div>
     </div>
 
-    <!-- Video Status -->
     <div class="video-status-bar" id="videoStatusBar">
       ▶ Video ad chal rahi hai — coins aa rahe hain! 🪙
     </div>
 
-    <!-- AD SLOT 1 -->
+    <div class="section-title">🎬 Movies — tap karke dekho</div>
+    <div class="movie-grid" id="movieGrid"></div>
+
     <div class="ad-slot">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
-    <!-- COINS BOX -->
     <div class="coins-box">
       <div>
         <div class="coins-label">🪙 Coins Earned</div>
@@ -353,17 +406,14 @@
       </div>
     </div>
 
-    <!-- PROGRESS -->
     <div class="progress-wrap">
       <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- STATUS -->
     <div class="status-box" id="statusBox">
       ✅ Ads chal rahe hain — har 30 sec mein coins milenge!
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-icon">👁</div>
@@ -382,13 +432,11 @@
       </div>
     </div>
 
-    <!-- AD SLOT 2 -->
     <div class="ad-slot">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
     </div>
 
-    <!-- AD SLOT 3 -->
     <div class="ad-slot">
       <script>atOptions={'key':'054b7c1a4cbb13266b09c565eb61513e','format':'iframe','height':50,'width':320,'params':{}};</script>
       <script src="https://www.highperformanceformat.com/054b7c1a4cbb13266b09c565eb61513e/invoke.js"></script>
@@ -401,17 +449,14 @@
 
   </div>
 
-  <!-- BOTTOM STICKY -->
   <div class="ad-bottom-sticky">
     <script src="https://pl29873222.effectivecpmnetwork.com/65/ba/95/65ba9550781bc72fb775c27ab3639d18.js"></script>
   </div>
 
-  <!-- ADSTERRA POPUNDER -->
   <div style="display:none;">
     <script src="https://pl29794516.effectivecpmnetwork.com/db/6f/ee/db6feee42bca4723e86ee4e801143863.js"></script>
   </div>
 
-  <!-- HILLTOPADS VIDEO SLIDER — BOTTOM RIGHT -->
   <script>
   (function(iia){
     var d=document,s=d.createElement('script'),l=d.scripts[d.scripts.length-1];
@@ -422,7 +467,6 @@
   })({})
   </script>
 
-  <!-- DAO.AD VIDEO SLIDER — BOTTOM LEFT -->
   <script type="text/javascript" src="https://video.agenteimmobiliare.info/d-video.js?b=32"></script>
   <script>
   function dviInit(){
@@ -437,7 +481,6 @@
   </script>
   <div id="vi-d-ad-container" style="position:fixed;bottom:60px;left:4px;z-index:200;width:240px;"></div>
 
-  <!-- DAO.AD INPAGE PUSH -->
   <script src="https://inppmayfinder.info/in-page.js?b=15"></script>
   <script>
   function dippInit(){
@@ -448,7 +491,6 @@
   else document.addEventListener('DOMContentLoaded',dippInit);
   </script>
 
-  <!-- DAO.AD POPUNDER -->
   <script src="https://onetouch4.com/sl/pnm/62513.js"></script>
   <script>
   window.addEventListener('load',function(){
@@ -458,32 +500,31 @@
   });
   </script>
 
-  <!-- CLICKADILLA -->
   <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="446089"></script>
 
-  <!-- VIDEO.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 
-  <!-- YOUTUBE IFRAME API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
-  <!-- ═══════════════════════════════════════════════════════
-       MAIN LOGIC
-       ───────────────────────────────────────────────────────
-       Features:
-       1. Dual VAST networks — HilltopAds + Clickadilla
-       2. Smart alternating — dono se barabar ads lo
-       3. Ad deduplication — same video URL dobara nahi aayega
-          jab tak doosre 10 ads na dekh le
-       4. Fail → doosra network try karo automatically
-       5. No network name shown anywhere
-       6. YouTube content player — 2-min segments, beech mein
-          apna khud ka VAST ad (YouTube ke bahar, apne UI mein)
-       7. SMART REFRESH — sirf tab visible + user active ho tab
-          hi countdown chalta hai; blind background reload nahi
-  ═══════════════════════════════════════════════════════ -->
   <script>
-  // ── VAST NETWORKS (no names shown to user) ──
+  var MOVIE_CATALOG = [
+    {
+      id: "la35ca-Cinema_35_-_The_Kid_1921",
+      title: "The Kid (1921) — Charlie Chaplin",
+      thumbnail: "https://archive.org/services/img/la35ca-Cinema_35_-_The_Kid_1921",
+      videoUrl: "https://archive.org/download/la35ca-Cinema_35_-_The_Kid_1921/Cinema_35_-_The_Kid_1921.mp4"
+    }
+    // Agli movie yahan comma laga ke add karo:
+    // ,{
+    //   id: "identifier",
+    //   title: "Movie Title (Year)",
+    //   thumbnail: "https://archive.org/services/img/identifier",
+    //   videoUrl: "https://archive.org/download/identifier/filename.mp4"
+    // }
+  ];
+  </script>
+
+  <script>
   var VAST_NETWORKS = [
     {
       url:  'https://surefootedpause.com/dim.FHzgdJGFNSv/Z/GOUz/Ke/mH9xu/ZbURlrkcPdTCcDx_OEDKQ/yWMRDkUJt/NuzGED4PNnDQI/wAOwQi',
@@ -497,7 +538,6 @@
     }
   ];
 
-  // ── AD DEDUPLICATION ──
   var playedUrls   = [];
   var DEDUP_WINDOW = 10;
   var MAX_DEDUP_RETRIES = 6;
@@ -512,7 +552,6 @@
     if (playedUrls.length > 50) playedUrls.shift();
   }
 
-  // ── NETWORK PICKER — strict alternating ──
   var lastNetIdx = -1;
 
   function getNextNetworkIdx() {
@@ -524,7 +563,6 @@
     return 0;
   }
 
-  // ── SESSION VARS ──
   var COINS_PER_CYCLE  = 2;
   var CYCLE_SECS       = 30;
   var REFRESH_SECS     = 35;
@@ -538,7 +576,9 @@
   var currentNetIdx    = 0;
   var dedupRetryCount  = 0;
 
-  // ── UI ELEMENTS ──
+  var isMoviePlaying   = false;
+  var currentMovieIdx  = -1;
+
   var coinsEl      = document.getElementById('coinsDisplay');
   var timerEl      = document.getElementById('timerDisplay');
   var progressEl   = document.getElementById('progressBar');
@@ -549,12 +589,63 @@
   var loadingEl    = document.getElementById('videoLoading');
   var loadingText  = document.getElementById('loadingText');
   var refreshBadge = document.getElementById('refreshBadge');
+  var movieGridEl  = document.getElementById('movieGrid');
 
-  // ══════════════════════════════════════════════
-  // SMART ACTIVITY TRACKING — refresh sirf real users ke liye
-  // ══════════════════════════════════════════════
+  function renderMovieGrid() {
+    movieGridEl.innerHTML = '';
+    MOVIE_CATALOG.forEach(function(movie, idx) {
+      var card = document.createElement('div');
+      card.className = 'movie-card' + (idx === currentMovieIdx ? ' active-card' : '');
+      card.setAttribute('data-idx', idx);
+
+      var thumbWrap = document.createElement('div');
+      thumbWrap.className = 'movie-thumb-wrap';
+      var img = document.createElement('img');
+      img.src = movie.thumbnail;
+      img.loading = 'lazy';
+      img.alt = movie.title;
+      thumbWrap.appendChild(img);
+      var badge = document.createElement('div');
+      badge.className = 'movie-play-badge';
+      badge.textContent = '▶ Play';
+      thumbWrap.appendChild(badge);
+
+      var titleEl = document.createElement('div');
+      titleEl.className = 'movie-title';
+      titleEl.textContent = movie.title;
+
+      card.appendChild(thumbWrap);
+      card.appendChild(titleEl);
+      card.addEventListener('click', function() { playMovie(idx); });
+      movieGridEl.appendChild(card);
+    });
+  }
+
+  function playMovie(idx) {
+    var movie = MOVIE_CATALOG[idx];
+    if (!movie || !vjsPlayer) return;
+
+    isMoviePlaying  = true;
+    currentMovieIdx = idx;
+    renderMovieGrid();
+
+    document.getElementById('youtubePlayerBox').style.display = 'none';
+    document.getElementById('myVideoPlayer').style.display = 'block';
+
+    loadingEl.style.display = 'none';
+    vjsPlayer.src({ type: 'video/mp4', src: movie.videoUrl });
+    vjsPlayer.play().catch(function() {
+      vjsPlayer.muted(true);
+      vjsPlayer.play().catch(function() {});
+    });
+
+    vStatusBar.textContent = '▶ ' + movie.title + ' chal rahi hai — coins aa rahe hain! 🪙';
+
+    document.querySelector('.video-player-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   var lastActivityTime = Date.now();
-  var ACTIVITY_TIMEOUT = 60000; // 60 sec — isse zyada idle to "inactive" maana jayega
+  var ACTIVITY_TIMEOUT = 60000;
 
   ['mousemove', 'mousedown', 'touchstart', 'keydown', 'scroll', 'click'].forEach(function(evt) {
     document.addEventListener(evt, function() {
@@ -570,7 +661,6 @@
     return document.visibilityState === 'visible';
   }
 
-  // ── VIDEO PLAYING CHECK ──
   function isAnyVideoPlaying() {
     try {
       if (vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended() && vjsPlayer.currentTime() > 0) return true;
@@ -585,9 +675,8 @@
     return false;
   }
 
-  // ── COIN TIMER — sirf video play hone par, tab visible ho tab hi ──
   setInterval(function() {
-    if (!isTabVisible()) return; // background tab mein coins accrue na ho
+    if (!isTabVisible()) return;
     var playing = isAnyVideoPlaying();
     if (!playing) {
       timerEl.textContent = '⏸';
@@ -620,15 +709,6 @@
     }
   }, 1000);
 
-  // ══════════════════════════════════════════════
-  // SMART REFRESH TIMER
-  // Purana behavior: har 35 sec blind location.reload() — chahe
-  // user dekh raha ho ya na ho, tab background mein ho ya na ho.
-  // Naya behavior: countdown sirf tab tak chalta hai jab tab
-  // VISIBLE ho AUR user ne last 60 sec mein koi activity ki ho.
-  // Agar tab hidden ho ya user idle ho — countdown pause,
-  // koi reload nahi hota jab tak user wapis active na ho.
-  // ══════════════════════════════════════════════
   setInterval(function() {
     var videoPlaying = false;
     try { if (vjsPlayer && !vjsPlayer.paused() && !vjsPlayer.ended()) videoPlaying = true; } catch(e) {}
@@ -643,7 +723,6 @@
       });
     } catch(e) {}
 
-    // Video chal rahi ho to refresh pura pause
     if (videoPlaying) {
       refreshRemaining = REFRESH_SECS;
       refreshBadge.textContent = '✅ Video chal rahi hai — refresh ruka hua hai';
@@ -653,7 +732,6 @@
       return;
     }
 
-    // Tab hidden ya user idle — countdown pause, reload mat karo
     if (!isTabVisible() || !isUserActive()) {
       refreshBadge.textContent = '⏸ Refresh paused (inactive)';
       refreshBadge.style.background  = 'rgba(150,150,150,0.15)';
@@ -662,7 +740,6 @@
       return;
     }
 
-    // Real active user + visible tab — normal countdown
     refreshRemaining--;
     refreshBadge.style.background  = 'rgba(108,71,255,0.2)';
     refreshBadge.style.borderColor = '#6c47ff';
@@ -674,7 +751,6 @@
     }
   }, 1000);
 
-  // ── SLIDER SOFT REFRESH ──
   setInterval(function() {
     if (!isTabVisible() || !isUserActive()) return;
     if (isAnyVideoPlaying()) return;
@@ -685,17 +761,15 @@
         });
       }
     } catch(e) {}
-    try { if (vjsPlayer && vjsPlayer.paused()) loadVastAd(); } catch(e) {}
+    try { if (vjsPlayer && vjsPlayer.paused() && !isMoviePlaying) loadVastAd(); } catch(e) {}
   }, 60000);
 
-  // ── MINUTES TRACKER ──
   setInterval(function() {
     if (!isTabVisible()) return;
     var el = document.getElementById('timeWatched');
     el.textContent = parseInt(el.textContent || '0') + 1;
   }, 60000);
 
-  // ── COIN POP ──
   function showCoinPop() {
     var el = document.createElement('div');
     el.className = 'coin-pop';
@@ -705,10 +779,6 @@
     document.body.appendChild(el);
     setTimeout(function() { el.remove(); }, 1200);
   }
-
-  // ══════════════════════════════════════════════
-  // VAST PLAYER — Smart Dual Network + Deduplication
-  // ══════════════════════════════════════════════
 
   function initVastPlayer() {
     loadingEl.style.display = 'flex';
@@ -724,34 +794,48 @@
     });
     vjsPlayer.on('ended', function() {
       dedupRetryCount = 0;
-      // Agar ye ad YouTube content ke beech wala "ad-break" tha,
-      // to ab wapis YouTube video resume karo
+
+      if (isMoviePlaying) {
+        isMoviePlaying = false;
+        currentMovieIdx = -1;
+        renderMovieGrid();
+        vStatusBar.textContent = '🎬 Movie khatam! Ek chota ad ke baad agli video choose karo.';
+        setTimeout(loadVastAd, 1000);
+        return;
+      }
+
       if (isContentAdBreak) {
         isContentAdBreak = false;
         vStatusBar.textContent = '▶ Video wapis chal rahi hai...';
         setTimeout(resumeContentVideo, 1000);
         return;
       }
-      // Agar curated content videos configured hain aur abhi
-      // content mode start nahi hua, to pehli ad ke baad
-      // YouTube content video shuru karo
       if (!contentModeStarted && CONTENT_VIDEO_IDS.length > 0) {
         contentModeStarted = true;
         vStatusBar.textContent = '⏳ Video load ho rahi hai...';
         setTimeout(startContentVideo, 1000);
         return;
       }
-      // Warna normal cycle — agli ad load karo
       vStatusBar.textContent = '⏳ Nayi ad aa rahi hai...';
       setTimeout(loadVastAd, 1500);
     });
     vjsPlayer.on('error', function() {
+      if (isMoviePlaying) {
+        isMoviePlaying = false;
+        currentMovieIdx = -1;
+        renderMovieGrid();
+        vStatusBar.textContent = '⚠️ Movie load nahi ho saki, ads chal rahe hain...';
+        loadVastAd();
+        return;
+      }
       onNetworkFail(currentNetIdx);
     });
     loadVastAd();
+    renderMovieGrid();
   }
 
   function loadVastAd() {
+    if (isMoviePlaying) return;
     loadingEl.style.display = 'flex';
     loadingText.textContent = 'Nayi ad load ho rahi hai...';
     vStatusBar.textContent  = '⏳ Ad aa rahi hai...';
@@ -767,6 +851,7 @@
   }
 
   function parseVast(url, depth, netIdx) {
+    if (isMoviePlaying) return;
     if (depth > 4) { onNetworkFail(netIdx); return; }
 
     fetch(url)
@@ -775,6 +860,7 @@
         return r.text();
       })
       .then(function(xml) {
+        if (isMoviePlaying) return;
         var parser = new DOMParser();
         var doc    = parser.parseFromString(xml, 'text/xml');
 
@@ -840,6 +926,7 @@
   }
 
   function playVideo(videoUrl, netIdx) {
+    if (isMoviePlaying) return;
     vjsPlayer.src({ type: 'video/mp4', src: videoUrl });
     vjsPlayer.play().catch(function() {
       vjsPlayer.muted(true);
@@ -854,6 +941,7 @@
   }
 
   function onNetworkFail(netIdx) {
+    if (isMoviePlaying) return;
     VAST_NETWORKS[netIdx].consecutiveFails++;
     var otherIdx = netIdx === 0 ? 1 : 0;
 
@@ -874,30 +962,22 @@
     }
   }
 
-  // ══════════════════════════════════════════════
-  // YOUTUBE CONTENT PLAYER
-  // 2-min segments; segment khatam hone par YouTube pause
-  // hoti hai aur apna khud ka VAST ad (upar wala system)
-  // chalta hai. Ad khatam -> YouTube resume.
-  // Video list yahan curated rakho (embedding-allowed IDs).
-  // ══════════════════════════════════════════════
   var CONTENT_VIDEO_IDS = [
-    // "dQw4w9WgXcQ", "xxxxxxxxxxx" -- apni curated list yahan daalo
   ];
   var currentVideoIndex = 0;
   var ytPlayer = null;
   var YT_SEGMENT_SECONDS = 120;
   var ytSegmentTimer = null;
   var ytReady = false;
-  var contentModeStarted = false; // true jab pehli baar YouTube content shuru ho chuka ho
-  var isContentAdBreak   = false; // true jab abhi content-video ke beech wala ad chal raha ho
+  var contentModeStarted = false;
+  var isContentAdBreak   = false;
 
   function onYouTubeIframeAPIReady() {
     ytReady = true;
   }
 
   function startContentVideo() {
-    if (!ytReady || CONTENT_VIDEO_IDS.length === 0) return;
+    if (!ytReady || CONTENT_VIDEO_IDS.length === 0 || isMoviePlaying) return;
     var videoId = CONTENT_VIDEO_IDS[currentVideoIndex];
     document.getElementById('youtubePlayerBox').style.display = 'block';
     document.getElementById('myVideoPlayer').style.display = 'none';
@@ -927,13 +1007,10 @@
   }
 
   function showAdBreakForContentVideo() {
-    // Apna VAST ad player wapis dikhao, YouTube ko chhupao
     isContentAdBreak = true;
     document.getElementById('youtubePlayerBox').style.display = 'none';
     document.getElementById('myVideoPlayer').style.display = 'block';
     loadVastAd();
-    // Jab ye ad "ended" event fire karega, vjsPlayer 'ended' listener
-    // isContentAdBreak flag check karke resumeContentVideo() khud call kar dega.
   }
 
   function resumeContentVideo() {
@@ -958,7 +1035,6 @@
   });
   </script>
 
-  <!-- FIREBASE -->
   <script type="module">
     import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
