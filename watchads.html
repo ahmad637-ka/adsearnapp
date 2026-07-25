@@ -624,13 +624,6 @@
       thumbnail: "https://archive.org/services/img/MaxFleischerSuperman",
       videoUrl: "https://archive.org/download/MaxFleischerSuperman/Superman.mp4"
     }
-    // Agli movie yahan comma laga ke add karo:
-    // ,{
-    //   id: "identifier",
-    //   title: "Movie Title (Year)",
-    //   thumbnail: "https://archive.org/services/img/identifier",
-    //   videoUrl: "https://archive.org/download/identifier/filename.mp4"
-    // }
   ];
   </script>
 
@@ -1148,7 +1141,6 @@
   <script type="module">
     import { initializeApp }      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey:      "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
@@ -1157,30 +1149,31 @@
       projectId:   "this-is-my-first-app-99e55"
     };
 
-    const app  = initializeApp(firebaseConfig);
-    const db   = getDatabase(app);
-    const auth = getAuth(app);
-    let currentUser = null;
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('statusBox').textContent =
-          '✅ ' + (user.displayName || user.email) + ' — Ad dekho coins kamao!';
-        const pending = localStorage.getItem('pendingCoins');
-        if (pending && parseInt(pending) > 0) localStorage.removeItem('pendingCoins');
-      } else {
-        document.getElementById('statusBox').textContent = '⚠️ Login karo coins save karne ke liye!';
-      }
-    });
+    // URL se uid nikalo (Flutter app se aaya hoga)
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('uid');
+
+    if (uid) {
+      document.getElementById('statusBox').textContent =
+        '✅ Login ho — Ad dekho coins kamao!';
+    } else {
+      document.getElementById('statusBox').textContent =
+        '⚠️ App se open karo taake coins save ho sakein!';
+    }
 
     window.saveCoinsToFirebase = async function(n) {
-      if (!currentUser) return;
+      if (!uid) {
+        console.error('UID nahi mila — coins save nahi honge');
+        return;
+      }
       try {
-        const r  = ref(db, 'users/' + currentUser.uid + '/coins');
+        const r  = ref(db, 'users/' + uid + '/coins');
         const s  = await get(r);
         await set(r, (s.val() || 0) + n);
-        const hr = ref(db, 'users/' + currentUser.uid + '/watchHistory');
+        const hr = ref(db, 'users/' + uid + '/watchHistory');
         const hs = await get(hr);
         await set(hr, (hs.val() || 0) + 1);
       } catch(e) { console.error(e); }
