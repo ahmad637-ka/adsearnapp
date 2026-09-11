@@ -298,9 +298,134 @@
       color: #a78bfa;
       z-index: 500;
     }
+
+    /* ===== Web-lock chain overlay (from lock popup) ===== */
+    #webLockOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #webLockOverlay svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    .lock-box {
+      position: relative;
+      background: #12122a;
+      border: 3px solid #8a8a80;
+      border-radius: 14px;
+      padding: 26px 30px;
+      max-width: 300px;
+      text-align: center;
+      color: #fff;
+    }
+    .lock-box .lk-icon { font-size: 34px; margin-bottom: 10px; }
+    .lock-box h3 { font-size: 16px; margin: 0 0 8px; }
+    .lock-box p { font-size: 13px; color: #8BA0C0; margin: 0 0 16px; }
+    .lock-box button {
+      background: #FFD700;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* ===== Coming soon popup (shown after tapping Download) ===== */
+    #comingSoonOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .soon-box {
+      background: #12122a;
+      border: 3px solid #FFD700;
+      border-radius: 14px;
+      padding: 26px 30px;
+      max-width: 300px;
+      text-align: center;
+      color: #fff;
+    }
+    .soon-box .sn-icon { font-size: 34px; margin-bottom: 10px; }
+    .soon-box h3 { font-size: 16px; margin: 0 0 8px; color: #FFD700; }
+    .soon-box p { font-size: 13px; color: #8BA0C0; margin: 0 0 16px; line-height: 1.5; }
+    .soon-box button {
+      background: #FFD700;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <!-- ===== Web-lock chain overlay ===== -->
+  <div id="webLockOverlay">
+    <svg viewBox="0 0 700 420" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="chainMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#d8d8d0"/>
+          <stop offset="50%" stop-color="#8a8a80"/>
+          <stop offset="100%" stop-color="#4a4a44"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="350" cy="15" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="42" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="69" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="96" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="122" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="405" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="378" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="351" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="324" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="350" cy="298" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="15" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="42" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="69" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="96" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="123" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="150" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="177" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="685" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="658" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="631" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="604" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="577" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="550" cy="210" rx="9" ry="17" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+      <ellipse cx="523" cy="210" rx="17" ry="9" fill="none" stroke="url(#chainMetal)" stroke-width="5"/>
+    </svg>
+    <div class="lock-box">
+      <div class="lk-icon">🔒</div>
+      <h3>This feature is now available on phone version</h3>
+      <p>Download the phone version to continue watching ads.</p>
+      <button onclick="showComingSoon()">Download phone version</button>
+    </div>
+  </div>
+
+  <!-- ===== Coming soon popup ===== -->
+  <div id="comingSoonOverlay">
+    <div class="soon-box">
+      <div class="sn-icon">⏳</div>
+      <h3>Sorry!</h3>
+      <p>App is not available right now.<br>We will launch this app very soon.<br>Thank you 🙏</p>
+      <button onclick="closeComingSoon()">OK</button>
+    </div>
+  </div>
 
   <div class="side-left">
     <div class="side-banner-box">
@@ -495,6 +620,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.6.1/video.min.js"></script>
 
   <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+  // ===== Web-lock / coming-soon popup logic =====
+  function showComingSoon() {
+    document.getElementById('comingSoonOverlay').style.display = 'flex';
+  }
+  function closeComingSoon() {
+    document.getElementById('comingSoonOverlay').style.display = 'none';
+  }
+  </script>
 
   <script>
   var MOVIE_CATALOG = [
@@ -1143,10 +1278,10 @@
     import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
     const firebaseConfig = {
-      apiKey:      "AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
-      authDomain:  "this-is-my-first-app-99e55.firebaseapp.com",
-      databaseURL: "https://this-is-my-first-app-99e55-default-rtdb.firebaseio.com",
-      projectId:   "this-is-my-first-app-99e55"
+      apiKey:      "YOUR_FIREBASE_API_KEY",
+      authDomain:  "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId:   "YOUR_PROJECT"
     };
 
     const app = initializeApp(firebaseConfig);
