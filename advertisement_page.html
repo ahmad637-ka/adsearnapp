@@ -40,6 +40,12 @@ button{cursor:pointer;font-family:inherit}
 .opt{border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:14px;margin-bottom:12px}
 .sum{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:14px}
 .pinfo{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--gold);margin-bottom:12px;word-break:break-all}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.quick button{flex:1;min-width:56px;padding:8px 6px;border-radius:10px;border:1px solid rgba(255,215,0,.3);background:transparent;color:var(--gold);font-weight:700;font-size:13px}
+.quick button:active{background:var(--gold);color:#1A0A00}
+.big{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(255,215,0,.15)}
+.big:last-child{border-bottom:0}
+.big b{font-size:16px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#1A0A00;padding:11px 20px;border-radius:30px;font-weight:700;font-size:13px;transition:.3s;z-index:200;max-width:90%}
 #toast.on{transform:translateX(-50%) translateY(0)}
 [hidden]{display:none!important}
@@ -71,7 +77,7 @@ button{cursor:pointer;font-family:inherit}
     <div><h1>Advertiser Dashboard</h1><p class="mut">Balance: <b class="gold" id="bal">0 coins</b> (<span id="balU">$0.00</span>)</p></div>
     <div class="acts">
       <button class="btn" onclick="openCamp()">+ Create Campaign</button>
-      <button class="btn o" onclick="openM('mCredit')">Add Credits</button>
+      <button class="btn o" onclick="openCredit()">Add Credits</button>
     </div>
   </div>
   <div class="g g4">
@@ -96,10 +102,13 @@ button{cursor:pointer;font-family:inherit}
   </div>
   <div class="opt">
     <b>2) Pay with money</b>
-    <p class="mut" style="margin:6px 0 10px">Send payment, then submit the transaction ID. Credits are added after we verify (usually within a few hours).</p>
-    <label>Amount (USD)</label><input id="dUsd" type="number" min="1" placeholder="e.g. 10">
+    <p class="mut" style="margin:6px 0 10px">Choose method, enter amount. You will see exactly how much to pay and how many coins you get. Send payment, then submit the transaction ID. Credits are added after we verify (usually within a few hours).</p>
     <label>Payment method</label><select id="dM" onchange="payInfo()"></select>
     <div class="pinfo" id="dInfo"></div>
+    <div class="sum" id="dRate"></div>
+    <label>Amount (USD)</label><input id="dUsd" type="number" min="1" step="1" placeholder="e.g. 10" oninput="payInfo()">
+    <div class="quick" id="dQuick"></div>
+    <div class="sum" id="dPay"></div>
     <label>Transaction ID / Reference</label><input id="dTx" placeholder="Transaction ID">
     <button class="btn w" onclick="doDeposit()">Submit Payment</button>
   </div>
@@ -133,7 +142,7 @@ button{cursor:pointer;font-family:inherit}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-/* ===== CONFIG — paste the same Firebase config your app uses ===== */
+/* ===== CONFIG ===== */
 const firebaseConfig={
   apiKey:"AIzaSyCZnYb6pb5JXWpTFy15XRaAyEixZdVXclA",
   authDomain:"this-is-my-first-app-99e55.firebaseapp.com",
@@ -145,14 +154,21 @@ const COINS_PER_USD=3333;   // same rate as the app
 const MIN_EARN_USD=3;       // earnings needed before coins can be moved to ads
 const FEE=0.30;             // platform commission; user gets 70% of price
 const EARN_PATH=uid=>'users/'+uid+'/coins'; // change if your app stores coins elsewhere
+
+/* 1 USD = kitni local currency. Rate badle to yahan manually update karo.
+   Margin rakhna ho to rate thoda upar rakh do (e.g. PKR 290). */
+const RATE={USD:1,PKR:280,INR:83};
+const SYM={USD:'$',PKR:'Rs ',INR:'₹'};
+const QUICK=[5,10,25,50,100]; // quick amount buttons (USD)
+
 const PAY={ // fill your real receiving details
-  easypaisa:{n:'EasyPaisa',d:'03XX-XXXXXXX (Account Name)'},
-  jazzcash:{n:'JazzCash',d:'03XX-XXXXXXX (Account Name)'},
-  bank:{n:'Bank Transfer',d:'Bank / IBAN / Account Title'},
-  upi:{n:'UPI (India)',d:'yourname@upi'},
-  payoneer:{n:'Payoneer',d:'your-payoneer@email.com'},
-  usdt:{n:'USDT (TRC-20)',d:'Your TRC-20 wallet address'},
-  binance:{n:'Binance Pay',d:'Your Binance Pay ID'}
+  easypaisa:{n:'EasyPaisa',cur:'PKR',d:'03XX-XXXXXXX (Account Name)'},
+  jazzcash:{n:'JazzCash',cur:'PKR',d:'03XX-XXXXXXX (Account Name)'},
+  bank:{n:'Bank Transfer',cur:'PKR',d:'Bank / IBAN / Account Title'},
+  upi:{n:'UPI (India)',cur:'INR',d:'yourname@upi'},
+  payoneer:{n:'Payoneer',cur:'USD',d:'your-payoneer@email.com'},
+  usdt:{n:'USDT (TRC-20)',cur:'USD',d:'Your TRC-20 wallet address'},
+  binance:{n:'Binance Pay',cur:'USD',d:'Your Binance Pay ID'}
 };
 
 const $=id=>document.getElementById(id);
@@ -228,9 +244,28 @@ async function cancelC(id){
 }
 
 /* ---------- CREDITS ---------- */
-$('dM').innerHTML=Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
-function payInfo(){const p=PAY[$('dM').value];$('dInfo').textContent=p.n+': '+p.d}
-payInfo();
+$('dM').innerHTML=Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v.n} (${v.cur})</option>`).join('');
+$('dQuick').innerHTML=QUICK.map(v=>`<button type="button" onclick="setUsd(${v})">$${v}</button>`).join('');
+function setUsd(v){$('dUsd').value=v;payInfo()}
+function openCredit(){payInfo();openM('mCredit')}
+
+/* Live calculation: jaise jaise amount badhta hai, pay amount aur coins dono badhte hain */
+function payInfo(){
+  const p=PAY[$('dM').value],r=RATE[p.cur],s=SYM[p.cur],u=Number($('dUsd').value)||0;
+  $('dInfo').textContent=p.n+': '+p.d;
+  $('dRate').innerHTML=
+    `<b>Rate (${p.n})</b><br>`+
+    `1 USD = <b class="gold">${s}${fmt(r)}</b><br>`+
+    `1 USD = <b class="gold">${fmt(COINS_PER_USD)} coins</b>`;
+  if(u>=1){
+    $('dPay').innerHTML=
+      `<div class="big"><span>Amount</span><b>$${fmt(u)}</b></div>`+
+      `<div class="big"><span>You pay (${p.cur})</span><b class="gold">${s}${fmt(Math.round(u*r))}</b></div>`+
+      `<div class="big"><span>You get</span><b class="gold">${fmt(Math.round(u*COINS_PER_USD))} coins</b></div>`;
+  }else{
+    $('dPay').innerHTML='<span class="mut">Enter amount (min $1) to see how much you pay and how many coins you get.</span>';
+  }
+}
 
 async function doTransfer(){
   const a=Math.floor(Number($('tAmt').value));
@@ -244,11 +279,21 @@ async function doTransfer(){
   $('tAmt').value='';closeM();toast(fmt(a)+' coins added to your ad balance');
 }
 async function doDeposit(){
-  const u=Number($('dUsd').value),tx=$('dTx').value.trim();
+  const u=Number($('dUsd').value),tx=$('dTx').value.trim(),m=$('dM').value,cur=PAY[m].cur;
   if(!u||u<1)return toast('Minimum $1');
   if(tx.length<4)return toast('Enter the transaction ID');
-  await db.ref('deposits').push({uid:U.uid,email:U.email,usd:u,coins:Math.round(u*COINS_PER_USD),method:$('dM').value,txnId:tx,status:'pending',at:TS()});
-  $('dUsd').value='';$('dTx').value='';closeM();toast('Payment submitted. Credits are added after verification.');
+  try{
+    await db.ref('deposits').push({
+      uid:U.uid,email:U.email,usd:u,
+      coins:Math.round(u*COINS_PER_USD),
+      method:m,currency:cur,
+      payAmount:Math.round(u*RATE[cur]),
+      rate:RATE[cur],
+      txnId:tx,status:'pending',at:TS()
+    });
+    $('dUsd').value='';$('dTx').value='';payInfo();closeM();
+    toast('Payment submitted. Credits are added after verification.');
+  }catch(e){toast('Failed: '+e.message)}
 }
 
 /* ---------- CAMPAIGN ---------- */
@@ -265,7 +310,7 @@ async function doCamp(){
   if(d.instructions.length<10)return toast('Write clear instructions for users');
   if(!(n>=10))return toast('Minimum 10 users');
   if(!(p>=100))return toast('Minimum price is 100 coins per task');
-  if(t>bal){closeM();openM('mCredit');return toast('Not enough balance. Add credits first.')}
+  if(t>bal){closeM();openCredit();return toast('Not enough balance. Add credits first.')}
   const r=await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)>=t?b-t:undefined);
   if(!r.committed)return toast('Not enough balance');
   try{
@@ -277,6 +322,7 @@ async function doCamp(){
   }
 }
 setMode('login');
+payInfo();
 </script>
 </body>
 </html>
