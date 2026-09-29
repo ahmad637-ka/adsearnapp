@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskCpm Advertisers — Run Your Campaign</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#FFD700;--bg:#0A1628;--card:#0D1F3C;--card2:#112244;--mut:#8BA0C0;--ok:#3ddc84;--bad:#ff6b6b}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#fff;min-height:100vh}
+a{color:inherit;text-decoration:none}
+nav{position:sticky;top:0;z-index:50;background:rgba(10,22,40,.95);border-bottom:1px solid rgba(255,215,0,.15);padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:18px}.logo span,.gold{color:var(--gold)}.logo small{font-size:11px;background:var(--gold);color:#1A0A00;padding:2px 8px;border-radius:10px;margin-left:6px}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+.card{background:var(--card);border:1px solid rgba(255,215,0,.15);border-radius:18px;padding:22px}
+.narrow{max-width:420px;margin:30px auto}
+h1{font-size:24px;margin-bottom:6px}h2{font-size:18px;margin-bottom:12px}
+.mut{color:var(--mut);font-size:13px;line-height:1.6}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid rgba(255,215,0,.25);color:#fff;border-radius:10px;padding:11px 13px;font-size:14px;margin:5px 0 12px;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+label{font-size:12px;color:var(--mut);font-weight:600}
+button{cursor:pointer;font-family:inherit}
+.btn{background:var(--gold);color:#1A0A00;border:0;border-radius:40px;padding:11px 22px;font-weight:700;font-size:14px}
+.btn.o{background:transparent;color:var(--gold);border:2px solid rgba(255,215,0,.4)}
+.btn.s{padding:7px 14px;font-size:12px}.btn.w{width:100%}.btn:disabled{opacity:.4;cursor:not-allowed}
+.tabs{display:flex;gap:8px;margin-bottom:16px}.tabs button{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,215,0,.25);background:transparent;color:var(--mut);font-weight:700}.tabs .on{background:var(--gold);color:#1A0A00}
+.g{display:grid;gap:12px}.g4{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.stat{background:var(--card2);border-radius:14px;padding:14px;text-align:center}.stat b{display:block;font-size:22px;color:var(--gold)}.stat span{font-size:11px;color:var(--mut)}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.camp{background:var(--card2);border-radius:14px;padding:16px;margin-top:12px}
+.camp h3{font-size:16px}.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(255,215,0,.15);color:var(--gold)}
+.badge.active{background:rgba(61,220,132,.15);color:var(--ok)}.badge.cancelled,.badge.rejected{background:rgba(255,107,107,.15);color:var(--bad)}
+.bar{height:8px;background:var(--bg);border-radius:6px;margin:12px 0;overflow:hidden}.bar i{display:block;height:100%;background:var(--gold)}
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:11px;color:var(--mut)}.mini b{display:block;font-size:16px;color:#fff}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}
+.ov.on{display:flex}.modal{background:var(--card);border:1px solid rgba(255,215,0,.3);border-radius:18px;padding:22px;max-width:520px;width:100%;position:relative;margin:auto}
+.x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--mut);font-size:22px}
+.opt{border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:14px;margin-bottom:12px}
+.sum{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:14px}
+.pinfo{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--gold);margin-bottom:12px;word-break:break-all}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#1A0A00;padding:11px 20px;border-radius:30px;font-weight:700;font-size:13px;transition:.3s;z-index:200;max-width:90%}
+#toast.on{transform:translateX(-50%) translateY(0)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Task<span>Cpm</span><small>ADS</small></a>
+  <button class="btn s o" id="logout" hidden onclick="auth.signOut()">Logout</button>
+</nav>
+
+<main>
+<!-- AUTH -->
+<section id="auth" class="card narrow">
+  <h1>Advertise on <span class="gold">TaskCpm</span></h1>
+  <p class="mut" style="margin-bottom:16px">Real users from Pakistan &amp; India complete your tasks. Sign up, add credits, launch a campaign.</p>
+  <div class="tabs"><button id="tabL" class="on" onclick="setMode('login')">Login</button><button id="tabS" onclick="setMode('signup')">Sign Up</button></div>
+  <div id="nameRow" hidden><label>Name / Business</label><input id="name" placeholder="Your name or business"></div>
+  <label>Email</label><input id="email" type="email" placeholder="you@email.com">
+  <label>Password</label><input id="pass" type="password" placeholder="Min 6 characters">
+  <button class="btn w" id="authBtn" onclick="submitAuth()">Login</button>
+  <button class="btn o w" style="margin-top:10px" onclick="googleLogin()">Continue with Google</button>
+  <p class="mut" style="margin-top:14px">Tip: log in with the same account you use in the TaskCpm app to spend your app earnings on ads.</p>
+</section>
+
+<!-- DASHBOARD -->
+<section id="app" hidden>
+  <div class="top">
+    <div><h1>Advertiser Dashboard</h1><p class="mut">Balance: <b class="gold" id="bal">0 coins</b> (<span id="balU">$0.00</span>)</p></div>
+    <div class="acts">
+      <button class="btn" onclick="openCamp()">+ Create Campaign</button>
+      <button class="btn o" onclick="openM('mCredit')">Add Credits</button>
+    </div>
+  </div>
+  <div class="g g4">
+    <div class="stat"><b id="sJ">0</b><span>Users Joined</span></div>
+    <div class="stat"><b id="sC">0</b><span>Completed</span></div>
+    <div class="stat"><b id="sI">0</b><span>Incomplete</span></div>
+    <div class="stat"><b id="sS">0</b><span>Coins Spent</span></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h2>My Campaigns</h2><div id="list"></div></div>
+</section>
+</main>
+
+<!-- ADD CREDITS -->
+<div class="ov" id="mCredit"><div class="modal">
+  <button class="x" onclick="closeM()">✕</button>
+  <h2>Add Credits</h2>
+  <div class="opt">
+    <b>1) Use my TaskCpm earnings</b>
+    <p class="mut" style="margin:6px 0 10px">Move coins from your earning account to your ad balance. Needs at least $3 in earnings. Your earnings: <b class="gold" id="earn">0</b></p>
+    <input id="tAmt" type="number" min="1000" placeholder="Coins to move (min 1,000)">
+    <button class="btn w" id="tBtn" onclick="doTransfer()">Move Coins to Ad Balance</button>
+  </div>
+  <div class="opt">
+    <b>2) Pay with money</b>
+    <p class="mut" style="margin:6px 0 10px">Send payment, then submit the transaction ID. Credits are added after we verify (usually within a few hours).</p>
+    <label>Amount (USD)</label><input id="dUsd" type="number" min="1" placeholder="e.g. 10">
+    <label>Payment method</label><select id="dM" onchange="payInfo()"></select>
+    <div class="pinfo" id="dInfo"></div>
+    <label>Transaction ID / Reference</label><input id="dTx" placeholder="Transaction ID">
+    <button class="btn w" onclick="doDeposit()">Submit Payment</button>
+  </div>
+</div></div>
+
+<!-- CREATE CAMPAIGN -->
+<div class="ov" id="mCamp"><div class="modal">
+  <button class="x" onclick="closeM()">✕</button>
+  <h2>Create Campaign</h2>
+  <label>Campaign title</label><input id="cT" maxlength="60" placeholder="e.g. Follow my Instagram page">
+  <label>Task type</label>
+  <select id="cType"><option>Social Follow / Like</option><option>App Install</option><option>Website Visit</option><option>Signup / Register</option><option>YouTube Watch / Subscribe</option><option>Other</option></select>
+  <label>Task link (https://)</label><input id="cL" placeholder="https://...">
+  <label>Instructions (what must the user do, step by step)</label><textarea id="cI" placeholder="1) Open the link&#10;2) Follow the page&#10;3) Upload a screenshot"></textarea>
+  <label>Proof required from user</label>
+  <select id="cProof"><option value="screenshot">Screenshot</option><option value="username">Username / ID</option><option value="none">No proof (auto)</option></select>
+  <label>Target country</label>
+  <select id="cCo"><option value="PK+IN">Pakistan + India</option><option value="PK">Pakistan</option><option value="IN">India</option><option value="ALL">All countries</option></select>
+  <div class="g g2">
+    <div><label>Number of users you want</label><input id="cN" type="number" min="10" value="100" oninput="calc()"></div>
+    <div><label>Price per task (coins)</label><input id="cP" type="number" min="100" value="200" oninput="calc()"></div>
+  </div>
+  <div class="sum" id="cSum"></div>
+  <button class="btn w" onclick="doCamp()">Submit Campaign for Review</button>
+  <p class="mut" style="margin-top:10px">New campaigns are reviewed before going live. Budget is held from your balance and unused budget is refundable.</p>
+</div></div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* ===== CONFIG — paste the same Firebase config your app uses ===== */
+const firebaseConfig={
+  apiKey:"YOUR_API_KEY",
+  authDomain:"this-is-my-first-app-99e55.firebaseapp.com",
+  databaseURL:"https://this-is-my-first-app-99e55-default-rtdb.firebaseio.com",
+  projectId:"this-is-my-first-app-99e55",
+  appId:"YOUR_APP_ID"
+};
+const COINS_PER_USD=3333;   // same rate as the app
+const MIN_EARN_USD=3;       // earnings needed before coins can be moved to ads
+const FEE=0.30;             // platform commission; user gets 70% of price
+const EARN_PATH=uid=>'users/'+uid+'/coins'; // change if your app stores coins elsewhere
+const PAY={ // fill your real receiving details
+  easypaisa:{n:'EasyPaisa',d:'03XX-XXXXXXX (Account Name)'},
+  jazzcash:{n:'JazzCash',d:'03XX-XXXXXXX (Account Name)'},
+  bank:{n:'Bank Transfer',d:'Bank / IBAN / Account Title'},
+  upi:{n:'UPI (India)',d:'yourname@upi'},
+  payoneer:{n:'Payoneer',d:'your-payoneer@email.com'},
+  usdt:{n:'USDT (TRC-20)',d:'Your TRC-20 wallet address'},
+  binance:{n:'Binance Pay',d:'Your Binance Pay ID'}
+};
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n||0).toLocaleString();
+const usd=c=>'$'+(c/COINS_PER_USD).toFixed(2);
+const TS=()=>firebase.database.ServerValue.TIMESTAMP;
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.database();
+let U=null,bal=0,earn=0,camps={},refs=[],mode='login';
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3500)}
+function openM(id){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));$(id).classList.add('on')}
+function closeM(){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'))}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeM()}));
+
+/* ---------- AUTH ---------- */
+function setMode(m){mode=m;$('nameRow').hidden=m!=='signup';$('authBtn').textContent=m==='signup'?'Create Advertiser Account':'Login';$('tabL').classList.toggle('on',m==='login');$('tabS').classList.toggle('on',m==='signup')}
+async function submitAuth(){
+  const e=$('email').value.trim(),p=$('pass').value;
+  if(!e||!p)return toast('Enter email and password');
+  try{
+    if(mode==='signup'){
+      const n=$('name').value.trim();if(!n)return toast('Enter your name');
+      const c=await auth.createUserWithEmailAndPassword(e,p);
+      await c.user.updateProfile({displayName:n});
+      await db.ref('advertisers/'+c.user.uid+'/name').set(n);
+    }else await auth.signInWithEmailAndPassword(e,p);
+  }catch(x){toast(x.message)}
+}
+function googleLogin(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(x=>toast(x.message))}
+
+auth.onAuthStateChanged(u=>{
+  refs.forEach(r=>r.off());refs=[];U=u;
+  $('auth').hidden=!!u;$('app').hidden=!u;$('logout').hidden=!u;
+  if(!u)return;
+  db.ref('advertisers/'+u.uid).transaction(c=>c||{name:u.displayName||u.email.split('@')[0],email:u.email,balance:0,createdAt:Date.now()});
+  const r1=db.ref('advertisers/'+u.uid+'/balance');r1.on('value',s=>{bal=Number(s.val())||0;paint()});
+  const r2=db.ref(EARN_PATH(u.uid));r2.on('value',s=>{earn=Number(s.val())||0;paint()});
+  const r3=db.ref('campaigns').orderByChild('ownerId').equalTo(u.uid);r3.on('value',s=>{camps=s.val()||{};paint()});
+  refs.push(r1,r2,r3);
+});
+
+/* ---------- DASHBOARD ---------- */
+function paint(){
+  $('bal').textContent=fmt(bal)+' coins';$('balU').textContent=usd(bal);
+  $('earn').textContent=fmt(earn)+' coins ('+usd(earn)+')';
+  const L=Object.entries(camps).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+  let j=0,c=0,s=0;L.forEach(([,x])=>{j+=x.joined||0;c+=x.completed||0;s+=x.spent||0});
+  $('sJ').textContent=fmt(j);$('sC').textContent=fmt(c);$('sI').textContent=fmt(Math.max(0,j-c));$('sS').textContent=fmt(s);
+  $('list').innerHTML=L.length?L.map(([id,x])=>card(id,x)).join(''):'<p class="mut">No campaigns yet. Click "Create Campaign" to start.</p>';
+}
+function card(id,x){
+  const j=x.joined||0,c=x.completed||0,t=x.targetUsers||1,pct=Math.min(100,Math.round(c/t*100));
+  let b='';
+  if(x.status==='active')b+=`<button class="btn s o" onclick="setStatus('${id}','paused')">Pause</button>`;
+  if(x.status==='paused')b+=`<button class="btn s" onclick="setStatus('${id}','active')">Resume</button>`;
+  if(x.status==='pending'||x.status==='paused')b+=` <button class="btn s o" onclick="cancelC('${id}')">Cancel &amp; Refund</button>`;
+  return `<div class="camp"><div class="row"><h3>${esc(x.title)}</h3><span class="badge ${esc(x.status)}">${esc(x.status)}</span></div>
+  <p class="mut">${esc(x.type)} · ${esc(x.country)} · ${fmt(x.pricePerTask)} coins/task</p>
+  <div class="bar"><i style="width:${pct}%"></i></div>
+  <div class="mini"><div><b>${fmt(j)}</b>Joined</div><div><b>${fmt(c)}</b>Completed</div><div><b>${fmt(Math.max(0,j-c))}</b>Incomplete</div><div><b>${fmt(x.spent||0)}/${fmt(x.budget)}</b>Spent</div></div>
+  <div style="margin-top:12px">${b}</div></div>`;
+}
+function setStatus(id,s){db.ref('campaigns/'+id+'/status').set(s)}
+async function cancelC(id){
+  if(!confirm('Cancel this campaign and refund the unused budget?'))return;
+  const x=camps[id],back=(x.budget||0)-(x.spent||0);
+  const r=await db.ref('campaigns/'+id+'/status').transaction(s=>(s==='pending'||s==='paused')?'cancelled':undefined);
+  if(!r.committed)return toast('Cannot cancel now');
+  await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)+back);
+  toast('Refunded '+fmt(back)+' coins');
+}
+
+/* ---------- CREDITS ---------- */
+$('dM').innerHTML=Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
+function payInfo(){const p=PAY[$('dM').value];$('dInfo').textContent=p.n+': '+p.d}
+payInfo();
+
+async function doTransfer(){
+  const a=Math.floor(Number($('tAmt').value));
+  if(earn<MIN_EARN_USD*COINS_PER_USD)return toast('You need at least $'+MIN_EARN_USD+' in your earning account');
+  if(!a||a<1000)return toast('Minimum 1,000 coins');
+  if(a>earn)return toast('Not enough earned coins');
+  const r=await db.ref(EARN_PATH(U.uid)).transaction(c=>(c!=null&&c>=a)?c-a:undefined);
+  if(!r.committed)return toast('Transfer failed, try again');
+  await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)+a);
+  db.ref('transfers').push({uid:U.uid,coins:a,at:TS()});
+  $('tAmt').value='';closeM();toast(fmt(a)+' coins added to your ad balance');
+}
+async function doDeposit(){
+  const u=Number($('dUsd').value),tx=$('dTx').value.trim();
+  if(!u||u<1)return toast('Minimum $1');
+  if(tx.length<4)return toast('Enter the transaction ID');
+  await db.ref('deposits').push({uid:U.uid,email:U.email,usd:u,coins:Math.round(u*COINS_PER_USD),method:$('dM').value,txnId:tx,status:'pending',at:TS()});
+  $('dUsd').value='';$('dTx').value='';closeM();toast('Payment submitted. Credits are added after verification.');
+}
+
+/* ---------- CAMPAIGN ---------- */
+function openCamp(){calc();openM('mCamp')}
+function calc(){
+  const n=+$('cN').value||0,p=+$('cP').value||0,t=n*p;
+  $('cSum').innerHTML=`Total budget: <b class="gold">${fmt(t)} coins</b> (${usd(t)})<br>Each user earns: <b>${Math.floor(p*(1-FEE))} coins</b> · Your balance: ${fmt(bal)} coins`;
+}
+async function doCamp(){
+  const n=Math.floor(+$('cN').value),p=Math.floor(+$('cP').value),t=n*p;
+  const d={title:$('cT').value.trim(),type:$('cType').value,link:$('cL').value.trim(),instructions:$('cI').value.trim(),proof:$('cProof').value,country:$('cCo').value};
+  if(d.title.length<4)return toast('Enter a campaign title');
+  if(!/^https:\/\//i.test(d.link))return toast('Link must start with https://');
+  if(d.instructions.length<10)return toast('Write clear instructions for users');
+  if(!(n>=10))return toast('Minimum 10 users');
+  if(!(p>=100))return toast('Minimum price is 100 coins per task');
+  if(t>bal){closeM();openM('mCredit');return toast('Not enough balance. Add credits first.')}
+  const r=await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)>=t?b-t:undefined);
+  if(!r.committed)return toast('Not enough balance');
+  try{
+    await db.ref('campaigns').push({...d,ownerId:U.uid,targetUsers:n,pricePerTask:p,userReward:Math.floor(p*(1-FEE)),budget:t,spent:0,joined:0,completed:0,rejected:0,status:'pending',createdAt:TS()});
+    closeM();toast('Campaign submitted for review');
+  }catch(e){
+    await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)+t);
+    toast('Failed: '+e.message);
+  }
+}
+setMode('login');
+</script>
+</body>
+</html>
