@@ -46,7 +46,7 @@ button{cursor:pointer;font-family:inherit}
 .big{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(255,215,0,.15)}
 .big:last-child{border-bottom:0}.big b{font-size:16px}
 .sub{background:var(--card2);border-radius:12px;padding:12px;margin-bottom:10px}
-.shot{max-height:140px;max-width:100%;border-radius:8px;margin:8px 0;display:block}
+.shot{width:100%;max-height:420px;object-fit:contain;background:#000;border-radius:8px;margin:8px 0;display:block}
 pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;border-radius:10px;font-size:12px;line-height:1.6;color:var(--gold);margin:10px 0}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#1A0A00;padding:11px 20px;border-radius:30px;font-weight:700;font-size:13px;transition:.3s;z-index:200;max-width:90%}
 #toast.on{transform:translateX(-50%) translateY(0)}
@@ -120,7 +120,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;
   <h2>Create Campaign</h2>
   <label>Campaign title</label><input id="cT" maxlength="60" placeholder="e.g. Follow my Instagram page">
   <label>Task type</label>
-  <select id="cType" onchange="typeChange()"><option>Social Follow / Like</option><option>App Install</option><option>Website Visit</option><option>Signup / Register</option><option>YouTube Watch / Subscribe</option><option>Other</option></select>
+  <select id="cType" onchange="typeChange()"><option>Social Follow / Like</option><option>Website Visit</option><option>Game / App (reach level)</option><option>Signup / Register</option><option>App Review / Rating</option></select>
   <label>Task link (https://)</label><input id="cL" placeholder="https://...">
   <label>Instructions (what must the user do, step by step)</label><textarea id="cI" placeholder="1) Open the link&#10;2) Follow the page&#10;3) Submit your proof"></textarea>
   <label>How will we verify the task?</label>
@@ -207,7 +207,7 @@ const TS=()=>firebase.database.ServerValue.TIMESTAMP;
 const rk=()=>Array.from(crypto.getRandomValues(new Uint8Array(18)),b=>b.toString(36).padStart(2,'0')).join('');
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database();
-let U=null,bal=0,earn=0,camps={},refs=[],mode='login',subs={},curC=null,subRef=null;
+let U=null,bal=0,earn=0,camps={},refs=[],mode='login',subs={},curC=null,subRef=null,rejecting=null,pend={},pRefs={};
 
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3500)}
 function openM(id){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));$(id).classList.add('on')}
@@ -231,7 +231,7 @@ async function submitAuth(){
 function googleLogin(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(x=>toast(x.message))}
 
 auth.onAuthStateChanged(u=>{
-  refs.forEach(r=>r.off());refs=[];U=u;
+  refs.forEach(r=>r.off());refs=[];Object.values(pRefs).forEach(r=>r.off());pRefs={};pend={};U=u;
   $('auth').hidden=!!u;$('app').hidden=!u;$('logout').hidden=!u;
   if(!u)return;
   db.ref('advertisers/'+u.uid).transaction(c=>c||{name:u.displayName||u.email.split('@')[0],email:u.email,balance:0,createdAt:Date.now()});
@@ -242,7 +242,9 @@ auth.onAuthStateChanged(u=>{
 });
 
 /* ---------- DASHBOARD ---------- */
+function syncPend(){Object.entries(camps).forEach(([id,x])=>{if(pRefs[id]||x.verify==='auto')return;const r=db.ref('submissions/'+id);r.on('value',s=>{let n=0;s.forEach(c=>{if(c.val().status==='pending')n++});pend[id]=n;paint()});pRefs[id]=r})}
 function paint(){
+  syncPend();
   $('bal').textContent=fmt(bal)+' coins';$('balU').textContent=usd(bal);
   $('earn').textContent=fmt(earn)+' coins ('+usd(earn)+')';
   const L=Object.entries(camps).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
@@ -254,7 +256,7 @@ function card(id,x){
   const j=x.joined||0,c=x.completed||0,t=x.targetUsers||1,pct=Math.min(100,Math.round(c/t*100)),v=x.verify||'screenshot';
   let b='';
   if(v==='auto')b+=`<button class="btn s" onclick="openApi('${id}')">Integration (API)</button> `;
-  else b+=`<button class="btn s" onclick="openSubs('${id}')">Review Submissions</button> `;
+  else b+=`<button class="btn s" onclick="openSubs('${id}')">Review Submissions (${pend[id]||0} pending)</button> `;
   if(x.status==='active')b+=`<button class="btn s o" onclick="setStatus('${id}','paused')">Pause</button>`;
   if(x.status==='paused')b+=`<button class="btn s o" onclick="setStatus('${id}','active')">Resume</button>`;
   if(x.status==='pending'||x.status==='paused')b+=` <button class="btn s o" onclick="cancelC('${id}')">Cancel &amp; Refund</button>`;
@@ -275,7 +277,7 @@ async function cancelC(id){
 }
 
 /* ---------- SUBMISSIONS (approve / reject / CSV / auto-approve) ---------- */
-const img=u=>/^(https:\/\/|data:image\/)/.test(u||'')?`<a href="${esc(u)}" target="_blank" rel="noopener"><img class="shot" src="${esc(u)}"></a>`:'';
+const img=u=>/^(https:\/\/|data:image\/)/.test(u||'')?`<img class="shot" src="${esc(u)}" loading="lazy">`:'';
 function openSubs(cid){
   curC=cid;$('sT').textContent=camps[cid].title;
   if(subRef)subRef.off();
@@ -290,10 +292,12 @@ function drawSubs(){
   L.forEach(([id,s])=>{if(s.status==='pending'&&s.at&&s.at<due)decide(id,true)});
   $('sList').innerHTML=L.length?L.map(([id,s])=>`<div class="sub"><div class="row"><b>${esc(s.ident||'(no ID)')}</b><span class="badge ${esc(s.status)}">${esc(s.status)}</span></div>
     <p class="mut">${new Date(s.at||0).toLocaleString()}${c.idLabel?' · '+esc(c.idLabel):''}</p>${img(s.shot)}
-    ${s.status==='pending'?`<button class="btn s" onclick="decide('${id}',true)">Approve</button> <button class="btn s o" onclick="decide('${id}',false)">Reject</button>`:''}</div>`).join(''):'<p class="mut">No submissions yet.</p>';
+    ${s.status==='pending'?(rejecting===id?`<textarea id="rj" placeholder="Reason for rejection (the user will see this)"></textarea><button class="btn s" onclick="doReject('${id}')">Confirm Reject</button> <button class="btn s o" onclick="rejecting=null;drawSubs()">Back</button>`:`<button class="btn s" onclick="decide('${id}',true)">Approve</button> <button class="btn s o" onclick="rejecting='${id}';drawSubs()">Reject</button>`):(s.status==='rejected'&&s.rejectReason?`<p class="mut">Reason: ${esc(s.rejectReason)}</p>`:'')}</div>`).join(''):'<p class="mut">No submissions yet.</p>';
 }
-async function decide(id,ok){
+function doReject(id){const r=($('rj').value||'').trim();if(r.length<3)return toast('Write the reason for rejection');rejecting=null;decide(id,false,r)}
+async function decide(id,ok,reason){
   const cid=curC,c=camps[cid],s=subs[id];if(!c||!s)return;
+  if(!ok&&reason)await db.ref(`submissions/${cid}/${id}/rejectReason`).set(reason);
   const r=await db.ref(`submissions/${cid}/${id}/status`).transaction(x=>x==='pending'?(ok?'approved':'rejected'):undefined);
   if(!r.committed)return;
   if(ok){
@@ -372,7 +376,8 @@ async function doDeposit(){
 }
 
 /* ---------- CAMPAIGN ---------- */
-function typeChange(){const t=$('cType').value;if(/Social|YouTube/.test(t))$('cV').value='screenshot';else if(t==='App Install')$('cV').value='id';vChange()}
+const TDEF={'Social Follow / Like':'screenshot','Website Visit':'screenshot','Game / App (reach level)':'auto','Signup / Register':'id','App Review / Rating':'screenshot'};
+function typeChange(){$('cV').value=TDEF[$('cType').value]||'screenshot';vChange()}
 function vChange(){const v=$('cV').value;$('rowId').hidden=!(v==='id'||v==='both');$('rowAuto').hidden=v!=='auto';$('rowDays').hidden=v==='auto'}
 function openCamp(){calc();vChange();openM('mCamp')}
 function calc(){
