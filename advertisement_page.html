@@ -48,6 +48,8 @@ button{cursor:pointer;font-family:inherit}
 .sub{background:var(--card2);border-radius:12px;padding:12px;margin-bottom:10px}
 .shot{width:100%;max-height:420px;object-fit:contain;background:#000;border-radius:8px;margin:8px 0;display:block}
 pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;border-radius:10px;font-size:12px;line-height:1.6;color:var(--gold);margin:10px 0}
+#zoom{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;cursor:zoom-out}
+#zoom.on{display:flex}#zoom img{max-width:95vw;max-height:95vh;object-fit:contain}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#1A0A00;padding:11px 20px;border-radius:30px;font-weight:700;font-size:13px;transition:.3s;z-index:200;max-width:90%}
 #toast.on{transform:translateX(-50%) translateY(0)}
 [hidden]{display:none!important}
@@ -162,6 +164,7 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;
   <pre id="apiBox"></pre>
 </div></div>
 
+<div id="zoom" onclick="this.classList.remove('on')"><img id="zImg" alt=""></div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -277,7 +280,8 @@ async function cancelC(id){
 }
 
 /* ---------- SUBMISSIONS (approve / reject / CSV / auto-approve) ---------- */
-const img=u=>/^(https:\/\/|data:image\/)/.test(u||'')?`<img class="shot" src="${esc(u)}" loading="lazy">`:'';
+const img=u=>/^(https:\/\/|data:image\/)/.test(u||'')?`<img class="shot" src="${esc(u)}" loading="lazy" style="cursor:zoom-in" onclick="zoomImg(this.src)">`:'';
+function zoomImg(u){$('zImg').src=u;$('zoom').classList.add('on')}
 function openSubs(cid){
   curC=cid;$('sT').textContent=camps[cid].title;
   if(subRef)subRef.off();
@@ -301,7 +305,8 @@ async function decide(id,ok,reason){
   const r=await db.ref(`submissions/${cid}/${id}/status`).transaction(x=>x==='pending'?(ok?'approved':'rejected'):undefined);
   if(!r.committed)return;
   if(ok){
-    await db.ref(EARN_PATH(s.uid)).transaction(v=>(v||0)+(c.userReward||0));
+    /* Interim: payout queue. The user's app claims it and adds coins to their own account. Move to the Worker before launch. */
+    await db.ref('payouts/'+s.uid).push({cid,sid:id,coins:c.userReward||0,status:'pending',at:TS()});
     await db.ref('campaigns/'+cid).transaction(x=>{if(x){x.completed=(x.completed||0)+1;x.spent=(x.spent||0)+(x.pricePerTask||0)}return x});
   }else await db.ref('campaigns/'+cid+'/rejected').transaction(v=>(v||0)+1);
 }
