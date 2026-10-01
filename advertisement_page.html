@@ -39,6 +39,7 @@ button{cursor:pointer;font-family:inherit}
 .x{position:absolute;top:10px;right:14px;background:none;border:0;color:var(--mut);font-size:22px}
 .opt{border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:14px;margin-bottom:12px}
 .sum{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:14px}
+.sum:empty{display:none}
 .pinfo{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--gold);margin-bottom:12px;word-break:break-all}
 .quick{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
 .quick button{flex:1;min-width:56px;padding:8px 6px;border-radius:10px;border:1px solid rgba(255,215,0,.3);background:transparent;color:var(--gold);font-weight:700;font-size:13px}
@@ -48,6 +49,8 @@ button{cursor:pointer;font-family:inherit}
 .sub{background:var(--card2);border-radius:12px;padding:12px;margin-bottom:10px}
 .shot{width:100%;max-height:420px;object-fit:contain;background:#000;border-radius:8px;margin:8px 0;display:block}
 pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;border-radius:10px;font-size:12px;line-height:1.6;color:var(--gold);margin:10px 0}
+pre.code{white-space:pre;word-break:normal;overflow:auto;max-height:340px}
+hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
 #zoom{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;cursor:zoom-out}
 #zoom.on{display:flex}#zoom img{max-width:95vw;max-height:95vh;object-fit:contain}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#1A0A00;padding:11px 20px;border-radius:30px;font-weight:700;font-size:13px;transition:.3s;z-index:200;max-width:90%}
@@ -125,18 +128,25 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;
   <select id="cType" onchange="typeChange()"><option>Social Follow / Like</option><option>Website Visit</option><option>Game / App (reach level)</option><option>Signup / Register</option><option>App Review / Rating</option></select>
   <label>Task link (https://)</label><input id="cL" placeholder="https://...">
   <label>Instructions (what must the user do, step by step)</label><textarea id="cI" placeholder="1) Open the link&#10;2) Follow the page&#10;3) Submit your proof"></textarea>
-  <label>How will we verify the task?</label>
+  <label>How will we track and verify the task?</label>
   <select id="cV" onchange="vChange()">
     <option value="screenshot">Screenshot (best for Like / Follow / Comment on YouTube, TikTok, Instagram)</option>
     <option value="id">User ID / Email / Username (you check on your server)</option>
     <option value="both">ID + Screenshot</option>
-    <option value="auto">Automatic: TaskCpm Code + API (games &amp; apps, most secure)</option>
+    <option value="auto">TaskCpm System: unique promo code per user (games, apps &amp; websites)</option>
   </select>
+  <div class="sum" id="vDesc"></div>
   <div id="rowId" hidden><label>What ID should the user submit?</label><input id="cIdL" maxlength="40" placeholder="e.g. Player ID, or Email used in my game"></div>
   <div id="rowDays"><label>Auto-approve if you do not decide within</label>
     <select id="cD"><option value="2">2 days</option><option value="3" selected>3 days</option><option value="4">4 days</option><option value="7">7 days</option></select></div>
-  <div id="rowAuto" hidden><div class="g g2"><div><label>Goal name</label><input id="cGL" value="Level" maxlength="20"></div><div><label>Goal value (user is paid when reached)</label><input id="cGV" type="number" min="1" value="30"></div></div>
-    <p class="mut" style="margin-bottom:12px">After creating the campaign, open <b>Integration</b> to get your secret key and the 2 API calls to add to your game/app/site.</p></div>
+  <div id="rowAuto" hidden>
+    <label>How will you add the tracker to your game / app / website?</label>
+    <select id="cInt">
+      <option value="made">Made with me: ready code (one box + one Submit button)</option>
+      <option value="self">I will build it myself (use the API)</option>
+    </select>
+    <div class="g g2"><div><label>Goal name</label><input id="cGL" value="Level" maxlength="20"></div><div><label>Goal value (user is paid when reached)</label><input id="cGV" type="number" min="1" value="30"></div></div>
+    <p class="mut" style="margin-bottom:12px">After creating the campaign, open <b>Integration &amp; Tracker Code</b> to get your tracker code (Dart, Python, Java or JavaScript) and your secret key.</p></div>
   <label>Target country</label>
   <select id="cCo"><option value="PK+IN">Pakistan + India</option><option value="PK">Pakistan</option><option value="IN">India</option><option value="ALL">All countries</option></select>
   <div class="g g2">
@@ -156,10 +166,25 @@ pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;
   <div id="sList"></div>
 </div></div>
 
-<!-- INTEGRATION -->
-<div class="ov" id="mApi"><div class="modal" style="max-width:640px">
+<!-- INTEGRATION & TRACKER CODE -->
+<div class="ov" id="mApi"><div class="modal" style="max-width:680px">
   <button class="x" onclick="closeM()">✕</button>
-  <h2>Integration (API)</h2>
+  <h2>Integration &amp; Tracker Code</h2>
+  <div id="mkWrap">
+    <h3 style="font-size:15px;margin-bottom:6px">Option 1: Made with me</h3>
+    <p class="mut">Paste this one piece of code into your game / app / website. It shows <b>one box and one Submit button</b>. Each user can submit their TaskCpm Code <b>only once</b>, then the box disappears. Change the language and the same code is converted for you.</p>
+    <label style="display:block;margin-top:10px">Language</label>
+    <select id="aLang" onchange="showTracker()">
+      <option value="dart">Dart (Flutter)</option>
+      <option value="py">Python</option>
+      <option value="java">Java (Android)</option>
+      <option value="js">JavaScript (Web)</option>
+    </select>
+    <pre class="code" id="trkBox"></pre>
+    <button class="btn s" id="trkCp" onclick="copyTrk()">Copy code</button>
+    <hr class="dash">
+  </div>
+  <h3 style="font-size:15px;margin-bottom:6px">Server API (most secure)</h3>
   <p class="mut">Call these from your <b>server</b> (never put the secret key inside the game or app).</p>
   <pre id="apiBox"></pre>
 </div></div>
@@ -199,7 +224,7 @@ const PAY={ // fill your real receiving details
   usdt:{n:'USDT (TRC-20)',cur:'USD',d:'Your TRC-20 wallet address'},
   binance:{n:'Binance Pay',cur:'USD',d:'Your Binance Pay ID'}
 };
-const VLBL={screenshot:'Screenshot',id:'ID check',both:'ID + Screenshot',auto:'Automatic (API)'};
+const VLBL={screenshot:'Screenshot',id:'ID check',both:'ID + Screenshot',auto:'TaskCpm System'};
 const PROOF={screenshot:'screenshot',id:'username',both:'screenshot',auto:'none'}; // old "proof" field, kept for the app's Offers tab
 
 const $=id=>document.getElementById(id);
@@ -210,7 +235,7 @@ const TS=()=>firebase.database.ServerValue.TIMESTAMP;
 const rk=()=>Array.from(crypto.getRandomValues(new Uint8Array(18)),b=>b.toString(36).padStart(2,'0')).join('');
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.database();
-let U=null,bal=0,earn=0,camps={},refs=[],mode='login',subs={},curC=null,subRef=null,rejecting=null,pend={},pRefs={};
+let U=null,bal=0,earn=0,camps={},refs=[],mode='login',subs={},curC=null,subRef=null,rejecting=null,pend={},pRefs={},curApi=null;
 
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3500)}
 function openM(id){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));$(id).classList.add('on')}
@@ -258,7 +283,7 @@ function paint(){
 function card(id,x){
   const j=x.joined||0,c=x.completed||0,t=x.targetUsers||1,pct=Math.min(100,Math.round(c/t*100)),v=x.verify||'screenshot';
   let b='';
-  if(v==='auto')b+=`<button class="btn s" onclick="openApi('${id}')">Integration (API)</button> `;
+  if(v==='auto')b+=`<button class="btn s" onclick="openApi('${id}')">Integration &amp; Tracker Code</button> `;
   else b+=`<button class="btn s" onclick="openSubs('${id}')">Review Submissions (${pend[id]||0} pending)</button> `;
   if(x.status==='active')b+=`<button class="btn s o" onclick="setStatus('${id}','paused')">Pause</button>`;
   if(x.status==='paused')b+=`<button class="btn s o" onclick="setStatus('${id}','active')">Resume</button>`;
@@ -318,16 +343,240 @@ function csv(){
   a.download='submissions-'+curC+'.csv';a.click();
 }
 
-/* ---------- INTEGRATION (API) ---------- */
+/* ---------- TRACKER CODE (Made with me): one code, 4 languages ----------
+   Placeholders __API__ and __CID__ are replaced automatically.
+   Worker endpoints used (public, no secret key):
+     POST /claim     {campaign, code, value}  -> 200 ok | 404 wrong code | 409 already used
+     POST /progress  {campaign, code, value}  -> 200 ok                                     */
+const SNIP={};
+SNIP.dart=String.raw`import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+const api = '__API__';
+const campaign = '__CID__';
+int getUserLevel() => 1; // TODO: return your app's level / score
+
+Future<int> _post(String path, String code) async {
+  final r = await http.post(Uri.parse(api + path),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'campaign': campaign, 'code': code, 'value': getUserLevel()}));
+  return r.statusCode;
+}
+
+// Call this whenever the level changes (after the code was submitted)
+Future<void> syncProgress() async {
+  final p = await SharedPreferences.getInstance();
+  final code = p.getString('taskcpm_code');
+  if (code != null) await _post('/progress', code);
+}
+
+// Put this widget anywhere in your app: const TaskCpmBox()
+class TaskCpmBox extends StatefulWidget {
+  const TaskCpmBox({super.key});
+  @override
+  State<TaskCpmBox> createState() => _TaskCpmBoxState();
+}
+
+class _TaskCpmBoxState extends State<TaskCpmBox> {
+  final c = TextEditingController();
+  String msg = '';
+  bool done = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (p.getString('taskcpm_code') != null) setState(() => done = true);
+    });
+  }
+
+  Future<void> submit() async {
+    final code = c.text.trim().toUpperCase();
+    try {
+      final s = await _post('/claim', code);
+      if (s == 404) { setState(() => msg = 'Wrong code'); return; }
+      if (s == 409) { setState(() => msg = 'Code already used'); return; }
+      if (s != 200) { setState(() => msg = 'Try again'); return; }
+      (await SharedPreferences.getInstance()).setString('taskcpm_code', code);
+      setState(() { done = true; msg = 'Done'; });
+    } catch (_) {
+      setState(() => msg = 'Check your internet');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => done
+      ? Text(msg.isEmpty ? 'Done' : msg)
+      : Column(children: [
+          TextField(controller: c, decoration: const InputDecoration(hintText: 'TaskCpm Code')),
+          ElevatedButton(onPressed: submit, child: const Text('Submit')),
+          Text(msg),
+        ]);
+}`;
+SNIP.py=String.raw`import json, os, tkinter as tk, urllib.request, urllib.error
+
+API = "__API__"
+CAMPAIGN = "__CID__"
+FLAG = "taskcpm_code.txt"
+
+def get_user_level():
+    return 1  # TODO: return your app's level / score
+
+def post(path, code):
+    body = json.dumps({"campaign": CAMPAIGN, "code": code, "value": get_user_level()}).encode()
+    req = urllib.request.Request(API + path, data=body, headers={"Content-Type": "application/json"})
+    try:
+        return urllib.request.urlopen(req, timeout=12).status
+    except urllib.error.HTTPError as e:
+        return e.code
+
+# Call this whenever the level changes (after the code was submitted)
+def sync_progress():
+    if os.path.exists(FLAG):
+        post("/progress", open(FLAG).read().strip())
+
+def submit():
+    code = entry.get().strip().upper()
+    try:
+        s = post("/claim", code)
+    except Exception:
+        msg.config(text="Check your internet"); return
+    if s == 404: msg.config(text="Wrong code")
+    elif s == 409: msg.config(text="Code already used")
+    elif s != 200: msg.config(text="Try again")
+    else:
+        open(FLAG, "w").write(code)
+        entry.pack_forget(); btn.pack_forget()
+        msg.config(text="Done")
+
+root = tk.Tk(); root.title("TaskCpm")
+entry = tk.Entry(root)
+btn = tk.Button(root, text="Submit", command=submit)
+msg = tk.Label(root)
+if os.path.exists(FLAG):
+    msg.config(text="Done")
+else:
+    entry.pack(padx=10, pady=6); btn.pack()
+msg.pack(padx=10, pady=6)
+root.mainloop()`;
+SNIP.java=String.raw`// AndroidManifest.xml: <uses-permission android:name="android.permission.INTERNET"/>
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.*;
+import java.net.*;
+
+public class TaskCpmActivity extends Activity {
+  static final String API = "__API__", CAMPAIGN = "__CID__";
+  int getUserLevel() { return 1; } // TODO: return your app's level / score
+
+  int post(String path, String code) throws Exception {
+    HttpURLConnection c = (HttpURLConnection) new URL(API + path).openConnection();
+    c.setRequestMethod("POST");
+    c.setRequestProperty("Content-Type", "application/json");
+    c.setDoOutput(true);
+    String body = "{\"campaign\":\"" + CAMPAIGN + "\",\"code\":\"" + code
+        + "\",\"value\":" + getUserLevel() + "}";
+    c.getOutputStream().write(body.getBytes());
+    return c.getResponseCode();
+  }
+
+  // Call this whenever the level changes (after the code was submitted)
+  void syncProgress() {
+    final String code = getSharedPreferences("taskcpm", MODE_PRIVATE).getString("code", null);
+    if (code == null) return;
+    new Thread(() -> { try { post("/progress", code); } catch (Exception e) {} }).start();
+  }
+
+  @Override protected void onCreate(Bundle b) {
+    super.onCreate(b);
+    final SharedPreferences sp = getSharedPreferences("taskcpm", MODE_PRIVATE);
+    LinearLayout box = new LinearLayout(this);
+    box.setOrientation(LinearLayout.VERTICAL);
+    final EditText et = new EditText(this); et.setHint("TaskCpm Code");
+    final Button bt = new Button(this); bt.setText("Submit");
+    final TextView tv = new TextView(this);
+    box.addView(et); box.addView(bt); box.addView(tv);
+    setContentView(box);
+    if (sp.getString("code", null) != null) {
+      et.setVisibility(8); bt.setVisibility(8); tv.setText("Done"); return;
+    }
+    bt.setOnClickListener(v -> new Thread(() -> {
+      String code = et.getText().toString().trim().toUpperCase().replaceAll("[^A-Z0-9-]", "");
+      String msg;
+      try {
+        int s = post("/claim", code);
+        if (s == 404) msg = "Wrong code";
+        else if (s == 409) msg = "Code already used";
+        else if (s != 200) msg = "Try again";
+        else { sp.edit().putString("code", code).apply(); msg = "Done"; }
+      } catch (Exception e) { msg = "Check your internet"; }
+      final String m = msg;
+      runOnUiThread(() -> tv.setText(m));
+    }).start());
+  }
+}`;
+SNIP.js=String.raw`<input id="tc" placeholder="TaskCpm Code">
+<button id="tb">Submit</button>
+<p id="tm"></p>
+<script>
+var API = "__API__", CAMPAIGN = "__CID__";
+function getUserLevel() { return 1; } // TODO: return your level / score
+
+function tcPost(path, code) {
+  return fetch(API + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ campaign: CAMPAIGN, code: code, value: getUserLevel() })
+  });
+}
+
+// Call this whenever the level changes (after the code was submitted)
+function syncProgress() {
+  var c = localStorage.getItem("taskcpm_code");
+  if (c) tcPost("/progress", c);
+}
+
+var tc = document.getElementById("tc"), tb = document.getElementById("tb"), tm = document.getElementById("tm");
+if (localStorage.getItem("taskcpm_code")) { tc.style.display = tb.style.display = "none"; tm.textContent = "Done"; }
+
+tb.onclick = async function () {
+  var code = tc.value.trim().toUpperCase();
+  try {
+    var r = await tcPost("/claim", code);
+    if (r.status === 404) { tm.textContent = "Wrong code"; return; }
+    if (r.status === 409) { tm.textContent = "Code already used"; return; }
+    if (!r.ok) { tm.textContent = "Try again"; return; }
+    localStorage.setItem("taskcpm_code", code);
+    tc.style.display = tb.style.display = "none"; tm.textContent = "Done";
+  } catch (e) { tm.textContent = "Check your internet"; }
+};
+</`+`script>`;
+
+function showTracker(){
+  if(!curApi)return;
+  $('trkBox').textContent=SNIP[$('aLang').value].replace(/__API__/g,API_BASE).replace(/__CID__/g,curApi);
+}
+function copyTrk(){
+  navigator.clipboard.writeText($('trkBox').textContent);
+  $('trkCp').textContent='Copied';setTimeout(()=>$('trkCp').textContent='Copy code',1500);
+}
+
+/* ---------- INTEGRATION (API + tracker code) ---------- */
 async function openApi(cid){
-  const c=camps[cid];let k='(not found, contact support)';
+  const c=camps[cid];curApi=cid;let k='(not found, contact support)';
   try{k=(await db.ref('campaignKeys/'+cid+'/key').once('value')).val()||k}catch(e){}
+  $('mkWrap').hidden=c.integration==='self';
+  showTracker();
   $('apiBox').textContent=
 `Campaign ID : ${cid}
 Secret key  : ${k}
 Goal        : ${c.goalLabel} ${c.goalValue}
 
-1) The player enters their TaskCpm Code (like TC-8F3K2)
+1) Every user who joins your task in the TaskCpm app gets their
+   own unique TaskCpm Code (like TC-8F3K2). The user enters it
    in your game / app / website.
 
 2) Check the code (optional):
@@ -382,8 +631,20 @@ async function doDeposit(){
 
 /* ---------- CAMPAIGN ---------- */
 const TDEF={'Social Follow / Like':'screenshot','Website Visit':'screenshot','Game / App (reach level)':'auto','Signup / Register':'id','App Review / Rating':'screenshot'};
+const VDESC={
+  screenshot:'<b>How it works:</b> the user completes the task and uploads a screenshot. You open <b>Review Submissions</b> and Approve or Reject. If you do not decide, it is auto-approved after the days you choose. Best for Like, Follow, Comment, Subscribe.',
+  id:'<b>How it works:</b> the user submits an ID, email or username. You check it on your own server or database, then Approve or Reject. If you do not decide, it is auto-approved after the days you choose. Best for sign-ups.',
+  both:'<b>How it works:</b> the user submits both an ID and a screenshot. You check both, then Approve or Reject. Auto-approved after the days you choose if you do nothing.',
+  auto:'<b>How the TaskCpm System works</b><br>'
+    +'1) When your campaign goes live, every user who joins it in the TaskCpm app automatically gets their own <b>unique TaskCpm Code</b> (like TC-8F3K2).<br>'
+    +'2) The user enters that code <b>once</b> in your game / app / website. One code = one user, it cannot be reused or shared.<br>'
+    +'3) Your product sends us the user\'s progress (for example the level). You see who joined, how far each user got and who is still incomplete, right on this dashboard.<br>'
+    +'4) When the goal is reached, the user is paid automatically. No screenshots, no manual approval.<br>'
+    +'<b>Two ways to add it:</b> <i>Made with me</i>: we give you ready code (one box + one Submit button) in Dart, Python, Java or JavaScript. <i>Build it yourself</i>: use our server API with your secret key (most secure). '
+    +'Note: the ready code reports progress from the app itself, so for high-value rewards use the server API.'
+};
 function typeChange(){$('cV').value=TDEF[$('cType').value]||'screenshot';vChange()}
-function vChange(){const v=$('cV').value;$('rowId').hidden=!(v==='id'||v==='both');$('rowAuto').hidden=v!=='auto';$('rowDays').hidden=v==='auto'}
+function vChange(){const v=$('cV').value;$('rowId').hidden=!(v==='id'||v==='both');$('rowAuto').hidden=v!=='auto';$('rowDays').hidden=v==='auto';$('vDesc').innerHTML=VDESC[v]||''}
 function openCamp(){calc();vChange();openM('mCamp')}
 function calc(){
   const n=+$('cN').value||0,p=+$('cP').value||0,t=n*p;
@@ -396,7 +657,7 @@ async function doCamp(){
   if(!/^https:\/\//i.test(d.link))return toast('Link must start with https://');
   if(d.instructions.length<10)return toast('Write clear instructions for users');
   if(v==='id'||v==='both'){d.idLabel=$('cIdL').value.trim();if(d.idLabel.length<2)return toast('Tell users which ID to submit (e.g. Player ID)')}
-  if(v==='auto'){d.goalLabel=$('cGL').value.trim()||'Level';d.goalValue=Math.floor(+$('cGV').value);if(!(d.goalValue>=1))return toast('Enter the goal value')}
+  if(v==='auto'){d.goalLabel=$('cGL').value.trim()||'Level';d.goalValue=Math.floor(+$('cGV').value);if(!(d.goalValue>=1))return toast('Enter the goal value');d.integration=$('cInt').value}
   if(!(n>=10))return toast('Minimum 10 users');
   if(!(p>=100))return toast('Minimum price is 100 coins per task');
   if(t>bal){closeM();openCredit();return toast('Not enough balance. Add credits first.')}
@@ -406,7 +667,7 @@ async function doCamp(){
     const ref=db.ref('campaigns').push();
     await ref.set({...d,ownerId:U.uid,targetUsers:n,pricePerTask:p,userReward:Math.floor(p*(1-FEE)),budget:t,spent:0,joined:0,completed:0,rejected:0,status:'pending',createdAt:TS()});
     if(v==='auto')await db.ref('campaignKeys/'+ref.key).set({ownerId:U.uid,key:rk()});
-    closeM();toast(v==='auto'?'Campaign submitted. Open Integration to get your key.':'Campaign submitted for review');
+    closeM();toast(v==='auto'?'Campaign submitted. Open Integration & Tracker Code to get your code.':'Campaign submitted for review');
   }catch(e){
     await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)+t);
     toast('Failed: '+e.message);
