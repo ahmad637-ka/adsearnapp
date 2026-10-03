@@ -155,7 +155,7 @@ hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
   </div>
   <div class="sum" id="cSum"></div>
   <button class="btn w" onclick="doCamp()">Submit Campaign for Review</button>
-  <p class="mut" style="margin-top:10px">New campaigns are reviewed before going live. Budget is held from your balance and unused budget is refundable.</p>
+  <p class="mut" style="margin-top:10px">New campaigns go live immediately. Budget is held from your balance and unused budget is refundable.</p>
 </div></div>
 
 <!-- SUBMISSIONS -->
@@ -665,7 +665,7 @@ async function doCamp(){
   if(!r.committed)return toast('Not enough balance');
   try{
     const ref=db.ref('campaigns').push();
-    await ref.set({...d,ownerId:U.uid,targetUsers:n,pricePerTask:p,userReward:Math.floor(p*(1-FEE)),budget:t,spent:0,joined:0,completed:0,rejected:0,status:'pending',createdAt:TS()});
+    await ref.set({...d,ownerId:U.uid,targetUsers:n,pricePerTask:p,userReward:Math.floor(p*(1-FEE)),budget:t,spent:0,joined:0,completed:0,rejected:0,status:'active',createdAt:TS()});
     if(v==='auto')await db.ref('campaignKeys/'+ref.key).set({ownerId:U.uid,key:rk()});
     closeM();toast(v==='auto'?'Campaign submitted. Open Integration & Tracker Code to get your code.':'Campaign submitted for review');
   }catch(e){
