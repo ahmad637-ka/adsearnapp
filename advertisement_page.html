@@ -54,6 +54,11 @@ button{cursor:pointer;font-family:inherit}
 .expect small{display:block;color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px}
 pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;border-radius:10px;font-size:12px;line-height:1.6;color:var(--gold);margin:10px 0}
 pre.code{white-space:pre;word-break:normal;overflow:auto;max-height:340px}
+/* task logo */
+.logoRow{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+.logoPrev{width:56px;height:56px;border-radius:12px;object-fit:contain;background:#fff;border:1px solid rgba(255,215,0,.35);padding:4px;flex:none}
+.tl{display:flex;align-items:center;gap:10px;min-width:0}
+.lg{width:36px;height:36px;border-radius:9px;object-fit:contain;background:#fff;padding:3px;flex:none}
 hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
 #zoom{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;cursor:zoom-out}
 #zoom.on{display:flex}#zoom img{max-width:95vw;max-height:95vh;object-fit:contain}
@@ -130,8 +135,15 @@ hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
   <label>Campaign title</label><input id="cT" maxlength="60" placeholder="e.g. Follow my Instagram page">
   <label>Task type</label>
   <select id="cType" onchange="typeChange()"><option>Social Follow / Like</option><option>Website Visit</option><option>Game / App (reach level)</option><option>Signup / Register</option><option>App Review / Rating</option></select>
-  <label>Task link (https://)</label><input id="cL" placeholder="https://...">
+  <label>Task link (https://)</label><input id="cL" placeholder="https://..." oninput="paintLogo()">
   <label>Instructions (what must the user do, step by step)</label><textarea id="cI" placeholder="1) Open the link&#10;2) Follow the page&#10;3) Submit your proof"></textarea>
+  <label>Task logo</label>
+  <select id="cLogoMode" onchange="logoChange()">
+    <option value="auto">TaskCpm Auto Logo (taken from your link)</option>
+    <option value="upload">Upload my own logo (from phone or computer)</option>
+  </select>
+  <div id="rowLogoUp" hidden><input id="cLogoFile" type="file" accept="image/*" onchange="pickLogo(this)"></div>
+  <div class="logoRow"><img id="logoPrev" class="logoPrev" alt="" hidden><p class="mut" id="logoNote"></p></div>
   <label>How will we track and verify the task?</label>
   <select id="cV" onchange="vChange()">
     <option value="screenshot">Screenshot (best for Like / Follow / Comment on YouTube, TikTok, Instagram)</option>
@@ -305,7 +317,7 @@ function card(id,x){
   if(x.status==='active')b+=`<button class="btn s o" onclick="setStatus('${id}','paused')">Pause</button>`;
   if(x.status==='paused')b+=`<button class="btn s o" onclick="setStatus('${id}','active')">Resume</button>`;
   if(x.status==='pending'||x.status==='paused')b+=` <button class="btn s o" onclick="cancelC('${id}')">Cancel &amp; Refund</button>`;
-  return `<div class="camp"><div class="row"><h3>${esc(x.title)}</h3><span class="badge ${esc(x.status)}">${esc(x.status)}</span></div>
+  return `<div class="camp"><div class="row"><div class="tl"><img class="lg" src="${esc(logoOf(x))}" alt="" onerror="this.style.display='none'"><h3>${esc(x.title)}</h3></div><span class="badge ${esc(x.status)}">${esc(x.status)}</span></div>
   <p class="mut">${esc(x.type)} · ${esc(x.country)} · ${fmt(x.pricePerTask)} coins/task · ${esc(VLBL[v]||v)}${v==='auto'?' · Goal: '+esc(x.goalLabel)+' '+esc(x.goalValue):''}</p>
   <div class="bar"><i style="width:${pct}%"></i></div>
   <div class="mini"><div><b>${fmt(j)}</b>Joined</div><div><b>${fmt(c)}</b>Completed</div><div><b>${fmt(Math.max(0,j-c))}</b>Incomplete</div><div><b>${fmt(x.spent||0)}/${fmt(x.budget)}</b>Spent</div></div>
@@ -650,6 +662,62 @@ async function doDeposit(){
   }catch(e){toast('Failed: '+e.message)}
 }
 
+/* ---------- TASK LOGO ---------- */
+let logoData='';
+const HMAP=[['youtu.be','youtube.com'],['youtube.com','youtube.com'],['tiktok.com','tiktok.com'],['facebook.com','facebook.com'],['fb.com','facebook.com'],['fb.me','facebook.com'],['fb.watch','facebook.com'],['instagram.com','instagram.com'],['instagr.am','instagram.com'],['twitter.com','x.com'],['x.com','x.com'],['t.co','x.com']];
+function hostOf(u){try{let h=new URL(u).hostname.toLowerCase();for(const [k,v] of HMAP){if(h===k||h.endsWith('.'+k))return v}return h}catch(e){return ''}}
+const favUrl=u=>{const h=hostOf(u);return h?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(h)+'&sz=128':''};
+const logoOf=x=>x.logo||favUrl(x.link);
+let autoLogo='',autoFor='',autoTimer=null;
+async function fetchAutoLogo(link){
+  if(!/^https:\/\//i.test(link))return '';
+  try{
+    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),9000);
+    const r=await fetch(API_BASE+'/logo?url='+encodeURIComponent(link),{signal:ctl.signal});
+    clearTimeout(t);
+    const j=await r.json();
+    if(j&&typeof j.logo==='string'&&/^https:\/\//.test(j.logo))return j.logo;
+  }catch(e){}
+  return favUrl(link);
+}
+function logoChange(){$('rowLogoUp').hidden=$('cLogoMode').value!=='upload';paintLogo()}
+function paintLogo(){
+  const m=$('cLogoMode').value,p=$('logoPrev'),n=$('logoNote'),link=$('cL').value.trim();
+  if(m==='upload'){
+    p.src=logoData;p.hidden=!logoData;
+    n.textContent=logoData?'Your logo is ready.':'Choose an image from your phone or computer.';
+    return;
+  }
+  if(!/^https:\/\/.+\..+/i.test(link)){p.hidden=true;n.textContent='Enter your task link above. TaskCpm will find its logo automatically.';return}
+  if(autoFor===link){
+    if(autoLogo){p.src=autoLogo;p.hidden=false;n.textContent='Logo found from your link. It will be used for your task.'}
+    else{p.hidden=true;n.textContent='Could not find a logo. Choose "Upload my own logo" instead.'}
+    return;
+  }
+  p.hidden=true;n.textContent='Finding the logo of your link...';
+  clearTimeout(autoTimer);
+  autoTimer=setTimeout(async()=>{
+    const l=link,lg=await fetchAutoLogo(l);
+    if($('cL').value.trim()!==l)return;
+    autoFor=l;autoLogo=lg;
+    if($('cLogoMode').value==='auto')paintLogo();
+  },600);
+}
+function pickLogo(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  if(!/^image\//.test(f.type))return toast('Choose an image file');
+  if(f.size>5*1024*1024)return toast('Image too big (max 5 MB)');
+  const url=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{
+    const S=96,c=document.createElement('canvas');c.width=c.height=S;
+    const k=Math.min(S/im.width,S/im.height),w=im.width*k,h=im.height*k;
+    c.getContext('2d').drawImage(im,(S-w)/2,(S-h)/2,w,h);
+    logoData=c.toDataURL('image/png');URL.revokeObjectURL(url);paintLogo();
+  };
+  im.onerror=()=>{URL.revokeObjectURL(url);toast('Could not read this image')};
+  im.src=url;
+}
+
 /* ---------- CAMPAIGN ---------- */
 const TDEF={'Social Follow / Like':'screenshot','Website Visit':'screenshot','Game / App (reach level)':'auto','Signup / Register':'id','App Review / Rating':'screenshot'};
 const VDESC={
@@ -675,7 +743,7 @@ function vChange(){
   $('rowDays').hidden=v==='auto';
   $('vDesc').innerHTML=VDESC[v]||'';
 }
-function openCamp(){calc();vChange();openM('mCamp')}
+function openCamp(){calc();vChange();logoChange();openM('mCamp')}
 function calc(){
   const n=+$('cN').value||0,p=+$('cP').value||0,t=n*p;
   $('cSum').innerHTML=`Total budget: <b class="gold">${fmt(t)} coins</b> (${usd(t)})<br>Each user earns: <b>${Math.floor(p*(1-FEE))} coins</b> · Your balance: ${fmt(bal)} coins`;
@@ -691,6 +759,12 @@ async function doCamp(){
   if(v==='auto'){d.goalLabel=$('cGL').value.trim()||'Level';d.goalValue=Math.floor(+$('cGV').value);if(!(d.goalValue>=1))return toast('Enter the goal value');d.integration=$('cInt').value}
   if(!(n>=10))return toast('Minimum 10 users');
   if(!(p>=100))return toast('Minimum price is 100 coins per task');
+  const lm=$('cLogoMode').value;
+  if(lm==='upload'){if(!logoData)return toast('Upload your logo or choose TaskCpm Auto Logo');d.logo=logoData}
+  else{
+    if(autoFor!==d.link){toast('Finding your logo...');autoLogo=await fetchAutoLogo(d.link);autoFor=d.link}
+    if(autoLogo)d.logo=autoLogo;
+  }
   if(t>bal){closeM();openCredit();return toast('Not enough balance. Add credits first.')}
   const r=await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)>=t?b-t:undefined);
   if(!r.committed)return toast('Not enough balance');
@@ -698,7 +772,7 @@ async function doCamp(){
     const ref=db.ref('campaigns').push();
     await ref.set({...d,ownerId:U.uid,targetUsers:n,pricePerTask:p,userReward:Math.floor(p*(1-FEE)),budget:t,spent:0,joined:0,completed:0,rejected:0,status:'active',createdAt:TS()});
     if(v==='auto')await db.ref('campaignKeys/'+ref.key).set({ownerId:U.uid,key:rk()});
-    closeM();toast(v==='auto'?'Campaign submitted. Open Integration & Tracker Code to get your code.':'Campaign submitted for review');
+    logoData='';autoLogo='';autoFor='';$('cLogoFile').value='';closeM();toast(v==='auto'?'Campaign submitted. Open Integration & Tracker Code to get your code.':'Campaign submitted for review');
   }catch(e){
     await db.ref('advertisers/'+U.uid+'/balance').transaction(b=>(b||0)+t);
     toast('Failed: '+e.message);
