@@ -48,6 +48,10 @@ button{cursor:pointer;font-family:inherit}
 .big:last-child{border-bottom:0}.big b{font-size:16px}
 .sub{background:var(--card2);border-radius:12px;padding:12px;margin-bottom:10px}
 .shot{width:100%;max-height:420px;object-fit:contain;background:#000;border-radius:8px;margin:8px 0;display:block}
+.txt{background:var(--bg);border:1px solid rgba(255,215,0,.25);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin:8px 0}
+.txt small{display:block;color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px}
+.expect{background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+.expect small{display:block;color:var(--gold);font-size:11px;font-weight:700;margin-bottom:4px}
 pre{white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:12px;border-radius:10px;font-size:12px;line-height:1.6;color:var(--gold);margin:10px 0}
 pre.code{white-space:pre;word-break:normal;overflow:auto;max-height:340px}
 hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
@@ -131,12 +135,19 @@ hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
   <label>How will we track and verify the task?</label>
   <select id="cV" onchange="vChange()">
     <option value="screenshot">Screenshot (best for Like / Follow / Comment on YouTube, TikTok, Instagram)</option>
+    <option value="text">Text (user pastes words / code from your video or description)</option>
     <option value="id">User ID / Email / Username (you check on your server)</option>
     <option value="both">ID + Screenshot</option>
+    <option value="all">ID + Screenshot + Text</option>
     <option value="auto">TaskCpm System: unique promo code per user (games, apps &amp; websites)</option>
   </select>
   <div class="sum" id="vDesc"></div>
   <div id="rowId" hidden><label>What ID should the user submit?</label><input id="cIdL" maxlength="40" placeholder="e.g. Player ID, or Email used in my game"></div>
+  <div id="rowExp" hidden>
+    <label>What do you expect? (which words should the user paste as proof)</label>
+    <textarea id="cExp" maxlength="300" placeholder="e.g. Watch my video till the end. At the end I say a secret word. Paste that word here.&#10;Or: Paste the code written in the video description."></textarea>
+    <p class="mut" style="margin:-6px 0 12px">The user will see this text and gets a text box to paste the words. You see their text next to the proof when you review.</p>
+  </div>
   <div id="rowDays"><label>Auto-approve if you do not decide within</label>
     <select id="cD"><option value="2">2 days</option><option value="3" selected>3 days</option><option value="4">4 days</option><option value="7">7 days</option></select></div>
   <div id="rowAuto" hidden>
@@ -162,6 +173,7 @@ hr.dash{border:0;border-top:1px dashed rgba(255,215,0,.2);margin:18px 0}
 <div class="ov" id="mSubs"><div class="modal" style="max-width:640px">
   <button class="x" onclick="closeM()">✕</button>
   <h2>Submissions: <span class="gold" id="sT"></span></h2>
+  <div id="sExp"></div>
   <div class="row" style="margin-bottom:12px"><p class="mut">Approve or reject. Pending items are auto-approved after your chosen days.</p><button class="btn s o" onclick="csv()">⬇ Download CSV</button></div>
   <div id="sList"></div>
 </div></div>
@@ -224,8 +236,13 @@ const PAY={ // fill your real receiving details
   usdt:{n:'USDT (TRC-20)',cur:'USD',d:'Your TRC-20 wallet address'},
   binance:{n:'Binance Pay',cur:'USD',d:'Your Binance Pay ID'}
 };
-const VLBL={screenshot:'Screenshot',id:'ID check',both:'ID + Screenshot',auto:'TaskCpm System'};
-const PROOF={screenshot:'screenshot',id:'username',both:'screenshot',auto:'none'}; // old "proof" field, kept for the app's Offers tab
+const VLBL={screenshot:'Screenshot',text:'Text',id:'ID check',both:'ID + Screenshot',all:'ID + Screenshot + Text',auto:'TaskCpm System'};
+/* old "proof" field, kept for the app's Offers tab. NEW value: 'text' (app must handle it). */
+const PROOF={screenshot:'screenshot',text:'text',id:'username',both:'screenshot',all:'screenshot',auto:'none'};
+/* What the user must send in the app for each mode */
+const NEED_ID=v=>v==='id'||v==='both'||v==='all';
+const NEED_SHOT=v=>v==='screenshot'||v==='both'||v==='all';
+const NEED_TXT=v=>v==='text'||v==='all';
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -304,11 +321,15 @@ async function cancelC(id){
   toast('Refunded '+fmt(back)+' coins');
 }
 
-/* ---------- SUBMISSIONS (approve / reject / CSV / auto-approve) ---------- */
+/* ---------- SUBMISSIONS (approve / reject / CSV / auto-approve) ----------
+   Submission fields read here: ident (ID), shot (screenshot url), text (pasted words), status, at, uid */
 const img=u=>/^(https:\/\/|data:image\/)/.test(u||'')?`<img class="shot" src="${esc(u)}" loading="lazy" style="cursor:zoom-in" onclick="zoomImg(this.src)">`:'';
+const txtBox=t=>t?`<div class="txt"><small>USER TEXT PROOF</small>${esc(t)}</div>`:'';
 function zoomImg(u){$('zImg').src=u;$('zoom').classList.add('on')}
 function openSubs(cid){
   curC=cid;$('sT').textContent=camps[cid].title;
+  const e=camps[cid].expectText;
+  $('sExp').innerHTML=e?`<div class="expect"><small>WHAT USER MUST PASTE (your instruction)</small>${esc(e)}</div>`:'';
   if(subRef)subRef.off();
   subRef=db.ref('submissions/'+cid);
   subRef.on('value',s=>{subs=s.val()||{};drawSubs()});
@@ -319,8 +340,8 @@ function drawSubs(){
   const L=Object.entries(subs).sort((a,b)=>(b[1].at||0)-(a[1].at||0));
   const due=Date.now()-(c.autoDays||3)*864e5;
   L.forEach(([id,s])=>{if(s.status==='pending'&&s.at&&s.at<due)decide(id,true)});
-  $('sList').innerHTML=L.length?L.map(([id,s])=>`<div class="sub"><div class="row"><b>${esc(s.ident||'(no ID)')}</b><span class="badge ${esc(s.status)}">${esc(s.status)}</span></div>
-    <p class="mut">${new Date(s.at||0).toLocaleString()}${c.idLabel?' · '+esc(c.idLabel):''}</p>${img(s.shot)}
+  $('sList').innerHTML=L.length?L.map(([id,s])=>`<div class="sub"><div class="row"><b>${esc(s.ident||(NEED_ID(c.verify)?'(no ID)':'User '+String(s.uid||'').slice(0,6)))}</b><span class="badge ${esc(s.status)}">${esc(s.status)}</span></div>
+    <p class="mut">${new Date(s.at||0).toLocaleString()}${c.idLabel?' · '+esc(c.idLabel):''}</p>${img(s.shot)}${txtBox(s.text)}
     ${s.status==='pending'?(rejecting===id?`<textarea id="rj" placeholder="Reason for rejection (the user will see this)"></textarea><button class="btn s" onclick="doReject('${id}')">Confirm Reject</button> <button class="btn s o" onclick="rejecting=null;drawSubs()">Back</button>`:`<button class="btn s" onclick="decide('${id}',true)">Approve</button> <button class="btn s o" onclick="rejecting='${id}';drawSubs()">Reject</button>`):(s.status==='rejected'&&s.rejectReason?`<p class="mut">Reason: ${esc(s.rejectReason)}</p>`:'')}</div>`).join(''):'<p class="mut">No submissions yet.</p>';
 }
 function doReject(id){const r=($('rj').value||'').trim();if(r.length<3)return toast('Write the reason for rejection');rejecting=null;decide(id,false,r)}
@@ -337,7 +358,7 @@ async function decide(id,ok,reason){
 }
 function csv(){
   const c=camps[curC],q=v=>{let t=String(v??'');if(/^[=+\-@]/.test(t))t="'"+t;return '"'+t.replace(/"/g,'""')+'"'};
-  const rows=[['Campaign','User ID','Identifier','Status','Date']].concat(Object.values(subs).map(s=>[c.title,s.uid,s.ident,s.status,new Date(s.at||0).toISOString()]));
+  const rows=[['Campaign','User ID','Identifier','Text Proof','Status','Date']].concat(Object.values(subs).map(s=>[c.title,s.uid,s.ident,s.text,s.status,new Date(s.at||0).toISOString()]));
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'}));
   a.download='submissions-'+curC+'.csv';a.click();
@@ -633,8 +654,10 @@ async function doDeposit(){
 const TDEF={'Social Follow / Like':'screenshot','Website Visit':'screenshot','Game / App (reach level)':'auto','Signup / Register':'id','App Review / Rating':'screenshot'};
 const VDESC={
   screenshot:'<b>How it works:</b> the user completes the task and uploads a screenshot. You open <b>Review Submissions</b> and Approve or Reject. If you do not decide, it is auto-approved after the days you choose. Best for Like, Follow, Comment, Subscribe.',
+  text:'<b>How it works:</b> you tell us which words you expect (for example a secret word said in your video, or a code in the video description). The user sees your instruction and gets a <b>text box</b> to paste those words as proof that they really watched it. You see their text in <b>Review Submissions</b> and Approve or Reject. Auto-approved after the days you choose if you do nothing. Best for video watch tasks.',
   id:'<b>How it works:</b> the user submits an ID, email or username. You check it on your own server or database, then Approve or Reject. If you do not decide, it is auto-approved after the days you choose. Best for sign-ups.',
   both:'<b>How it works:</b> the user submits both an ID and a screenshot. You check both, then Approve or Reject. Auto-approved after the days you choose if you do nothing.',
+  all:'<b>How it works:</b> the user submits an ID, a screenshot <b>and</b> the text you asked for. You see all three together in <b>Review Submissions</b>, then Approve or Reject. Auto-approved after the days you choose if you do nothing. Strongest manual proof.',
   auto:'<b>How the TaskCpm System works</b><br>'
     +'1) When your campaign goes live, every user who joins it in the TaskCpm app automatically gets their own <b>unique TaskCpm Code</b> (like TC-8F3K2).<br>'
     +'2) The user enters that code <b>once</b> in your game / app / website. One code = one user, it cannot be reused or shared.<br>'
@@ -644,7 +667,14 @@ const VDESC={
     +'Note: the ready code reports progress from the app itself, so for high-value rewards use the server API.'
 };
 function typeChange(){$('cV').value=TDEF[$('cType').value]||'screenshot';vChange()}
-function vChange(){const v=$('cV').value;$('rowId').hidden=!(v==='id'||v==='both');$('rowAuto').hidden=v!=='auto';$('rowDays').hidden=v==='auto';$('vDesc').innerHTML=VDESC[v]||''}
+function vChange(){
+  const v=$('cV').value;
+  $('rowId').hidden=!NEED_ID(v);
+  $('rowExp').hidden=!NEED_TXT(v);
+  $('rowAuto').hidden=v!=='auto';
+  $('rowDays').hidden=v==='auto';
+  $('vDesc').innerHTML=VDESC[v]||'';
+}
 function openCamp(){calc();vChange();openM('mCamp')}
 function calc(){
   const n=+$('cN').value||0,p=+$('cP').value||0,t=n*p;
@@ -656,7 +686,8 @@ async function doCamp(){
   if(d.title.length<4)return toast('Enter a campaign title');
   if(!/^https:\/\//i.test(d.link))return toast('Link must start with https://');
   if(d.instructions.length<10)return toast('Write clear instructions for users');
-  if(v==='id'||v==='both'){d.idLabel=$('cIdL').value.trim();if(d.idLabel.length<2)return toast('Tell users which ID to submit (e.g. Player ID)')}
+  if(NEED_ID(v)){d.idLabel=$('cIdL').value.trim();if(d.idLabel.length<2)return toast('Tell users which ID to submit (e.g. Player ID)')}
+  if(NEED_TXT(v)){d.expectText=$('cExp').value.trim();if(d.expectText.length<5)return toast('Write what words the user must paste (min 5 characters)')}
   if(v==='auto'){d.goalLabel=$('cGL').value.trim()||'Level';d.goalValue=Math.floor(+$('cGV').value);if(!(d.goalValue>=1))return toast('Enter the goal value');d.integration=$('cInt').value}
   if(!(n>=10))return toast('Minimum 10 users');
   if(!(p>=100))return toast('Minimum price is 100 coins per task');
