@@ -308,6 +308,7 @@ function paint(){
   let j=0,c=0,s=0;L.forEach(([,x])=>{j+=x.joined||0;c+=x.completed||0;s+=x.spent||0});
   $('sJ').textContent=fmt(j);$('sC').textContent=fmt(c);$('sI').textContent=fmt(Math.max(0,j-c));$('sS').textContent=fmt(s);
   $('list').innerHTML=L.length?L.map(([id,x])=>card(id,x)).join(''):'<p class="mut">No campaigns yet. Click "Create Campaign" to start.</p>';
+  fixOldLogos();
 }
 function card(id,x){
   const j=x.joined||0,c=x.completed||0,t=x.targetUsers||1,pct=Math.min(100,Math.round(c/t*100)),v=x.verify||'screenshot';
@@ -662,23 +663,146 @@ async function doDeposit(){
   }catch(e){toast('Failed: '+e.message)}
 }
 
-/* ---------- TASK LOGO ---------- */
+/* =====================================================================
+   TASK LOGO  (MERGED: code 1 + code 2)
+   Order of tries for the "TaskCpm Auto Logo":
+   1) Social platforms (TikTok, YouTube, Instagram, Facebook, X) -> drawn locally (instant, no network)
+   2) Other social/chat brands (Telegram, Discord, WhatsApp, Snapchat, Pinterest,
+      LinkedIn, Reddit, Twitch, Spotify, Threads) -> official icon from CDN, drawn on brand colour
+   3) Any other link (Play Store game, website, Cloudflare, Google ...):
+        a) Worker  /logo?data=1&url=...   (returns image as data:)   <- code 1 way
+        b) Worker  /logo?url=...          (returns logo url)         <- code 2 way (Play Store)
+        c) Google favicon of the site
+        d) Letter tile (first letter of the site) so a logo is NEVER empty
+   ===================================================================== */
 let logoData='';
 const HMAP=[['youtu.be','youtube.com'],['youtube.com','youtube.com'],['tiktok.com','tiktok.com'],['facebook.com','facebook.com'],['fb.com','facebook.com'],['fb.me','facebook.com'],['fb.watch','facebook.com'],['instagram.com','instagram.com'],['instagr.am','instagram.com'],['twitter.com','x.com'],['x.com','x.com'],['t.co','x.com']];
 function hostOf(u){try{let h=new URL(u).hostname.toLowerCase();for(const [k,v] of HMAP){if(h===k||h.endsWith('.'+k))return v}return h}catch(e){return ''}}
 const favUrl=u=>{const h=hostOf(u);return h?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(h)+'&sz=128':''};
 const logoOf=x=>x.logo||favUrl(x.link);
 let autoLogo='',autoFor='',autoTimer=null;
+
+/* --- 5 big platforms: SVG path drawn on canvas --- */
+const SOC={"youtube":{"bg":"#ffffff","fg":"#FF0000","d":"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},"tiktok":{"bg":"#000000","fg":"#ffffff","d":"M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"},"facebook":{"bg":"#ffffff","fg":"#0866FF","d":"M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"},"instagram":{"grad":["#FEDA75","#FA7E1E","#D62976","#962FBF","#4F5BD5"],"fg":"#ffffff","d":"M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"},"x":{"bg":"#000000","fg":"#ffffff","d":"M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"}};
+const SOC_KEY={'youtube.com':'youtube','tiktok.com':'tiktok','facebook.com':'facebook','instagram.com':'instagram','x.com':'x'};
+
+/* --- other brands: icon from CDN (simple-icons) on brand colour --- */
+const BR={
+  telegram:{bg:'#26A5E4',fg:'#ffffff'},
+  discord:{bg:'#5865F2',fg:'#ffffff'},
+  whatsapp:{bg:'#25D366',fg:'#ffffff'},
+  snapchat:{bg:'#FFFC00',fg:'#000000'},
+  pinterest:{bg:'#BD081C',fg:'#ffffff'},
+  linkedin:{bg:'#0A66C2',fg:'#ffffff'},
+  reddit:{bg:'#FF4500',fg:'#ffffff'},
+  twitch:{bg:'#9146FF',fg:'#ffffff'},
+  spotify:{bg:'#1DB954',fg:'#ffffff'},
+  threads:{bg:'#000000',fg:'#ffffff'}
+};
+const BR_HOST=[['t.me','telegram'],['telegram.me','telegram'],['telegram.org','telegram'],['telegram.dog','telegram'],['discord.gg','discord'],['discord.com','discord'],['discordapp.com','discord'],['wa.me','whatsapp'],['whatsapp.com','whatsapp'],['snapchat.com','snapchat'],['pinterest.com','pinterest'],['pin.it','pinterest'],['linkedin.com','linkedin'],['lnkd.in','linkedin'],['reddit.com','reddit'],['redd.it','reddit'],['twitch.tv','twitch'],['spotify.com','spotify'],['spotify.link','spotify'],['threads.net','threads'],['threads.com','threads']];
+function brandKey(link){
+  try{
+    const h=new URL(link).hostname.toLowerCase();
+    for(const [k,v] of BR_HOST){if(h===k||h.endsWith('.'+k))return v}
+  }catch(e){}
+  return '';
+}
+
+function canvasTile(bg){
+  const S=96,c=document.createElement('canvas');c.width=c.height=S;
+  const x=c.getContext('2d');
+  if(Array.isArray(bg)){const g=x.createLinearGradient(0,S,S,0);bg.forEach((cl,i)=>g.addColorStop(i/(bg.length-1),cl));x.fillStyle=g}
+  else x.fillStyle=bg;
+  x.fillRect(0,0,S,S);
+  return [c,x,S];
+}
+/* Social platforms: logo is drawn right here (no network, no CORS, instant) */
+function socialLogo(link){
+  const k=SOC_KEY[hostOf(link)];if(!k)return '';
+  const s=SOC[k],[c,x,S]=canvasTile(s.grad||s.bg);
+  const pad=S*0.2;x.save();x.translate(pad,pad);x.scale((S-pad*2)/24,(S-pad*2)/24);
+  x.fillStyle=s.fg;x.fill(new Path2D(s.d));x.restore();
+  return c.toDataURL('image/png');
+}
+/* Letter tile: always works, used as the very last fallback */
+function letterLogo(link,bg){
+  const h=hostOf(link).replace(/^www\./,'');
+  const L=(h[0]||'?').toUpperCase();
+  const cols=['#E53935','#8E24AA','#3949AB','#039BE5','#00897B','#7CB342','#F4511E','#6D4C41'];
+  let n=0;for(const ch of h)n+=ch.charCodeAt(0);
+  const [c,x,S]=canvasTile(bg||cols[n%cols.length]);
+  x.fillStyle='#fff';x.font='bold 56px Arial,sans-serif';x.textAlign='center';x.textBaseline='middle';
+  x.fillText(L,S/2,S/2+3);
+  return c.toDataURL('image/png');
+}
+/* Telegram, Discord, WhatsApp... */
+async function brandLogo(k,link){
+  const b=BR[k];
+  try{
+    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),8000);
+    const r=await fetch('https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/'+k+'.svg',{signal:ctl.signal});
+    clearTimeout(t);
+    if(!r.ok)throw 0;
+    let svg=await r.text();
+    svg=svg.replace('<svg ','<svg width="96" height="96" fill="'+b.fg+'" ');
+    const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)});
+    const [c,x,S]=canvasTile(b.bg);
+    const pad=S*0.2;x.drawImage(im,pad,pad,S-pad*2,S-pad*2);
+    return c.toDataURL('image/png');
+  }catch(e){}
+  return letterLogo(link,b.bg);
+}
+
+/* Make any image small (96x96 PNG). Returns '' if the image cannot be read. */
+function shrinkLogo(src){
+  return new Promise(res=>{
+    const im=new Image();
+    if(!/^data:/.test(src))im.crossOrigin='anonymous';
+    im.onload=()=>{
+      try{
+        const S=96,c=document.createElement('canvas');c.width=c.height=S;
+        const w0=im.naturalWidth||im.width,h0=im.naturalHeight||im.height;
+        if(!w0||!h0)return res('');
+        const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,S,S);
+        const k=Math.min(S/w0,S/h0),w=w0*k,h=h0*k;
+        x.drawImage(im,(S-w)/2,(S-h)/2,w,h);
+        res(c.toDataURL('image/png'));
+      }catch(e){res('')}
+    };
+    im.onerror=()=>res('');
+    im.src=src;
+  });
+}
+async function workerJson(url,ms){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms);
+  try{const r=await fetch(url,{signal:ctl.signal});return await r.json()}
+  catch(e){return null}
+  finally{clearTimeout(t)}
+}
 async function fetchAutoLogo(link){
   if(!/^https:\/\//i.test(link))return '';
-  try{
-    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),9000);
-    const r=await fetch(API_BASE+'/logo?url='+encodeURIComponent(link),{signal:ctl.signal});
-    clearTimeout(t);
-    const j=await r.json();
-    if(j&&typeof j.logo==='string'&&/^https:\/\//.test(j.logo))return j.logo;
-  }catch(e){}
-  return favUrl(link);
+  /* 1) big social platforms */
+  const sl=socialLogo(link);if(sl)return sl;
+  /* 2) telegram, discord, whatsapp ... */
+  const bk=brandKey(link);if(bk)return await brandLogo(bk,link);
+  /* 3a) worker, data mode (websites, google, cloudflare ...) */
+  let u='';
+  let j=await workerJson(API_BASE+'/logo?data=1&url='+encodeURIComponent(link),20000);
+  if(j){
+    if(typeof j.data==='string'&&j.data.startsWith('data:image/')){const d=await shrinkLogo(j.data);if(d)return d}
+    if(typeof j.logo==='string'&&/^https:\/\//.test(j.logo))u=j.logo;
+  }
+  /* 3b) worker, url mode (Play Store games ...) */
+  if(!u){
+    j=await workerJson(API_BASE+'/logo?url='+encodeURIComponent(link),12000);
+    if(j&&typeof j.logo==='string'&&/^https:\/\//.test(j.logo))u=j.logo;
+  }
+  if(u){const d=await shrinkLogo(u);return d||u}
+  /* 3c) favicon of the site */
+  const f=favUrl(link);
+  if(f){const d=await shrinkLogo(f);return d||f}
+  /* 3d) letter tile */
+  return letterLogo(link);
 }
 function logoChange(){$('rowLogoUp').hidden=$('cLogoMode').value!=='upload';paintLogo()}
 function paintLogo(){
@@ -707,15 +831,28 @@ function pickLogo(inp){
   const f=inp.files&&inp.files[0];if(!f)return;
   if(!/^image\//.test(f.type))return toast('Choose an image file');
   if(f.size>5*1024*1024)return toast('Image too big (max 5 MB)');
-  const url=URL.createObjectURL(f),im=new Image();
-  im.onload=()=>{
-    const S=96,c=document.createElement('canvas');c.width=c.height=S;
-    const k=Math.min(S/im.width,S/im.height),w=im.width*k,h=im.height*k;
-    c.getContext('2d').drawImage(im,(S-w)/2,(S-h)/2,w,h);
-    logoData=c.toDataURL('image/png');URL.revokeObjectURL(url);paintLogo();
-  };
-  im.onerror=()=>{URL.revokeObjectURL(url);toast('Could not read this image')};
-  im.src=url;
+  const url=URL.createObjectURL(f);
+  shrinkLogo(url).then(d=>{
+    URL.revokeObjectURL(url);
+    if(!d)return toast('Could not read this image');
+    logoData=d;paintLogo();
+  });
+}
+
+/* old campaigns: convert their logo to a small image once (so it shows in the app everywhere) */
+const migDone=new Set();let migRun=false;
+async function fixOldLogos(){
+  if(migRun)return;migRun=true;
+  try{
+    for(const [id,x] of Object.entries(camps)){
+      if(migDone.has(id)||x.status==='cancelled')continue;
+      migDone.add(id);
+      if(typeof x.logo==='string'&&x.logo.startsWith('data:image/'))continue;
+      if(!/^https:\/\//i.test(x.link||''))continue;
+      const lg=await fetchAutoLogo(x.link);
+      if(lg&&lg.startsWith('data:image/')){try{await db.ref('campaigns/'+id+'/logo').set(lg)}catch(e){}}
+    }
+  }finally{migRun=false}
 }
 
 /* ---------- CAMPAIGN ---------- */
