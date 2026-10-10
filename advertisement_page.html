@@ -308,6 +308,7 @@ function paint(){
   let j=0,c=0,s=0;L.forEach(([,x])=>{j+=x.joined||0;c+=x.completed||0;s+=x.spent||0});
   $('sJ').textContent=fmt(j);$('sC').textContent=fmt(c);$('sI').textContent=fmt(Math.max(0,j-c));$('sS').textContent=fmt(s);
   $('list').innerHTML=L.length?L.map(([id,x])=>card(id,x)).join(''):'<p class="mut">No campaigns yet. Click "Create Campaign" to start.</p>';
+  fixOldLogos();
 }
 function card(id,x){
   const j=x.joined||0,c=x.completed||0,t=x.targetUsers||1,pct=Math.min(100,Math.round(c/t*100)),v=x.verify||'screenshot';
@@ -669,16 +670,34 @@ function hostOf(u){try{let h=new URL(u).hostname.toLowerCase();for(const [k,v] o
 const favUrl=u=>{const h=hostOf(u);return h?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(h)+'&sz=128':''};
 const logoOf=x=>x.logo||favUrl(x.link);
 let autoLogo='',autoFor='',autoTimer=null;
+function shrinkLogo(src){
+  return new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>{
+      try{
+        const S=96,c=document.createElement('canvas');c.width=c.height=S;
+        const w0=im.naturalWidth||im.width,h0=im.naturalHeight||im.height;
+        if(!w0||!h0)return res('');
+        const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,S,S);
+        const k=Math.min(S/w0,S/h0),w=w0*k,h=h0*k;
+        x.drawImage(im,(S-w)/2,(S-h)/2,w,h);
+        res(c.toDataURL('image/png'));
+      }catch(e){res('')}
+    };
+    im.onerror=()=>res('');
+    im.src=src;
+  });
+}
 async function fetchAutoLogo(link){
   if(!/^https:\/\//i.test(link))return '';
   try{
-    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),9000);
-    const r=await fetch(API_BASE+'/logo?url='+encodeURIComponent(link),{signal:ctl.signal});
+    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),28000);
+    const r=await fetch(API_BASE+'/logo?data=1&url='+encodeURIComponent(link),{signal:ctl.signal});
     clearTimeout(t);
     const j=await r.json();
-    if(j&&typeof j.logo==='string'&&/^https:\/\//.test(j.logo))return j.logo;
+    if(j&&typeof j.data==='string'&&j.data.startsWith('data:image/'))return await shrinkLogo(j.data);
   }catch(e){}
-  return favUrl(link);
+  return '';
 }
 function logoChange(){$('rowLogoUp').hidden=$('cLogoMode').value!=='upload';paintLogo()}
 function paintLogo(){
@@ -707,15 +726,28 @@ function pickLogo(inp){
   const f=inp.files&&inp.files[0];if(!f)return;
   if(!/^image\//.test(f.type))return toast('Choose an image file');
   if(f.size>5*1024*1024)return toast('Image too big (max 5 MB)');
-  const url=URL.createObjectURL(f),im=new Image();
-  im.onload=()=>{
-    const S=96,c=document.createElement('canvas');c.width=c.height=S;
-    const k=Math.min(S/im.width,S/im.height),w=im.width*k,h=im.height*k;
-    c.getContext('2d').drawImage(im,(S-w)/2,(S-h)/2,w,h);
-    logoData=c.toDataURL('image/png');URL.revokeObjectURL(url);paintLogo();
-  };
-  im.onerror=()=>{URL.revokeObjectURL(url);toast('Could not read this image')};
-  im.src=url;
+  const url=URL.createObjectURL(f);
+  shrinkLogo(url).then(d=>{
+    URL.revokeObjectURL(url);
+    if(!d)return toast('Could not read this image');
+    logoData=d;paintLogo();
+  });
+}
+
+/* old campaigns: convert their logo to a small image once (so it shows in the app everywhere) */
+const migDone=new Set();let migRun=false;
+async function fixOldLogos(){
+  if(migRun)return;migRun=true;
+  try{
+    for(const [id,x] of Object.entries(camps)){
+      if(migDone.has(id)||x.status==='cancelled')continue;
+      migDone.add(id);
+      if(typeof x.logo==='string'&&x.logo.startsWith('data:image/'))continue;
+      if(!/^https:\/\//i.test(x.link||''))continue;
+      const lg=await fetchAutoLogo(x.link);
+      if(lg){try{await db.ref('campaigns/'+id+'/logo').set(lg)}catch(e){}}
+    }
+  }finally{migRun=false}
 }
 
 /* ---------- CAMPAIGN ---------- */
