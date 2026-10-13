@@ -63,6 +63,32 @@ h3{font-size:17px;font-weight:700;margin-bottom:8px}
 .withdraw-card div{font-size:36px;margin-bottom:10px}.withdraw-card p{font-size:12px;color:var(--mut);margin-top:4px}
 .hl{margin-top:28px;padding:20px 22px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);border-radius:16px;display:flex;gap:14px;align-items:flex-start;text-align:left}
 .hl span{font-size:28px}.hl p{font-size:14px;color:var(--text-light,#C8D8F0);line-height:1.7}.hl strong{color:var(--gold)}
+
+/* ===== IMPORTANT INFO (NEW) ===== */
+.important-section{padding:60px 20px}
+.important-box{position:relative;background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(13,31,60,.95) 55%);border:2px solid var(--gold);border-radius:28px;padding:48px 36px;box-shadow:0 0 50px rgba(255,215,0,.15);overflow:hidden}
+.important-box:before{content:"";position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,215,0,.25),transparent 70%);pointer-events:none}
+.important-head{display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+.important-head .imp-icon{width:60px;height:60px;background:var(--gold);color:#1A0A00;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;animation:impPulse 2s infinite}
+.important-head h2{font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.1}
+.important-head h2 span{color:var(--gold)}
+@keyframes impPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.5)}50%{box-shadow:0 0 0 14px rgba(255,215,0,0)}}
+.imp-min{margin:26px 0 8px;padding:22px 24px;background:var(--gold);color:#1A0A00;border-radius:18px;font-size:clamp(18px,3vw,24px);font-weight:900;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.imp-min b{font-size:clamp(26px,5vw,38px)}
+.imp-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:22px}
+.imp-item{display:flex;gap:14px;align-items:flex-start;background:rgba(10,22,40,.7);border:1px solid rgba(255,215,0,.25);border-radius:16px;padding:18px}
+.imp-item .ic{font-size:30px;line-height:1}
+.imp-item h4{font-size:16px;font-weight:800;color:var(--gold);margin-bottom:6px}
+.imp-item p{font-size:14px;color:#C8D8F0;line-height:1.7}
+.imp-news{margin-top:22px;padding:22px 24px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.45);border-radius:18px;display:flex;gap:14px;align-items:flex-start}
+.imp-news .ic{font-size:30px}
+.imp-news h4{font-size:17px;font-weight:800;color:#2ecc71;margin-bottom:6px}
+.imp-news p{font-size:14px;color:#C8D8F0;line-height:1.8}
+.imp-news strong,.imp-item strong{color:var(--gold)}
+.imp-note{margin-top:16px;padding:18px 22px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,215,0,.4);border-radius:16px;font-size:14px;color:#C8D8F0;line-height:1.8}
+.imp-note strong{color:var(--gold)}
+/* ===== END IMPORTANT INFO ===== */
+
 .download-section{background:linear-gradient(135deg,rgba(255,215,0,.08),transparent);border:1px solid rgba(255,215,0,.2);border-radius:28px;padding:60px 40px;text-align:center}
 .download-section h2{font-size:clamp(28px,4vw,42px);font-weight:900;margin-bottom:16px}
 .download-section p{font-size:16px;color:var(--mut);margin-bottom:36px;line-height:1.7}
@@ -86,7 +112,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
 .contact-modal p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.6}
 .contact-email-box{background:var(--bg);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:14px;font-size:14px;font-weight:600;color:var(--gold);word-break:break-all;margin-bottom:16px}
 .contact-email-btn{display:inline-block;background:var(--gold);color:#1A0A00;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;border:0;cursor:pointer;width:100%}
-@media(max-width:600px){nav{padding:10px 12px}.hero{padding:40px 16px}section{padding:56px 16px}.withdraw-section,.download-section{padding:32px 20px}.nav-btn{padding:7px 12px;font-size:12px}}
+@media(max-width:600px){nav{padding:10px 12px}.hero{padding:40px 16px}section{padding:56px 16px}.withdraw-section,.download-section{padding:32px 20px}.nav-btn{padding:7px 12px;font-size:12px}.important-section{padding:40px 16px}.important-box{padding:30px 18px}}
 </style>
 </head>
 <body>
@@ -95,6 +121,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
   <a href="#" class="logo"><i>$</i><span style="color:#fff">Task<span>Cpm</span></span></a>
   <div class="nr">
     <div class="lang"><button id="bU" class="on" onclick="setLang('ur')">Roman Urdu</button><button id="bE" onclick="setLang('en')">English</button></div>
+    <a href="#important" class="nav-btn o" data-e="⚠️ Important Info">⚠️ Important Info</a>
     <a href="#advertise" class="nav-btn o" data-e="📢 Advertise">📢 Ad Chalao</a>
     <a href="#download" class="nav-btn" data-e="📥 Download APK">📥 APK Download</a>
   </div>
@@ -119,6 +146,67 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
     </div>
   </div>
 </section>
+
+<!-- ============ IMPORTANT INFO (NEW SECTION) ============ -->
+<section id="important" class="important-section">
+  <div class="container">
+    <div class="important-box">
+      <div class="important-head">
+        <div class="imp-icon">⚠️</div>
+        <h2 data-e="Important <span>Info</span>">Important <span>Info</span></h2>
+      </div>
+
+      <div class="imp-min">
+        <span>💵</span>
+        <span data-e="Minimum Withdraw is <b>$20</b>">Minimum Withdraw <b>20$</b> hai</span>
+      </div>
+
+      <div class="imp-list">
+        <div class="imp-item">
+          <div class="ic">🎬</div>
+          <div>
+            <h4 data-e="Earn Fast!">Fast Earn Karo!</h4>
+            <p data-e="The more movies/videos you watch, the more you earn. <strong>Watch as many as you can!</strong>">Jitni zyada movies/videos dekho ge utna zyada earn karo ge. <strong>Jitna ho sake zyada dekho!</strong></p>
+          </div>
+        </div>
+        <div class="imp-item">
+          <div class="ic">✅</div>
+          <div>
+            <h4 data-e="Complete More Tasks">Zyada Tasks Complete Karo</h4>
+            <p data-e="Complete as many tasks as you can. <strong>Videos and tasks are the main sources of earning.</strong>">Jitne zyada tasks complete kar sakte ho karo. <strong>Ye sab earning ke sources hain.</strong></p>
+          </div>
+        </div>
+        <div class="imp-item">
+          <div class="ic">⌨️</div>
+          <div>
+            <h4 data-e="Typing Is Best Too">Typing Bhi Best Hai</h4>
+            <p data-e="Typing tasks are also one of the <strong>best ways to earn</strong>. Do them regularly!">Typing tasks bhi <strong>earning ka best tarika</strong> hain. Inhe regularly karo!</p>
+          </div>
+        </div>
+        <div class="imp-item">
+          <div class="ic">🚀</div>
+          <div>
+            <h4 data-e="Reach $20 ASAP">Jald Se Jald $20 Karo</h4>
+            <p data-e="Reach <strong>$20 as soon as possible</strong> and withdraw your money!">Jald se jald <strong>20$ complete karo</strong> aur apne paise withdraw karo!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="imp-news">
+        <div class="ic">📉</div>
+        <div>
+          <h4 data-e="Good News — Minimum Withdraw Will Drop!">Khush Khabri — Minimum Withdraw Kam Hoga!</h4>
+          <p data-e="In <strong>5 to 7 months</strong>, Insha'Allah, we will reduce the minimum withdrawal by <strong>70%</strong>. That means the minimum withdrawal will be only <strong>$5 to $7</strong>.">Insha'Allah <strong>5 se 7 mahine</strong> mein hum minimum withdraw ko <strong>70% kam</strong> kar denge. Matlab phir minimum withdraw sirf <strong>5$ se 7$</strong> hoga.</p>
+        </div>
+      </div>
+
+      <div class="imp-note" data-e="Right now the company is facing a few issues, which is why we had to keep the minimum withdrawal higher. But <strong>once you complete $20, you WILL get your withdrawal</strong>, Insha'Allah — no matter what, and <strong>from any country</strong>.">
+        Abhi company ko kuch masail hain, is liye minimum withdraw zyada rakhna para hai. Lekin aap ke <strong>20$ complete karne ke baad aap ko withdraw zaroor milega</strong>, Insha'Allah — beshak jo bhi ho, aur <strong>beshak kisi bhi country se ho</strong>.
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ END IMPORTANT INFO ============ -->
 
 <section id="features">
   <div class="container c">
@@ -238,6 +326,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
   <p data-e="Pakistan &amp; India's #1 Earning App — earn money from home!<br>Powered by Firebase &amp; Flutter">Pakistan &amp; India ka #1 Earning App — Ghar baithe paise kamao!<br>Powered by Firebase &amp; Flutter</p>
   <div class="footer-links">
     <a href="#features" data-e="Features">Features</a>
+    <a href="#important" data-e="Important Info">Important Info</a>
     <a href="#advertise" data-e="Advertise">Advertise</a>
     <a href="#download" data-e="Download">Download</a>
     <a href="privacy.html" data-e="Privacy Policy">Privacy Policy</a>
