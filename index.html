@@ -66,6 +66,30 @@ h3{font-size:17px;font-weight:700;margin-bottom:8px}
 .hl.warn{background:rgba(255,99,71,.08);border-color:rgba(255,99,71,.4)}
 .hl.warn strong{color:#ff8a75}
 
+/* ===== SPECIAL & IMPORTANT INFO (NEW - ADS RULE) ===== */
+.special-section{padding:60px 20px 0}
+.special-box{position:relative;background:linear-gradient(135deg,rgba(255,99,71,.16),rgba(13,31,60,.95) 55%);border:2px solid #ff6347;border-radius:28px;padding:48px 36px;box-shadow:0 0 50px rgba(255,99,71,.18);overflow:hidden}
+.special-box:before{content:"";position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,99,71,.3),transparent 70%);pointer-events:none}
+.special-head{display:flex;align-items:center;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+.special-head .sp-icon{width:60px;height:60px;background:#ff6347;color:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;animation:spPulse 2s infinite}
+.special-head h2{font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.1}
+.special-head h2 span{color:#ff8a75}
+@keyframes spPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,99,71,.55)}50%{box-shadow:0 0 0 14px rgba(255,99,71,0)}}
+.sp-main{margin:26px 0 8px;padding:22px 24px;background:#ff6347;color:#fff;border-radius:18px;font-size:clamp(17px,3vw,22px);font-weight:900;display:flex;align-items:center;gap:14px;line-height:1.5}
+.sp-main span:first-child{font-size:34px}
+.sp-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:22px}
+.sp-item{display:flex;gap:14px;align-items:flex-start;background:rgba(10,22,40,.7);border:1px solid rgba(255,99,71,.35);border-radius:16px;padding:18px}
+.sp-item .ic{font-size:30px;line-height:1}
+.sp-item h4{font-size:16px;font-weight:800;color:#ff8a75;margin-bottom:6px}
+.sp-item p{font-size:14px;color:#C8D8F0;line-height:1.7}
+.sp-item strong{color:var(--gold)}
+.sp-warn{margin-top:22px;padding:20px 24px;background:rgba(255,99,71,.1);border:1px solid rgba(255,99,71,.5);border-radius:18px;display:flex;gap:14px;align-items:flex-start}
+.sp-warn .ic{font-size:30px}
+.sp-warn h4{font-size:17px;font-weight:800;color:#ff8a75;margin-bottom:6px}
+.sp-warn p{font-size:14px;color:#C8D8F0;line-height:1.8}
+.sp-warn strong{color:#ff8a75}
+/* ===== END SPECIAL INFO ===== */
+
 /* ===== IMPORTANT INFO (NEW) ===== */
 .important-section{padding:60px 20px}
 .important-box{position:relative;background:linear-gradient(135deg,rgba(255,215,0,.14),rgba(13,31,60,.95) 55%);border:2px solid var(--gold);border-radius:28px;padding:48px 36px;box-shadow:0 0 50px rgba(255,215,0,.15);overflow:hidden}
@@ -114,7 +138,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
 .contact-modal p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.6}
 .contact-email-box{background:var(--bg);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:14px;font-size:14px;font-weight:600;color:var(--gold);word-break:break-all;margin-bottom:16px}
 .contact-email-btn{display:inline-block;background:var(--gold);color:#1A0A00;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;border:0;cursor:pointer;width:100%}
-@media(max-width:600px){nav{padding:10px 12px}.hero{padding:40px 16px}section{padding:56px 16px}.withdraw-section,.download-section{padding:32px 20px}.nav-btn{padding:7px 12px;font-size:12px}.important-section{padding:40px 16px}.important-box{padding:30px 18px}}
+@media(max-width:600px){nav{padding:10px 12px}.hero{padding:40px 16px}section{padding:56px 16px}.withdraw-section,.download-section{padding:32px 20px}.nav-btn{padding:7px 12px;font-size:12px}.important-section{padding:40px 16px}.important-box{padding:30px 18px}.special-section{padding:40px 16px 0}.special-box{padding:30px 18px}}
 </style>
 </head>
 <body>
@@ -123,6 +147,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
   <a href="#" class="logo"><i>$</i><span style="color:#fff">Task<span>Cpm</span></span></a>
   <div class="nr">
     <div class="lang"><button id="bU" class="on" onclick="setLang('ur')">Roman Urdu</button><button id="bE" onclick="setLang('en')">English</button></div>
+    <a href="#special" class="nav-btn o" data-e="🔥 Special Info">🔥 Special Info</a>
     <a href="#important" class="nav-btn o" data-e="⚠️ Important Info">⚠️ Important Info</a>
     <a href="#advertise" class="nav-btn o" data-e="📢 Advertise">📢 Ad Chalao</a>
     <a href="#download" class="nav-btn" data-e="📥 Download APK">📥 APK Download</a>
@@ -149,6 +174,49 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
     </div>
   </div>
 </section>
+
+<!-- ============ SPECIAL & IMPORTANT INFO (NEW SECTION - ADS RULE) ============ -->
+<section id="special" class="special-section">
+  <div class="container">
+    <div class="special-box">
+      <div class="special-head">
+        <div class="sp-icon">🔥</div>
+        <h2 data-e="Special &amp; <span>Important Info</span>">Special &amp; <span>Important Info</span></h2>
+      </div>
+
+      <div class="sp-main">
+        <span>📺</span>
+        <span data-e="Wherever you see a <u>Watch Ads</u> or ad option in the app, you MUST watch ads — and only on this app!">App mein jahan bhi <u>Watch Ads</u> ya ads dekhne ka option aaye, aap ko ads <u>zaroor</u> dekhne hain — aur sirf isi app par!</span>
+      </div>
+
+      <div class="sp-list">
+        <div class="sp-item">
+          <div class="ic">💰</div>
+          <div>
+            <h4 data-e="Most Earning Comes From Ads">Zyada Earning Ads Se Hoti Hai</h4>
+            <p data-e="Your <strong>biggest earning comes from watching ads</strong>. The more ads you watch, the more coins you earn.">Aap ki <strong>sab se zyada earning ads dekhne se hoti hai</strong>. Jitne zyada ads dekho ge utne zyada coins milenge.</p>
+          </div>
+        </div>
+        <div class="sp-item">
+          <div class="ic">📉</div>
+          <div>
+            <h4 data-e="Skipping Ads = Less Earning">Ads Se Bachoge To Earning Kam</h4>
+            <p data-e="If you try to avoid or skip ads, your earning will be <strong>much lower than other users</strong>, because most of the earning comes from ads.">Agar aap ads se bachne ya skip karne ki koshish karo ge to aap ki earning <strong>baqi logon se bohot kam</strong> hogi, kyun ke zyada earning ads se hi aati hai.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-warn">
+        <div class="ic">🚫</div>
+        <div>
+          <h4 data-e="Account Can Be Banned!">Account Ban Bhi Ho Sakta Hai!</h4>
+          <p data-e="Trying to avoid ads can also get your <strong>account banned</strong>. So always watch ads fully and honestly, only on this app, and keep earning safely.">Ads se bachne ki koshish karne par aap ka <strong>account ban bhi ho sakta hai</strong>. Is liye hamesha ads poore aur imandari se sirf isi app par dekho aur safe earning karte raho.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ============ END SPECIAL & IMPORTANT INFO ============ -->
 
 <!-- ============ IMPORTANT INFO (NEW SECTION) ============ -->
 <section id="important" class="important-section">
@@ -352,6 +420,7 @@ footer p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.7}
   <p data-e="Pakistan &amp; India's #1 Earning App — earn money from home!<br>Powered by Firebase &amp; Flutter">Pakistan &amp; India ka #1 Earning App — Ghar baithe paise kamao!<br>Powered by Firebase &amp; Flutter</p>
   <div class="footer-links">
     <a href="#features" data-e="Features">Features</a>
+    <a href="#special" data-e="Special Info">Special Info</a>
     <a href="#important" data-e="Important Info">Important Info</a>
     <a href="#partner" data-e="Partner Program">Partner Program</a>
     <a href="#advertise" data-e="Advertise">Advertise</a>
